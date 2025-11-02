@@ -1,0 +1,11 @@
+/* .postselect{
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 100dvh;
+  max-height: auto;
+  max-width: 43rem; /* 최대너비 아이폰 프로 14맥스에 맞춤 *
+  height: calc(var(--dvh, 1dvh) * 100); 
+  width: auto;
+  background-color: #ffffff;
+  padding: 2rem;
+} */

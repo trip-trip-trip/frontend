@@ -1,0 +1,40 @@
+.header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2rem;
+    max-width: 39rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* padding-bottom: 1.1rem; */
+    /* border-bottom: solid 1px #D4D4D4; */
+    font-size: 2.2rem;
+    font-weight: 500;
+    background-color: #ffffff;
+    color: var(--text-primary);
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 3.2rem;
+    z-index: 1;
+}
+
+/* .back{
+    position: absolute;
+    left: 1.1rem;
+    text-align: left;
+    font-size: 1.7rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+} */
+
+/* .back:hover{
+    cursor: pointer;
+} */
+
+.page-name{
+    margin-bottom: 3rem;
+    padding: 0;
+}

@@ -2,6 +2,9 @@ import React from 'react'
 import Home from './pages/Home/Home'
 import { useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import Login from './pages/SignUp/Login';
+import StartPage from './pages/SignUp/StartPage';
+import Post_Select from './pages/Home/Post/Post_Select';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -28,6 +31,12 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home/>}/>
+
+		{/*/////////// alua /////////////*/}
+        <Route path='/Login' element={<Login/>}/>
+        <Route path='/StartPage' element={<StartPage/>}/>
+        <Route path='/post_select' element={<Post_Select/>}/>
+
       </Routes>
     </BrowserRouter>
   )
