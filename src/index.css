@@ -82,7 +82,11 @@ body {
 .camera,
 .album, 
 .startpage,
-.postselect{
+.postselect
+.create-trip,
+.trip-detail,
+.video-detail,
+.photo-detail{
   margin-left: auto;
   margin-right: auto;
   min-height: 100dvh;
@@ -94,7 +98,7 @@ body {
 }
 
 :root {
-  --vh: 100%;
+  --dvh: 100%;
   font-family: 'Pretendard', sans-serif;
 }
 
