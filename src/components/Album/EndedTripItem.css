@@ -1,15 +1,24 @@
 .EndedTripItem{
+    color: #17171B;
     border-radius: 20px;
     background: #F1F6EF;   
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    margin: 1.6rem 0 0 0;
+    margin: 0 0 1.6rem 0;
+    gap: 1rem;
+}
+
+.EndedTripItem:hover{
+    background: #dbe1d7;
+    cursor: pointer;
+    transition: ease-in-out 0.2s;
 }
 
 .end-trip-head{
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
 .end-trip-title{
@@ -17,14 +26,28 @@
     justify-content: space-between;
 }
 
-h3{
-    font-size: 1.5rem;
-    font-weight: 500;
+.end-trip-head h3{
+    font-size: 1.6rem;
+    font-weight: 600;
     margin: 0;
     padding: 0;
 }
 
-p{
-    font-size: 1rem;
+.end-trip-head p{
+    font-size: 1.2rem;
     font-weight: 400;
+    margin: 0;
+}
+
+.main-image{
+    display: flex;
+    justify-content: center;
+    margin-top: 0.8rem;
+}
+
+.main-image img{
+    width: 12rem;
+    height: 12rem;
+    object-fit: cover;
+    border-radius: 1rem;
 }

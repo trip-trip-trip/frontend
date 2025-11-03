@@ -3,12 +3,16 @@ import Home from './pages/Home/Home'
 import { useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import Album from './pages/Album/Album';
+import CreateTrip from './pages/Album/CreateTrip';
+import TripDetail from './pages/Album/TripDetail';
+import VideoDetail from './pages/Album/VideoDetail';
+import PhotoDetail from './pages/Album/PhotoDetail';
 
 const App = () => {
   // 스크린 사이즈 세팅
   function setScreenSize() {
-		let vh = window.innerHeight * 0.01;
-		document.documentElement.style.setProperty('--vh', `${vh}px`);
+		let dvh = window.innerHeight * 0.01;
+		document.documentElement.style.setProperty('--dvh', `${dvh}px`);
 	}
 
   useEffect(() => {
@@ -29,9 +33,11 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home/>}/>
-        <Route path='/album' element={<Album/>}/>
-        <Route path='/' element={<Home/>}/>
-        <Route path='/' element={<Home/>}/>
+        <Route path='/trips' element={<Album/>}/>
+        <Route path='/trips/create' element={<CreateTrip/>}/>
+        <Route path='/trips/detail' element={<TripDetail/>}/>
+        <Route path='/trips/detail/vid' element={<VideoDetail/>}/>
+        <Route path='/trips/detail/pic' element={<PhotoDetail/>}/>
       </Routes>
     </BrowserRouter>
   )

@@ -10,12 +10,14 @@ const Album = () => {
       dateRange: '2024.02.20-23',
       members: 3,
       count: 24,
+      image: '/trip-img/trip1.jpeg',
     },
     {
       title: '경주 여행',
       dateRange: '2021.03.05-06',
       members: 3,
       count: 24,
+      image: '/trip-img/trip2.jpeg'
     },
   ];
 
@@ -32,28 +34,32 @@ const Album = () => {
               <p>진행 중 - 3명 참여</p>
             </div>
             <div className="album-photo-grid">
-
+              {[...Array(10)].map((_, i) => (
+              <div key={i} className="photo-placeholder-item"></div>
+            ))}
             </div>
             <div className="album-release">
               <p>여행이 끝나면 공개됩니다</p>
-              <p>10/24개 촬영 완료</p>
+              <p className='album-shots'>10/24개 촬영 완료</p>
             </div>
           </div>
 
-        <h2 className="section-title">완료된 여행</h2>
-        <div className="completed-trips-list">
-          {completedTrips.map((trip, index) => (
-            <EndedTripItem
-              key={index}
-              title={trip.title}
-              dateRange={trip.dateRange}
-              members={trip.members}
-              count={trip.count}
-            />
-          ))}
+        <div className="completed-album">
+          <h2 className="section-title">완료된 여행</h2>
+          <div className="completed-trips-list">
+            {completedTrips.map((trip, index) => (
+              <EndedTripItem
+                key={index}
+                title={trip.title}
+                dateRange={trip.dateRange}
+                members={trip.members}
+                count={trip.count}
+                image={trip.image}
+              />
+            ))}
+          </div>          
         </div>
 
-          
         </div>
     </div>
   )

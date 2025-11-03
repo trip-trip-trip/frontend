@@ -80,19 +80,23 @@ body {
 .home,
 .mypage,
 .camera,
-.album{
+.album,
+.create-trip,
+.trip-detail,
+.video-detail,
+.photo-detail{
   margin-left: auto;
   margin-right: auto;
   min-height: 100dvh;
   max-height: auto;
   max-width: 43rem; /* 최대너비 아이폰 프로 14맥스에 맞춤 */
-  height: calc(var(--dvh, 1dvh) * 100);
+  height: calc(var(--vh, 1vh) * 100);
   width: auto;
   background-color: #ffffff;
 }
 
 :root {
-  --vh: 100%;
+  --dvh: 100%;
   font-family: 'Pretendard', sans-serif;
 }
 
