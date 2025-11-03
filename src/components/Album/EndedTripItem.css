@@ -1,39 +1,18 @@
-.album {
-    margin: 0;
-    padding: 0;
-}
-
-.album-container{
-    margin: 0;
-    padding: 5rem 2rem;
-    display: flex;
-    flex-direction: column;
-}
-
-.album-container h2{
-    color: #000;
-    font-size: 1.5rem;
-    font-style: normal;
-    font-weight: 500;
-    margin: 0;
-    padding: 0;
-}
-
-.album-box{
+.EndedTripItem{
     border-radius: 20px;
-    background: #DCF7CF;
+    background: #F1F6EF;   
     padding: 2rem;
     display: flex;
     flex-direction: column;
     margin: 1.6rem 0 0 0;
 }
 
-.album-head{
+.end-trip-head{
     display: flex;
     flex-direction: column;
 }
 
-.album-title{
+.end-trip-title{
     display: flex;
     justify-content: space-between;
 }

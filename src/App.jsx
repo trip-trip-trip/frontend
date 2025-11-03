@@ -31,12 +31,10 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home/>}/>
-
-		{/*/////////// alua /////////////*/}
         <Route path='/Login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
         <Route path='/post_select' element={<Post_Select/>}/>
-
+        <Route path='/album' element={<Album/>}/>
       </Routes>
     </BrowserRouter>
   )

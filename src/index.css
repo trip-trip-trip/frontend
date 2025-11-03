@@ -91,7 +91,6 @@ body {
   height: calc(var(--dvh, 1dvh) * 100); 
   width: auto;
   background-color: #ffffff;
-  padding: 2rem;
 }
 
 :root {
