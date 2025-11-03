@@ -2,6 +2,7 @@ import React from 'react'
 import Home from './pages/Home/Home'
 import { useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import Album from './pages/Album/Album';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -27,6 +28,9 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path='/' element={<Home/>}/>
+        <Route path='/album' element={<Album/>}/>
+        <Route path='/' element={<Home/>}/>
         <Route path='/' element={<Home/>}/>
       </Routes>
     </BrowserRouter>
