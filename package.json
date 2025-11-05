@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview" 
   },
+  
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
