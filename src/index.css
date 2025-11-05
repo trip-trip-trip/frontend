@@ -80,6 +80,11 @@ body {
 .home,
 .mypage,
 .camera,
+.album,
+.create-trip,
+.trip-detail,
+.video-detail,
+.photo-detail{
 .album, 
 .startpage,
 .postselect{
@@ -91,11 +96,10 @@ body {
   height: calc(var(--dvh, 1dvh) * 100); 
   width: auto;
   background-color: #ffffff;
-  padding: 2rem;
 }
 
 :root {
-  --vh: 100%;
+  --dvh: 100%;
   font-family: 'Pretendard', sans-serif;
 }
 

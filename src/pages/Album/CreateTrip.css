@@ -1,0 +1,146 @@
+.create-trip{
+    padding: 10rem 0;
+    color: #17171B;
+}
+
+.create-trip-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+.create-trip-name h3{
+    font-size: 1.8rem;
+    font-weight: 600;
+    padding: 0;
+}
+
+form.create-trip-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 90%;
+}
+
+.create-trip-name{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.input-field{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.create-trip-form input{
+    padding: 1.2rem 1.4rem;
+    border-radius: 0.8rem;
+    border: #E1E8ED solid 0.2rem;
+    background: #F8F9FA;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.date-form{
+    display: flex;
+    gap: 1.2rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+input[type="date"]{
+    margin: 0;
+    width: 34%;
+}
+  
+/* input[type="date"]::-webkit-clear-button,
+input[type="date"]::-webkit-inner-spin-button { 
+    display: none;
+} 
+input[type="date"]::-webkit-calendar-picker-indicator { 
+    background: transparent;
+    z-index: 1;
+}  */
+
+/* .input_date_box input:after{
+position: absolute;
+top:50%;
+right:10px;
+content: '';
+width: 20px;
+height:22px;
+transform: translateY(-50%);
+z-index: 0;
+} */
+
+  
+  
+.date-form p{
+   font-size: 1.8rem;
+}
+
+.friend-head{
+    display: flex;
+    gap: 2.4rem;
+    align-items: center;
+    margin-bottom: 1.4rem;
+}
+.friend-head input{
+    display: flex;
+    width: 20.5rem;
+    height: 2.3rem;
+    padding: 1rem 1.5rem;
+    align-items: center;
+    gap: 1.2rem;
+    border-radius: 11rem;
+    border: 0.1rem solid #BABABA;
+    margin: 0;
+}
+
+input::placeholder{
+    font-size: 1.4rem;
+}
+
+.friend-list{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.friend-list-row{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.friend-profile{
+    display: flex;
+    gap: 1.4rem;
+    align-items: center;
+}
+
+.friend-profile p{
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.friend-profile img{
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 5rem;
+    object-fit: cover;
+}
+
+
+input[type="checkbox"]{
+    width: 1.3rem;
+    height: 1.3rem;
+}
