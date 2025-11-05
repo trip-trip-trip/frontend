@@ -1,7 +1,9 @@
 import React from 'react';
 import './TripDetail.css';
-import SharedFriends from '../../components/Album/sharedFriends';
+import SharedFriends from '../../../components/Album/sharedFriends';
 import { useNavigate } from 'react-router-dom';
+import Header from '../../../components/Header/Header';
+import Navbar from '../../../components/NavBar/NavBar';
 
 const sharedList = [
     {
@@ -26,6 +28,7 @@ const TripDetail = () => {
   const navigate = useNavigate();
   return (
     <div className='trip-detail'>
+      <Header title={"부산 여행 완료!"}/>
       <div className='trip-detail-container'>
         {/* 공유된 친구 정보 */}
         <SharedFriends data={sharedList} />
@@ -63,7 +66,7 @@ const TripDetail = () => {
         <section className='section'>
           <div className='section-header'>
             <h2 className='section-title'>사진</h2>
-            <button className='more-button'>+ 더보기</button>
+            <button className='more-button' onClick={()=>navigate('/trips/detail/pic')}>+ 더보기</button>
           </div>
 
           <div className='photo-grid'>
@@ -80,11 +83,12 @@ const TripDetail = () => {
           <button className='scrapbook-btn'>
             <h1>완성된<br />스크랩북</h1>
           </button>
-          <button className='scrapbook-btn'>
+          <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame')}>
             <h1>스크랩북<br />만들기</h1>
           </button>
         </section>
       </div>
+      <Navbar/>
     </div>
   );
 };

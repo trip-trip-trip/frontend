@@ -7,9 +7,12 @@ import StartPage from './pages/SignUp/StartPage';
 import Post_Select from './pages/Home/Post/Post_Select';
 import Album from './pages/Album/Album';
 import CreateTrip from './pages/Album/CreateTrip';
-import TripDetail from './pages/Album/TripDetail';
-import VideoDetail from './pages/Album/VideoDetail';
-import PhotoDetail from './pages/Album/PhotoDetail';
+import TripDetail from './pages/Album/TripDetails/TripDetail';
+import VideoDetail from './pages/Album/TripDetails/VideoDetail';
+import PhotoDetail from './pages/Album/TripDetails/PhotoDetail';
+import PickFrame from './pages/Album/ScrapBook/PickFrame';
+import SelectPic from './pages/Album/ScrapBook/SelectPic';
+import CreateScrap from './pages/Album/ScrapBook/CreateScrap';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -39,12 +42,14 @@ const App = () => {
         <Route path='/Login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
         <Route path='/post_select' element={<Post_Select/>}/>
-        <Route path='/album' element={<Album/>}/>
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail' element={<TripDetail/>}/>
         <Route path='/trips/detail/vid' element={<VideoDetail/>}/>
         <Route path='/trips/detail/pic' element={<PhotoDetail/>}/>
+        <Route path='/scrapbook/frame' element={<PickFrame/>}/>
+        <Route path='/scrapbook/create' element={<SelectPic/>}/>
+        <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
       </Routes>
     </BrowserRouter>
   )

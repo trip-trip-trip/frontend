@@ -86,7 +86,10 @@ body {
 .create-trip,
 .trip-detail,
 .video-detail,
-.photo-detail{
+.photo-detail,
+.pick-frame,
+.select-pic,
+.create-scrap{
   margin-left: auto;
   margin-right: auto;
   min-height: 100dvh;

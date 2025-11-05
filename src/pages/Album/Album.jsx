@@ -1,6 +1,8 @@
 import React from 'react'
 import './Album.css'
 import EndedTripItem from '../../components/Album/EndedTripItem';
+import Header from '../../components/Header/Header';
+import Navbar from '../../components/NavBar/NavBar';
 
 const Album = () => {
 
@@ -23,6 +25,7 @@ const Album = () => {
 
   return (
     <div className='album'>
+      <Header title={"여행 모아보기"}/>
         <div className="album-container">
           <h2>활성 여행</h2>
           <div className="album-box">
@@ -48,19 +51,23 @@ const Album = () => {
           <h2 className="section-title">완료된 여행</h2>
           <div className="completed-trips-list">
             {completedTrips.map((trip, index) => (
-              <EndedTripItem
-                key={index}
-                title={trip.title}
-                dateRange={trip.dateRange}
-                members={trip.members}
-                count={trip.count}
-                image={trip.image}
-              />
+              <div 
+                key = {index}
+                className="completed-trip-item">
+                <EndedTripItem
+                  title={trip.title}
+                  dateRange={trip.dateRange}
+                  members={trip.members}
+                  count={trip.count}
+                  image={trip.image}
+                />
+              </div>
             ))}
           </div>          
         </div>
 
         </div>
+        <Navbar/>
     </div>
   )
 }

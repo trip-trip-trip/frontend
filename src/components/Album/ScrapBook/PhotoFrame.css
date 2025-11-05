@@ -1,0 +1,33 @@
+/* PhotoFrame.css 또는 ScrapbookCreate.css에 추가 */
+
+.photo-frame {
+    position: absolute; /* ScrapbookCreate.js에서 전달받은 frameStyle로 위치 지정 */
+    cursor: pointer;
+    border: 10px solid white; /* 폴라로이드 사진 틀 효과 */
+    background-color: #f0f0f0; 
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* 이미지가 프레임을 벗어나지 않도록 */
+    transition: transform 0.2s;
+    /* width, height, top, left, transform 등은 frameStyle prop으로 제어됩니다. */
+  }
+  
+  .photo-frame:hover {
+      opacity: 0.8; /* 호버 시 약간 투명하게 */
+  }
+  
+  .placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    color: #aaa;
+    font-style: italic;
+    text-align: center;
+  }
+
+  .scrap-img{
+    object-fit: cover;
+    position: absolute;
+  }
