@@ -1,60 +1,51 @@
-/* 폰트 설정 */
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 900;
 	font-display: swap;
 	src: local('Pretendard Black'), url(./woff2-subset/Pretendard-Black.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-Black.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 800;
 	font-display: swap;
 	src: local('Pretendard ExtraBold'), url(./woff2-subset/Pretendard-ExtraBold.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-ExtraBold.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 700;
 	font-display: swap;
 	src: local('Pretendard Bold'), url(./woff2-subset/Pretendard-Bold.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-Bold.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 600;
 	font-display: swap;
 	src: local('Pretendard SemiBold'), url(./woff2-subset/Pretendard-SemiBold.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-SemiBold.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 500;
 	font-display: swap;
 	src: local('Pretendard Medium'), url(./woff2-subset/Pretendard-Medium.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-Medium.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 400;
 	font-display: swap;
 	src: local('Pretendard Regular'), url(./woff2-subset/Pretendard-Regular.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-Regular.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 300;
 	font-display: swap;
 	src: local('Pretendard Light'), url(./woff2-subset/Pretendard-Light.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-Light.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 200;
 	font-display: swap;
 	src: local('Pretendard ExtraLight'), url(./woff2-subset/Pretendard-ExtraLight.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-ExtraLight.subset.woff) format('woff');
 }
-
 @font-face {
 	font-family: 'Pretendard';
 	font-weight: 100;
@@ -76,34 +67,40 @@ body {
   -ms-overflow-style: none;
 }
 
-/* 모바일 화면 설정 */
-.home,
-.mypage,
-.camera,
-.album{
+/* [병합] .app-container로 모든 페이지의 '틀'을 관리 */
+.app-container {
+  /* PC에서 중앙 정렬 */
   margin-left: auto;
   margin-right: auto;
-  min-height: 100vh;
-  max-height: auto;
-  max-width: 43rem; /* 최대너비 아이폰 프로 14맥스에 맞춤 */
-  height: calc(var(--vh, 1vh) * 100);
-  width: auto;
+  
+  /* 최대 너비 (팀원 설정) */
+  max-width: 43rem; /* 430px */
+  width: 100%;
+  
+  /* 높이 (팀원 설정 dvh 사용) */
+  min-height: 100dvh;
+  /* App.jsx에서 설정한 --dvh 변수 사용 (fallback으로 1dvh) */
+  height: calc(var(--dvh, 1dvh) * 100); 
+  
+  /* 페이지 기본 배경색 */
   background-color: #ffffff;
-  padding: 2rem;
-}
-
-:root {
-  --vh: 100%;
-  font-family: 'Pretendard', sans-serif;
+  
+  /* [중요] padding: 0 (카메라 페이지 등 꽉 차는 UI용) */
+  padding: 0; 
+  
+  /* [중요] flex 레이아웃 (페이지 높이 100% 유지용) */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+  position: relative;
 }
 
 /* 스크롤바 제거 */
 ::-webkit-scrollbar {
    display: none;
- }
+}
 
- /* 색상 팔레트 - 정해지면 설정*/
-
+/* 색상 팔레트 ( */
  /* :root {
   --text-primary: 
   --text-secondary: 
