@@ -8,6 +8,7 @@ import SettingsPage from './pages/MyPage/SettingPage';
 import FeedPage from './pages/MyPage/FeedPage';
 import CameraPage from './pages/Camera/CameraPage'; // 새로 만들 컴포넌트
 import CaptureCompletePage from './pages/Camera/CaptureCompletePage'; 
+import AddToHomeScreenPrompt from './components/AddToHomeScreenPrompt';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -60,6 +61,7 @@ const App = () => {
         <Route path="/capture-complete" element={<CaptureCompletePage />} />
 
       </Routes>
+      <AddToHomeScreenPrompt />
       </div>
     </BrowserRouter>
   )
