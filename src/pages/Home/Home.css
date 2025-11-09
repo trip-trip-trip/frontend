@@ -1,3 +1,28 @@
-h1{
-    margin: 0;
+.home-header { 
+    background:#fff; 
+    /* z-index: 5;  */
+    padding: 5rem 14rem; 
 }
+.tabs { 
+    display:flex; 
+    gap: 2.6rem; 
+    margin-left: 0.8rem;
+}
+.tab { 
+    padding: .6rem 1.5rem; 
+    border-radius: 2rem;
+    border:1px solid #e5e5e5; 
+    background:#f6f6f6;
+}
+.tab.active { 
+    background:#3b66ff; 
+    color:#fff; 
+    border-color:#3b66ff; 
+}
+.home-body { 
+    padding: 1.2rem 1.6rem 8rem; 
+} /* 하단 Navbar 여백 */
+.skeleton { 
+    height: 6rem; 
+    background:#f2f2f2; 
+    border-radius: .8rem; }

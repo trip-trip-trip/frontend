@@ -2,6 +2,14 @@ import React from 'react'
 import Home from './pages/Home/Home'
 import { useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import Album from './pages/Album/Album';
+import CreateTrip from './pages/Album/CreateTrip';
+import TripDetail from './pages/Album/TripDetail';
+import VideoDetail from './pages/Album/VideoDetail';
+import PhotoDetail from './pages/Album/PhotoDetail';
+import Login from './pages/SignUp/Login';
+import StartPage from './pages/SignUp/StartPage';
+import Post_Select from './pages/Home/Post/Post_Select';
 import ProfilePage from './pages/MyPage/ProfilePage';
 import FriendListPage from './pages/MyPage/FriendListPage';
 import SettingsPage from './pages/MyPage/SettingPage';
@@ -13,6 +21,8 @@ import AddToHomeScreenPrompt from './components/AddToHomeScreenPrompt';
 const App = () => {
   // 스크린 사이즈 세팅
   function setScreenSize() {
+		let dvh = window.innerHeight * 0.01;
+		document.documentElement.style.setProperty('--dvh', `${dvh}px`);
 		let dvh = window.innerHeight * 0.01;
 		document.documentElement.style.setProperty('--dvh', `${dvh}px`);
 	}
@@ -49,6 +59,17 @@ const App = () => {
 <div className="app-container"> 
    <Routes>
         <Route path='/' element={<Home/>}/>
+        <Route path='/trips' element={<Album/>}/>
+        <Route path='/trips/create' element={<CreateTrip/>}/>
+        <Route path='/trips/detail' element={<TripDetail/>}/>
+        <Route path='/trips/detail/vid' element={<VideoDetail/>}/>
+        <Route path='/trips/detail/pic' element={<PhotoDetail/>}/>
+
+		{/*/////////// alua /////////////*/}
+        <Route path='/Login' element={<Login/>}/>
+        <Route path='/StartPage' element={<StartPage/>}/>
+        <Route path='/post_select' element={<Post_Select/>}/>
+
 		  {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
         <Route path="/mypage/profile" element={<ProfilePage />} />
 

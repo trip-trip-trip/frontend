@@ -1,0 +1,57 @@
+/* 하단 고정 네비바 */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%); /* max-width 적용 시 가운데 맞춤 */
+  width: 100%;
+  max-width: 43rem;            /* 기기 프레임 폭 */
+  height: 7.2rem;
+  background-color: #ffffff;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0;
+
+  border-top: 1px solid #D4D4D4;   
+  border-radius: 1.2rem 1.2rem 0 0; /* 윗부분 라운드 */
+  box-shadow: 0 -2px 16px rgba(0,0,0,0.06);
+
+  padding-bottom: env(safe-area-inset-bottom); /* iOS 홈인디케이터 대비 */
+  z-index: 100;
+}
+
+/* 링크 아이템: float 제거, flex만 사용 */
+.nav-link {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  text-decoration: none;
+  color: #333333;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.nav-link p {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.nav-link:active,
+.nav-link:hover {
+  background-color: rgba(255, 239, 230, 0.25);
+  transition: background-color .15s ease-in-out;
+}
+
+/* 아이콘 크기 통일 */
+.icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  display: block;
+}

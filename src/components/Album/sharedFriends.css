@@ -1,0 +1,24 @@
+/* 멤버 정보 */
+.shared-friends {
+display: flex;
+align-items: center;
+margin-top: 0.75rem;
+gap: 1rem;
+color: #17171B;
+}
+
+.shared-profiles {
+display: flex;
+gap: 0.3rem;
+}
+
+.profile-img{
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 5rem;
+    object-fit: cover;
+}
+
+.shared-friends p{
+    font-size: 1.2rem;
+}

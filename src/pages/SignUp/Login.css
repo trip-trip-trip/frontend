@@ -1,0 +1,84 @@
+.login {
+  margin: 0 auto;
+  min-height: 100dvh;
+  max-height: auto;
+  max-width: 43rem; /* 최대너비 아이폰 프로 14맥스에 맞춤 */
+  height: calc(var(--dvh, 1dvh) * 100); 
+  width: auto;
+  background: #fff;
+  padding: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  gap: 1.6rem;
+}
+/* 제목 */
+.lg-title {
+  margin: 0 0 2rem 0;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* 입력 필드 */
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.lg-field label {
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.lg-field input {
+  padding: 1.2rem;
+  border: 1px solid #ddd;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 로그인 버튼들 */
+.kakao-login,
+.google-login {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    height: 4.8rem;
+    border: none;
+    border-radius: 0.8rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.social-login{
+    width: 2.4rem;
+    height: 2.4rem;
+}
+.kakao-login {
+  background: #ffe812;
+  color: #3c1e1e;
+}
+
+.google-login {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.go-login {
+  margin-top: 14rem;
+  width: 100%;
+  height: 5.2rem;
+  border: 0;
+  border-radius: 1.2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #fff;
+  background: #3a59ff;
+  cursor: pointer;
+}
