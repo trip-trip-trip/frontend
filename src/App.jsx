@@ -13,6 +13,13 @@ import PhotoDetail from './pages/Album/TripDetails/PhotoDetail';
 import PickFrame from './pages/Album/ScrapBook/PickFrame';
 import SelectPic from './pages/Album/ScrapBook/SelectPic';
 import CreateScrap from './pages/Album/ScrapBook/CreateScrap';
+import ProfilePage from './pages/MyPage/ProfilePage';
+import FriendListPage from './pages/MyPage/FriendListPage';
+import SettingsPage from './pages/MyPage/SettingPage';
+import FeedPage from './pages/MyPage/FeedPage';
+import CameraPage from './pages/Camera/CameraPage'; // 새로 만들 컴포넌트
+import CaptureCompletePage from './pages/Camera/CaptureCompletePage'; 
+import AddToHomeScreenPrompt from './components/AddToHomeScreenPrompt';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -35,13 +42,25 @@ const App = () => {
 		};
 	}, []);
 
+   useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then((reg) => console.log('✅ Service Worker 등록 완료:', reg))
+          .catch((err) => console.error('❌ 등록 실패:', err));
+      });
+    }
+  }, []);
+  
   return (
     <BrowserRouter>
-      <Routes>
+    
+        
+<div className="app-container"> 
+   <Routes>
         <Route path='/' element={<Home/>}/>
-        <Route path='/Login' element={<Login/>}/>
-        <Route path='/StartPage' element={<StartPage/>}/>
-        <Route path='/post_select' element={<Post_Select/>}/>
+
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail' element={<TripDetail/>}/>
@@ -50,7 +69,25 @@ const App = () => {
         <Route path='/scrapbook/frame' element={<PickFrame/>}/>
         <Route path='/scrapbook/create' element={<SelectPic/>}/>
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
+
+		{/*/////////// alua /////////////*/}
+        <Route path='/Login' element={<Login/>}/>
+        <Route path='/StartPage' element={<StartPage/>}/>
+        <Route path='/post_select' element={<Post_Select/>}/>
+
+		  {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
+        <Route path="/mypage/profile" element={<ProfilePage />} />
+
+        {/* 프로필 하위 페이지들 */}
+        <Route path="/mypage/friends" element={<FriendListPage />} />
+        <Route path="/mypage/settings" element={<SettingsPage />} />
+        <Route path="/mypage/feed" element={<FeedPage />} />
+        <Route path="./mypage/settings" element={<SettingsPage />} />
+      , <Route path="/camera" element={<CameraPage />} />
+        <Route path="/capture-complete" element={<CaptureCompletePage />} />
       </Routes>
+      <AddToHomeScreenPrompt />
+      </div>
     </BrowserRouter>
   )
 }

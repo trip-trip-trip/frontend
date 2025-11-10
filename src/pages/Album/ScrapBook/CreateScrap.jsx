@@ -93,7 +93,7 @@ const CreateScrap = () => {
                 ))}
               </div>
 
-              <button className='save-button' onClick={handleSaveScrapbook}>
+              <button className='save-scrap-button' onClick={handleSaveScrapbook}>
                 스크랩북 저장하기
               </button>
           </div>

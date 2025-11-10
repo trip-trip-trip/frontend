@@ -45,7 +45,7 @@
     object-fit: cover;
 }
 
-.save-button{
+.save-scrap-button{
     margin: 2.5rem 0;
     width: 32rem;
     padding: 1.5rem;
@@ -58,7 +58,7 @@
     cursor: pointer;
 }
 
-.save-button:hover{
+.save-scrap-button:hover{
     background-color: #448153;
     transition: ease-in-out 0.2s;
 }
