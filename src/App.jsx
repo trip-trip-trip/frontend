@@ -20,6 +20,11 @@ import FeedPage from './pages/MyPage/FeedPage';
 import CameraPage from './pages/Camera/CameraPage'; // 새로 만들 컴포넌트
 import CaptureCompletePage from './pages/Camera/CaptureCompletePage'; 
 import AddToHomeScreenPrompt from './components/AddToHomeScreenPrompt';
+import PhoneEnter from './pages/SignUp/PhoneEnter';
+import CodeVerify from './pages/SignUp/CodeVerify';
+import AccountFound from './pages/SignUp/AccountFound';
+import SignupWelcome from './pages/SignUp/SignupWelcome';
+
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -73,6 +78,11 @@ const App = () => {
 		{/*/////////// alua /////////////*/}
         <Route path='/Login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
+        <Route path="/phone" element={<PhoneEnter />} />
+        <Route path="/verify" element={<CodeVerify />} />
+        <Route path="/link" element={<AccountFound />} />
+        <Route path="/signup" element={<SignupWelcome />} />
+
         <Route path='/post_select' element={<Post_Select/>}/>
 
 		  {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}

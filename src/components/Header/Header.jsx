@@ -8,7 +8,7 @@ const Header = ({title}) => {
   
   return (
     <div className='header'>
-      <div className='page-name'>{title?title: "서비스 이름"}</div>
+      <div className='page-name'>{title?title: "트립샷"}</div>
     </div>
   ); 
 }

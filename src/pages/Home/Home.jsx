@@ -23,26 +23,40 @@ const Home = () => {
 
   return (
     <div className='home'>
-        {/* <Header title={'home'}/> */}
         <header className='home-header'>
            <Header/>
-           <div className='tabs'>
-            <button 
-            className={`tab ${tab==='all'? 'active':""}`}
-            onClick={()=>setTab('all')}
-            aria-selected={tab==='all'}
-            role="tab" > 전체 </button>
-
-            <button 
-            className={`tab ${tab==='place'? 'active':""}`}
-            onClick={()=>setTab('place')}
-            aria-selected={tab==='place'}
-            role="tab" > 장소 </button>
-           </div>
         </header>
+        
+          <nav className="tabs-bar" role="tablist" aria-label="홈 탭">
+        <button
+          type="button"
+          className={`tab ${tab === 'all' ? 'active' : ''}`}
+          onClick={() => setTab('all')}
+          aria-selected={tab === 'all'}
+          role="tab"
+        >
+          전체
+        </button>
+        <button
+          type="button"
+          className={`tab ${tab === 'place' ? 'active' : ''}`}
+          onClick={() => setTab('place')}
+          aria-selected={tab === 'place'}
+          role="tab"
+        >
+          장소
+        </button>
+      </nav>
+        
         <main className="home-body" role="tabpanel">
         <Suspense fallback={<div className="skeleton">불러오는 중…</div>}>
-          {tab === 'all' ? <TabAll /> : <TabPlace />}
+          {tab === 'all' ? 
+          <TabAll 
+           activeTrip={{ title: '제주도 여행', members: 3 }}
+          posts={[{ id: 1, userName: 'username', timeAgo: '2시간 전', likes: 24, comments: 13 },
+            { id: 2, userName: 'username', timeAgo: '3시간 전', likes: 12, comments: 4 },
+            ]}/> : 
+            <TabPlace />}
         </Suspense>
         </main>
         <Navbar/>
