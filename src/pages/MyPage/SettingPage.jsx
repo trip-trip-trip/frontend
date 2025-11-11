@@ -5,6 +5,7 @@ import {
   requestNotificationPermission,
   showPushNotification,
 } from "../../utils/notification";
+import NavBar from "../../components/NavBar/NavBar";
 
 export default function SettingPage() {
   const navigate = useNavigate();
@@ -202,6 +203,8 @@ export default function SettingPage() {
         </section>
 
       </main>
+      
+      <NavBar current="mypage" />
     </div>
   );
 }

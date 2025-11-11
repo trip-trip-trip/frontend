@@ -25,6 +25,8 @@ import CodeVerify from './pages/SignUp/CodeVerify';
 import AccountFound from './pages/SignUp/AccountFound';
 import SignupWelcome from './pages/SignUp/SignupWelcome';
 
+import ProfileEditPage from './pages/MyPage/ProfileEditPage';
+import { AuthProvider } from './contexts/AuthContext';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -41,11 +43,14 @@ const App = () => {
 		};
 
 		window.addEventListener('resize', handleResize);
-
-		return () => {
+    
+    return () => {
 			window.removeEventListener('resize', handleResize);
 		};
 	}, []);
+    
+
+		
 
    useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -61,7 +66,7 @@ const App = () => {
   return (
     <BrowserRouter>
     
-        
+        <AuthProvider>
 <div className="app-container"> 
    <Routes>
         <Route path='/' element={<Home/>}/>
@@ -85,19 +90,24 @@ const App = () => {
 
         <Route path='/post_select' element={<Post_Select/>}/>
 
-		  {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
+		  {/* sorin */}
         <Route path="/mypage/profile" element={<ProfilePage />} />
-
-        {/* 프로필 하위 페이지들 */}
+<Route path="mypage/edit" element={<ProfileEditPage/>} />
+ 
         <Route path="/mypage/friends" element={<FriendListPage />} />
         <Route path="/mypage/settings" element={<SettingsPage />} />
         <Route path="/mypage/feed" element={<FeedPage />} />
         <Route path="./mypage/settings" element={<SettingsPage />} />
       , <Route path="/camera" element={<CameraPage />} />
         <Route path="/capture-complete" element={<CaptureCompletePage />} />
+        
+     <Route path="/camera/:tripId" element={<CameraPage />} />
+        <Route path="/capture-complete/:tripId" element={<CaptureCompletePage />} />
+
       </Routes>
       <AddToHomeScreenPrompt />
       </div>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

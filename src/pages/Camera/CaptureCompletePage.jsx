@@ -1,24 +1,25 @@
 // src/pages/Camera/CaptureCompletePage.jsx
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate,useParams } from 'react-router-dom';
 import './CaptureCompletePage.css'; // CSS 파일 생성
 
 const CaptureCompletePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { tripId } = useParams();
+  
   const { media, type, blob } = location.state || {}; // CameraPage에서 넘긴 state
   const [comment, setComment] = useState('');
 
-  if (!media) {
-    // 잘못된 접근 처리
-    navigate('/camera');
-    return null;
-  }
+  const handleSave = async () => {
+    // 1. tripId가 있는지 확인 (URL에서)
+    if (!tripId) {
+      alert("유효하지 않은 여행입니다. (tripId 없음)");
+      return;
+    }
 
   // 저장하기 버튼 클릭 시
-  const handleSave = async () => {
-    // 1. FormData 생성
-    const formData = new FormData();
+  const formData = new FormData();
     formData.append('comment', comment);
     formData.append('type', type);
 
@@ -39,21 +40,33 @@ const CaptureCompletePage = () => {
       }
     }
 
-    // 3. 백엔드로 FormData 전송 (axios 예시)
-    try {
-      // const response = await axios.post('/api/travel/media', formData, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //     // 로그인 토큰 등도 헤더에 추가
-      //   },
-      // });
-      console.log('서버로 전송할 데이터:', formData);
-      alert('저장되었습니다! (여행이 끝나면 확인하세요)');
+  try {
+      // 2. 이 여행의 미디어 저장 키 
+      const mediaStorageKey = `media_${tripId}`;
       
-      // 저장이 완료되면 메인 페이지 등으로 이동
-      navigate('/'); // 혹은 여행 메인 페이지
+      // 3. 기존에 저장된 미디어 불러오기 (없으면 빈 배열)
+      const existingMedia = JSON.parse(localStorage.getItem(mediaStorageKey)) || [];
+      
+      // 4. 새로 저장할 미디어 객체
+      // (Blob은 localStorage에 저장이 안되므로, base64(사진)나 url(영상)인 'media'를 저장)
+      const newMedia = {
+        id: new Date().getTime(), // 고유 ID
+        type: type, // 'photo' or 'video'
+        dataUrl: media, // base64 이미지 또는 Blob URL
+        comment: comment,
+        timestamp: new Date().toISOString()
+      };
+
+      // 5. 새 미디어를 기존 배열에 추가해서 다시 저장
+      localStorage.setItem(mediaStorageKey, JSON.stringify([...existingMedia, newMedia]));
+      
+      console.log(`[${tripId}] 미디어 저장 완료. 총 ${existingMedia.length + 1}개`);
+      alert('저장되었습니다!');
+      
+      // 6. 저장이 완료되면 앨범 메인 페이지로 이동
+      navigate('/trips'); 
     } catch (error) {
-      console.error('업로드 실패:', error);
+      console.error('localStorage 저장 실패:', error);
       alert('저장에 실패했습니다.');
     }
   };
