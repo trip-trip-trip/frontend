@@ -33,7 +33,7 @@ const Navbar = () => {
             <img src={camera_icon} alt="" className='icon' />
           <p>사진촬영</p>
         </Link>
-        <Link to="/album" className="nav-link">
+        <Link to="/trips" className="nav-link">
           {/* {locationNow.pathname.startsWith("/album") ? 
             <img src={album_icon} alt="" className='icon' /> :
             <img src={album_light} alt="" className='icon' />} */}

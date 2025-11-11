@@ -1,0 +1,10 @@
+.photo-detail{
+    padding: 5rem 0;
+}
+
+.photo-detail-container{
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

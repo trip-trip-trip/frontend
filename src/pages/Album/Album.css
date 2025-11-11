@@ -1,5 +1,5 @@
 .album {
-    padding: 10rem 0;
+    padding: 5rem 0 17rem 0;
     color: #17171B;
 }
 
@@ -89,4 +89,10 @@
 
 .completed-album{
     margin-bottom: 5rem;
+}
+
+.completed-trips-list{
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 5rem;
 }

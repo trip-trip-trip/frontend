@@ -1,6 +1,9 @@
 import React from 'react'
 import './CreateTrip.css'
 import { useState } from 'react';
+import search_icon from '/search.png'
+import Header from '../../components/Header/Header';
+import Navbar from '../../components/NavBar/NavBar';
 
 const CreateTrip = () => {
   const [name, setName] = useState("");
@@ -8,6 +11,7 @@ const CreateTrip = () => {
   const [endDate, setEndDate] = useState("");
   const [location, setLocation] = useState("");
   const [image, setImage] = useState("");
+
 
   const friendList = [
     {
@@ -30,6 +34,7 @@ const CreateTrip = () => {
 
   return (
     <div className='create-trip'>
+      <Header title={"새 여행"}/>
       <div className='create-trip-container'>
         
           <form action="" className='create-trip-form'>
@@ -55,7 +60,16 @@ const CreateTrip = () => {
             <div className="add-friend">
               <div className="friend-head">
                 <h3>친구 초대</h3>
-                <input type="search" placeholder='친구 검색' />
+                <form>
+                  <img src={search_icon} alt="" className='search-icon'/>
+                  <input type="search" placeholder='친구 검색'/>
+                </form>
+                <input type="search" placeholder='친구 검색'>
+                  <div className="search-bar">
+                    <img src="" alt="" />
+                  </div>
+                </input>
+
               </div>
               <div className="friend-list">
                 {friendList.map((friend) => (
@@ -72,6 +86,7 @@ const CreateTrip = () => {
         </div>
           </form>
       </div>
+      <Navbar/>
     </div>
   )
 }

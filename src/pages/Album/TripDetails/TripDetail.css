@@ -1,5 +1,6 @@
 
   .trip-detail{
+    padding: 5rem 0;
     height: auto;
     color: #17171B;
   }
@@ -162,6 +163,7 @@
     border: 1px solid #262626;
     background: #ffffff;
     padding: 0.75rem 0.4rem;
+    margin-bottom: 3rem;
     font-size: 0.8rem;
     font-weight: 600;
     line-height: 1.4;
@@ -169,8 +171,14 @@
     color: #17171B;
   }
 
+  .scrapbook-btn:hover{
+    background: #e3e3e3;
+    transition: ease-in-out 0.2s;
+  }
+
 .scrapbook-btn h1{
     font-size: 1.8rem;
     font-weight: 500;
+    margin: 0;
 }
   
