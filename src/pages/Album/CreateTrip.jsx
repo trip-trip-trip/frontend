@@ -123,7 +123,7 @@ const CreateTrip = () => {
               <div className="friend-head">
                 <h3>친구 초대</h3>
                 <form>
-                  <img src={search_icon} alt="" className='search-icon'/>
+                  <img src alt="" className='search-icon'/>
                   <input type="search" placeholder='친구 검색'/>
                 </form>
                 <input type="search" placeholder='친구 검색'>

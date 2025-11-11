@@ -5,6 +5,7 @@ import tripshot_logo from '../../assets/tripshot_logo.png';
 import googleLogo from '../../assets/Group.png';
 import kakaoLogo from '../../assets/symbol-kakao.png';
 import naverLogo from '../../assets/naver_icon.png';
+import { useAuth } from '../../contexts/AuthContext';
 
 const GOOGLE_CLIENT_ID = '364312669525-jj81n7v5l54c8i80gajft74dvg956b29.apps.googleusercontent.com';
 const NAVER_CLIENT_ID  = 'KjWlar32TpuHvTY1JTpF';
@@ -24,6 +25,7 @@ function decodeJwt(idToken) {
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+const { loginWithKakao, loginWithGoogle } = useAuth();
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
@@ -36,6 +38,11 @@ export default function Login() {
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (res) => {
+          const loginSuccess = loginWithGoogle(res.credential); // 님의 Context에 저장
+          if (!loginSuccess) {
+            alert('Google 사용자 정보 처리에 실패했습니다.');
+            return;
+          }
           const payload = decodeJwt(res.credential);
           afterSocialLogin('google', res.credential, {
             displayName: payload?.name,
@@ -48,7 +55,7 @@ export default function Login() {
         auto_select: false,
       });
     }
-  }, []);
+  }, [loginWithGoogle]);
 
   useEffect(() => {
     const hash = location.hash.startsWith('#') ? new URLSearchParams(location.hash.slice(1)) : null;
@@ -93,6 +100,12 @@ export default function Login() {
     window.Kakao.Auth.login({
       scope: 'profile_nickname, profile_image',
       success: async (authObj) => {
+        const loginSuccess = await loginWithKakao(authObj.access_token);
+        if (!loginSuccess) {
+          alert('Kakao 사용자 정보 처리에 실패했습니다.');
+          return;
+        }
+        
         let account = {};
         try {
           const me = await window.Kakao.API.request({ url: '/v2/user/me' });
