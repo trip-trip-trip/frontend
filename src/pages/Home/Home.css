@@ -1,28 +1,45 @@
-.home-header { 
-    background:#fff; 
-    /* z-index: 5;  */
-    padding: 5rem 14rem; 
+.home { 
+  height: auto !important; 
+  min-height: 100svh; 
+  overflow-y: auto;
 }
-.tabs { 
-    display:flex; 
-    gap: 2.6rem; 
-    margin-left: 0.8rem;
+
+.home-header{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 5.6rem;
+  display: flex;
+  align-items: center;
+  padding: 0 1.6rem;
+  background:#fff;
+  border-bottom: 1px solid #eee;
 }
-.tab { 
-    padding: .6rem 1.5rem; 
-    border-radius: 2rem;
-    border:1px solid #e5e5e5; 
-    background:#f6f6f6;
+
+.tabs-bar{
+  top: 5.6rem;    
+  justify-self: center;
+  z-index: 19;
+  display: flex;
+  gap: .8rem;
+  padding: .8rem 1.6rem;
+  background:#fff;
+  border-bottom: 1px solid #eee;
 }
-.tab.active { 
-    background:#3b66ff; 
-    color:#fff; 
-    border-color:#3b66ff; 
+
+.tab{
+  min-width: 6.4rem;
+  padding: .6rem 1.2rem;
+  border-radius: 9999px;
+  border: 1px solid #e9e9ef;
+  background: #f6f6f8;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
-.home-body { 
-    padding: 1.2rem 1.6rem 8rem; 
-} /* 하단 Navbar 여백 */
-.skeleton { 
-    height: 6rem; 
-    background:#f2f2f2; 
-    border-radius: .8rem; }
+.tab.active{ background:#3a59ff; color:#fff; border-color:#3a59ff; }
+
+/* 본문: 헤더+탭 높이만큼 위 여백 확보 */
+.home-body{
+  padding: 1.2rem 1.6rem 9.6rem;
+}
+

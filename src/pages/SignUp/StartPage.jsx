@@ -1,12 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './StartPage.css';
+import tripshot_logo from '../../assets/tripshot_logo.png'
+
 
 const StartPage = () => {
   const navigate = useNavigate();
   return (
     <main className="startpage">
-      {/* 로고*/}
+      <img src={tripshot_logo} alt="tripshot-logo" className="logo" />
       <div className='sp-content'>
       <h1 className="sp-title">여행의 순간을 기록해보세요</h1>
 

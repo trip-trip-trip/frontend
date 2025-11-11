@@ -1,84 +1,73 @@
 .login {
   margin: 0 auto;
-  min-height: 100dvh;
-  max-height: auto;
-  max-width: 43rem; /* 최대너비 아이폰 프로 14맥스에 맞춤 */
-  height: calc(var(--dvh, 1dvh) * 100); 
-  width: auto;
+  /* min-height: 100svh; */
+  max-width: 43rem;
   background: #fff;
   padding: 2.4rem;
   display: flex;
   flex-direction: column;
-  justify-content: center; 
+  align-items: center;
   gap: 1.6rem;
 }
-/* 제목 */
+
+.logo-login {
+  width: 18rem;                        
+  height: auto;
+  display: block;
+  margin: 6px auto 4px;
+}
+
 .lg-title {
-  margin: 0 0 2rem 0;
-  font-size: 2.8rem;
-  font-weight: 700;
+  margin: 0.6rem 0 1.9rem 0;
+  font-size: 2.4rem;
+  font-weight: 800;
   line-height: 1.3;
   text-align: center;
 }
 
-/* 입력 필드 */
-.lg-field {
+.social-btn {
+  width: 180%;
+  height: 5rem;
+  border: none;
+  border-radius: 0.9rem;
+  font-size: 1.5rem;
+  font-weight: 700;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.8rem;
+  cursor: pointer;
 }
 
-.lg-field label {
-  font-size: 1.4rem;
-  font-weight: 500;
+.social-icon {
+  width: 2rem;
+  height: 2rem;
 }
 
-.lg-field input {
-  padding: 1.2rem;
-  border: 1px solid #ddd;
-  border-radius: 0.8rem;
-  font-size: 1.4rem;
-  font-family: 'Pretendard', sans-serif;
+.naver-login { 
+  background: #09BE34; 
+  color: #fff; 
+}
+.kakao-login { 
+  background: #FFDD00; 
+  color: #3c1e1e; 
+}
+.google-login { 
+  background: #fff; 
+  color: #333; 
+  border: 1px solid #e5e5e5; 
 }
 
-/* 로그인 버튼들 */
-.kakao-login,
-.google-login {
-    display:flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-    height: 4.8rem;
-    border: none;
-    border-radius: 0.8rem;
-    font-size: 1.5rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-.social-login{
-    width: 2.4rem;
-    height: 2.4rem;
-}
-.kakao-login {
-  background: #ffe812;
-  color: #3c1e1e;
-}
 
-.google-login {
-  background: #fff;
-  border: 1px solid #ddd;
-  color: #333;
-}
-
-.go-login {
-  margin-top: 14rem;
-  width: 100%;
+/* .go-login {
+  margin-top: 9rem;
+  width: 160%;
   height: 5.2rem;
   border: 0;
   border-radius: 1.2rem;
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #fff;
-  background: #3a59ff;
+  background: #3A59FF;
   cursor: pointer;
-}
+} */
