@@ -1,6 +1,7 @@
 .create-trip{
     padding: 5rem 0;
     color: #17171B;
+    display: flex;
 }
 
 .create-trip-container{
@@ -14,6 +15,8 @@
     font-size: 1.8rem;
     font-weight: 600;
     padding: 0;
+    display: flex;
+    align-items: center;
 }
 
 form.create-trip-form{
@@ -36,6 +39,33 @@ form.create-trip-form{
     justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
+}
+
+/* 헤더에 <만들기> 위치할 때 CSS */
+/* .create-trip-btn{
+    position: absolute;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    font-weight: 600;
+    top: 1.5rem;
+    right: 2rem;
+    z-index: 999;
+    cursor: pointer;
+    color: #131BF6;
+} */
+
+.create-trip-btn{
+    font-size: 1.8rem;
+    font-weight: 600;
+    width: 100%;
+    margin: 2rem 0 5rem 0;
+    padding: 1.2rem;
+    border-radius: 1.3rem;
+    border: none;
+    cursor: pointer;
+    background: #3f43bc;
+    color: white;
 }
 
 .create-trip-form input{
@@ -93,12 +123,13 @@ z-index: 0;
     align-items: center;
     margin-bottom: 1.4rem;
 }
+
 .friend-head input{
     display: flex;
-    width: 20.5rem;
-    height: 2.3rem;
-    padding: 1rem 1.5rem;
+    width: 23rem;
+    padding: 1.4rem 2rem 1.4rem 4rem;
     align-items: center;
+    justify-content: center;
     gap: 1.2rem;
     border-radius: 11rem;
     border: 0.1rem solid #BABABA;
@@ -118,6 +149,7 @@ input::placeholder{
 .friend-list-row{
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
 }
 
@@ -143,4 +175,26 @@ input::placeholder{
 input[type="checkbox"]{
     width: 1.3rem;
     height: 1.3rem;
+}
+
+.friend-search{
+    position: relative;
+}
+
+input[type="search"]{
+    height: 2.3rem;
+}
+
+.friend-search-bar{
+    padding: 1rem;
+    height: 1rem;
+}
+
+
+.search-icon{
+    position: absolute;
+    width: 1.4rem;
+    height: 1.4rem;
+    left: 1.5rem;
+    top: 0.8rem;
 }

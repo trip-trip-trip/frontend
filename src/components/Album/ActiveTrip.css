@@ -1,0 +1,80 @@
+.album-box{
+    border-radius: 20px;
+    background: #DCF7CF;
+    padding: 2rem 2.3rem;
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 1.5rem 0;
+    gap: 1.5rem;
+}
+
+.album-head{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.album-title{
+    display: flex;
+    justify-content: space-between;
+}
+
+.album-photo-grid{
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1rem;
+    padding: 0.3rem 0.5rem 0.3rem 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.album-photo-grid img{
+    width: 3.6rem;
+    height: 2.7rem;
+    object-fit: cover;
+}
+
+.photo-placeholder-item{
+    width: 2.5rem;
+    height: 2.3rem;
+    background-color: #D9D9D9;
+    /* margin: 1rem 1rem 1rem 0; */
+    /* border-radius: 0.2rem; */
+}
+
+.album-release{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.album-shots{
+    color: #888787;
+}
+
+
+.active-trip-container h2{
+    font-size: 1.9rem;
+    font-style: normal;
+    font-weight: 600;
+    margin: 1.6rem 0;
+    padding: 0;
+}
+
+
+
+.active-trip-container h3{
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+}
+
+.active-trip-container p{
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 0;
+    padding: 0;
+}

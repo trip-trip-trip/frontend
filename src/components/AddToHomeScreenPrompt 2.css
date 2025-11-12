@@ -1,0 +1,36 @@
+.a2hs-prompt {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 43rem; /* index.css와 동일하게 */
+  margin: 0 auto;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  z-index: 1000;
+  text-align: center;
+  font-size: 1.4rem;
+  box-sizing: border-box;
+}
+
+.a2hs-content {
+  padding: 10px;
+}
+
+.a2hs-instructions {
+  font-weight: 600;
+  color: #007AFF; /* iOS 파란색 */
+  margin-top: 10px;
+}
+.ios-share-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  background: #fff;
+  color: #007AFF;
+  border-radius: 4px;
+  font-size: 1.6rem;
+}

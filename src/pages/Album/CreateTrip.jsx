@@ -7,6 +7,7 @@ import Navbar from '../../components/NavBar/NavBar';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext'; 
 
+
 const CreateTrip = () => {
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -63,9 +64,10 @@ const CreateTrip = () => {
       title: name,
       startDate: startDate,
       endDate: endDate,
-      location,
+      location: location,
       members: selectedFriend,
       count: 0,
+      image: [],
       coverImage: image, 
     }
     
@@ -84,7 +86,6 @@ const CreateTrip = () => {
     <div className='create-trip page-with-nav'> {/* .page-with-nav 추가 (Navbar 하단 여백) */}
       <Header title={"새 여행"}/>
       <div className='create-trip-container'>
-        
           <form action="" className='create-trip-form' onSubmit={(e) => e.preventDefault()}>
           <div className="create-trip-name">
             <h3>여행 이름</h3>

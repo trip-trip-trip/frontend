@@ -1,6 +1,19 @@
 .album {
     padding: 5rem 0 17rem 0;
     color: #17171B;
+    position: relative;
+}
+
+.add-trip-btn{
+    position: absolute;
+    background: none;
+    border: none;
+    font-size: 4rem;
+    font-weight: 200;
+    top: 1rem;
+    right: 2rem;
+    z-index: 999;
+    cursor: pointer;
 }
 
 .album-container{

@@ -80,7 +80,8 @@ body {
   /* 높이 (팀원 설정 dvh 사용) */
   min-height: 100dvh;
   /* App.jsx에서 설정한 --dvh 변수 사용 (fallback으로 1dvh) */
-  height: calc(var(--dvh, 1dvh) * 100); 
+  height: calc(var(--dvh, 1dvh) * 100);
+  height: auto; 
   
   /* 페이지 기본 배경색 */
   background-color: #ffffff;
