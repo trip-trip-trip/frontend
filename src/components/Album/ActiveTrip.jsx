@@ -6,9 +6,9 @@ const ActiveTrip = ({tripName, members, img, count}) => {
   return (
     <div className='active-trip-container'>
         <h2>활성 여행</h2>
-          <div className="album-box">
-            <div className="album-head">
-              <div className="album-title">
+          <div className="active-album-box">
+            <div className="active-album-head">
+              <div className="active-album-title">
                 <h3>{tripName}</h3>
                 <h3>LIVE</h3>
               </div>

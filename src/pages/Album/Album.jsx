@@ -13,8 +13,8 @@ import Header from '../../components/Header/Header';
 const Album = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { activeTripId } = useAuth(); // 2. Context에서 활성 ID 가져오기
-  
+  const { activeTripId, setActiveTripId } = useAuth();
+
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeTrip, setActiveTrip] = useState(null); 
   const [activeShotCount, setActiveShotCount] = useState(0);
@@ -44,7 +44,7 @@ const Album = () => {
     endDate: '2025-12-12',
     members: ['김친구', '박친구'],
     image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
-    thumbnail: '',
+    coverImage: '/trip-img/trip4.jpeg',
   });
 
   // setTripRequest({
@@ -60,6 +60,7 @@ const Album = () => {
     
     if (activeTripId) {
       // 4. localStorage에서 '여행 정보' 불러오기
+      console.log({activeTripId})
       const tripInfoKey = `tripInfo_${activeTripId}`;
       const savedTripInfo = JSON.parse(localStorage.getItem(tripInfoKey));
       setActiveTrip(savedTripInfo);
@@ -114,8 +115,8 @@ const Album = () => {
   // 친구 초대 요청에서 <수락> 클릭 시 동작
   const handleAcceptRequest = () => {
     setHasInviteRequest(false);
-    if (!activeTrip){
-      const newTripId = `${name.replace(/\s/g, '-')}-${new Date().getTime()}`;
+    if (!activeTripId){
+      const newTripId = `${tripRequest.title.replace(/\s/g, '-')}-${new Date().getTime()}`;
       const newTripInfo = {
         id: newTripId,
         title : tripRequest.title,
@@ -123,7 +124,7 @@ const Album = () => {
         count: 0,
         endDate : tripRequest.endDate,
         members : tripRequest.members,
-        coverImage : tripRequest.image || '',
+        coverImage : tripRequest.coverImage || '',
         image: [],
       }
 
@@ -131,6 +132,7 @@ const Album = () => {
       const ids = JSON.parse(localStorage.getItem('tripIds') || '[]');
       localStorage.setItem('tripIds', JSON.stringify([...new Set([...ids, newTripId])]));
       setActiveTrip(newTripInfo);
+      setActiveTripId(newTripId);
       setHasInviteRequest(false);
       
       // setActiveTripInfo({
@@ -148,7 +150,7 @@ const Album = () => {
 
   // 상단(헤더) <+> 클릭시 동작
   const handleCreateBtn = () => {
-    if (activeTrip){
+    if (activeTripId){
       alert("이미 활성화된 여행이 있어 새 여행을 만들 수 없습니다.")
       navigate('/trips');
     } else {
@@ -182,7 +184,7 @@ return(
               onReject={handleRejectRequest}/> 
           : <></>}
         {/* 활성화된 여행 있으면 표시 */}
-        {activeTrip ? <ActiveTrip tripName={activeTrip?.title} members={activeTrip?.members} img={activeTrip?.image} count={activeTrip.count} /> : <></> }
+        {activeTrip ? <ActiveTrip tripName={activeTrip?.title} members={activeTrip?.members || []} img={activeTrip?.image || []} count={activeTrip.count || 0} /> : <></> }
 
         {/* --- 완료된 여행 섹션 --- */}
         <div className="completed-album">

@@ -23,12 +23,12 @@ const CreateTrip = () => {
   const { activeTripId, setActiveTripId } = useAuth(); 
 
   
-  useEffect(() => {
-    if (activeTripId) {
-       alert("이미 진행 중인 활성 여행이 있습니다. 새 여행을 만들 수 없습니다.");
-      navigate('/trips'); // 앨범 페이지로 튕겨내기
-    }
-  }, [activeTripId, navigate]);
+  // useEffect(() => {
+  //   if (activeTripId) {
+  //      alert("이미 진행 중인 활성 여행이 있습니다. 새 여행을 만들 수 없습니다.");
+  //     navigate('/trips'); // 앨범 페이지로 튕겨내기
+  //   }
+  // }, [activeTripId, navigate]);
 
 
   const friendList = [
