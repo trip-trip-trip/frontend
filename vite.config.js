@@ -14,7 +14,7 @@ export default defineConfig({
       
 
       strategies: 'injectManifest',
-      srcDir: 'public',
+      srcDir: 'src',
       filename: 'sw.js',
 
 
