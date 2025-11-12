@@ -2,7 +2,7 @@
 import React from 'react';
 // 👇 1. [수정] Link 대신 useNavigate, useLocation 임포트
 import { useLocation, useNavigate } from 'react-router-dom';
-import './Navbar.css';
+import './NavBar.css' ;
 
 import home_light from '../../assets/home_off.png'; // (아이콘 경로는 assets에서 맞게)
 import camera_icon from '../../assets/camera_off.png';
