@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import Login from './pages/SignUp/Login';
 import StartPage from './pages/SignUp/StartPage';
-import Post_Select from './pages/Home/Post/Post_Select';
+import Post_Select from './pages/Home/post/Post_Select';
 import Album from './pages/Album/Album';
 import CreateTrip from './pages/Album/CreateTrip';
 import TripDetail from './pages/Album/TripDetails/TripDetail';
@@ -78,7 +78,7 @@ const App = () => {
         <Route path='/Login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
         <Route path='/post_select' element={<Post_Select/>}/>
-           <Route path="/phone" element={<PhoneEnter />} />
+        <Route path="/phone" element={<PhoneEnter />} />
         <Route path="/verify" element={<CodeVerify />} />
         <Route path="/link" element={<AccountFound />} />
         <Route path="/signup" element={<SignupWelcome />} />
