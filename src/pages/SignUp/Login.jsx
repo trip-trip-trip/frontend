@@ -35,6 +35,19 @@ const { loginWithKakao, loginWithGoogle } = useAuth();
   }, []);
 
   useEffect(() => {
+     try {
+    console.log("✅ Login 컴포넌트 마운트됨");
+
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init(KAKAO_JS_KEY);
+      console.log("Kakao SDK 초기화 완료");
+    } else {
+      console.warn("⚠️ Kakao SDK 로드 안됨 or 이미 초기화됨");
+    }
+  } catch (err) {
+    console.error("🔥 useEffect 에러:", err);
+  }
+  
     if (window.google?.accounts?.id) {
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,

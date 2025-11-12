@@ -25,6 +25,9 @@ import CodeVerify from './pages/SignUp/CodeVerify';
 import AccountFound from './pages/SignUp/AccountFound';
 import SignupWelcome from './pages/SignUp/SignupWelcome'; 
 import { AuthProvider } from './contexts/AuthContext';
+import ProfileEditPage from './pages/MyPage/ProfileEditPage'; 
+import Navbar from './components/NavBar/NavBar';
+
 const App = () => {
   // 스크린 사이즈 세팅
   function setScreenSize() {
@@ -92,9 +95,8 @@ const App = () => {
         <Route path="/mypage/friends" element={<FriendListPage />} />
         <Route path="/mypage/settings" element={<SettingsPage />} />
         <Route path="/mypage/feed" element={<FeedPage />} />
-        <Route path="/mypage/settings" element={<SettingsPage />} />
-      , <Route path="/camera" element={<CameraPage />} />
-        <Route path="/capture-complete" element={<CaptureCompletePage />} />
+        <Route path="/camera/:tripId" element={<CameraPage />} />
+        <Route path="/capture-complete/:tripId" element={<CaptureCompletePage />} />
       </Routes>
       <AddToHomeScreenPrompt />
       </div>
