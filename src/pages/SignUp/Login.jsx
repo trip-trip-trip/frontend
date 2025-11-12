@@ -7,8 +7,9 @@ import kakaoLogo from '../../assets/symbol-kakao.png';
 import naverLogo from '../../assets/naver_icon.png';
 import { useAuth } from '../../contexts/AuthContext';
 
-const GOOGLE_CLIENT_ID = '364312669525-jj81n7v5l54c8i80gajft74dvg956b29.apps.googleusercontent.com';
-const NAVER_CLIENT_ID  = 'KjWlar32TpuHvTY1JTpF';
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const NAVER_CLIENT_ID  = import.meta.env.VITE_NAVER_CLIENT_ID;
+const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_KEY;
 
 const REDIRECT_URI = `${window.location.origin}/login`;
 
@@ -29,7 +30,7 @@ const { loginWithKakao, loginWithGoogle } = useAuth();
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init('928be3539586d5c856cf5e36be2a0724'); // JS Key(프론트 임시)
+      window.Kakao.init(KAKAO_JS_KEY); // JS Key(프론트 임시)
     }
   }, []);
 
@@ -105,7 +106,7 @@ const { loginWithKakao, loginWithGoogle } = useAuth();
           alert('Kakao 사용자 정보 처리에 실패했습니다.');
           return;
         }
-        
+
         let account = {};
         try {
           const me = await window.Kakao.API.request({ url: '/v2/user/me' });
