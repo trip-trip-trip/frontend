@@ -17,7 +17,6 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
 
-
       manifest: {
         name: 'TripShot', // 앱 이름
         short_name: 'TripShot', // 홈 화면에 표시될 짧은 이름
