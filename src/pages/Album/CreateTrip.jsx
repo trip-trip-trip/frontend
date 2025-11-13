@@ -7,6 +7,7 @@ import Navbar from '../../components/NavBar/NavBar';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext'; 
 
+
 const CreateTrip = () => {
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -22,12 +23,12 @@ const CreateTrip = () => {
   const { activeTripId, setActiveTripId } = useAuth(); 
 
   
-  useEffect(() => {
-    if (activeTripId) {
-       alert("이미 진행 중인 활성 여행이 있습니다. 새 여행을 만들 수 없습니다.");
-      navigate('/trips'); // 앨범 페이지로 튕겨내기
-    }
-  }, [activeTripId, navigate]);
+  // useEffect(() => {
+  //   if (activeTripId) {
+  //      alert("이미 진행 중인 활성 여행이 있습니다. 새 여행을 만들 수 없습니다.");
+  //     navigate('/trips'); // 앨범 페이지로 튕겨내기
+  //   }
+  // }, [activeTripId, navigate]);
 
 
   const friendList = [
@@ -63,9 +64,10 @@ const CreateTrip = () => {
       title: name,
       startDate: startDate,
       endDate: endDate,
-      location,
+      location: location,
       members: selectedFriend,
       count: 0,
+      image: [],
       coverImage: image, 
     }
     
@@ -84,7 +86,6 @@ const CreateTrip = () => {
     <div className='create-trip page-with-nav'> {/* .page-with-nav 추가 (Navbar 하단 여백) */}
       <Header title={"새 여행"}/>
       <div className='create-trip-container'>
-        
           <form action="" className='create-trip-form' onSubmit={(e) => e.preventDefault()}>
           <div className="create-trip-name">
             <h3>여행 이름</h3>
