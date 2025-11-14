@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import Login from './pages/SignUp/Login';
 import StartPage from './pages/SignUp/StartPage';
-import Post_Select from './pages/Home/post/Post_Select';
 import Album from './pages/Album/Album';
 import CreateTrip from './pages/Album/CreateTrip';
 import TripDetail from './pages/Album/TripDetails/TripDetail';
@@ -27,6 +26,11 @@ import SignupWelcome from './pages/SignUp/SignupWelcome';
 import { AuthProvider } from './contexts/AuthContext';
 import ProfileEditPage from './pages/MyPage/ProfileEditPage'; 
 import Navbar from './components/NavBar/NavBar';
+import PostItem from './pages/Home/post/PostItem';
+import PostDetails from './pages/Home/post/PostDetails';
+import PostCreate from './pages/Home/post/PostCreate';
+
+
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -80,14 +84,15 @@ const App = () => {
 		{/*/////////// alua /////////////*/}
         <Route path='/Login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
-        <Route path='/post_select' element={<Post_Select/>}/>
         <Route path="/phone" element={<PhoneEnter />} />
         <Route path="/verify" element={<CodeVerify />} />
         <Route path="/link" element={<AccountFound />} />
         <Route path="/signup" element={<SignupWelcome />} />
+        <Route path="/post" element={< PostItem/>} />
+        <Route path="/post/:id" element={< PostDetails/>} />
+        <Route path="/post/create" element={< PostCreate/>} />
 
 
-        <Route path='/post_select' element={<Post_Select/>}/>
 		  {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
         <Route path="/mypage/profile" element={<ProfilePage />} />
 
@@ -98,7 +103,7 @@ const App = () => {
         <Route path="/camera/:tripId" element={<CameraPage />} />
         <Route path="/capture-complete/:tripId" element={<CaptureCompletePage />} />
       </Routes>
-      <AddToHomeScreenPrompt />
+      {/* <AddToHomeScreenPrompt /> */}
       </div>
       </AuthProvider>
     </BrowserRouter>

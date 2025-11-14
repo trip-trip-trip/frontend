@@ -1,69 +1,104 @@
-// src/components/NavBar/NavBar.jsx
 import React from 'react';
-// 👇 1. [수정] Link 대신 useNavigate, useLocation 임포트
 import { useLocation, useNavigate } from 'react-router-dom';
 import './NavBar.css' ;
 
-import home_light from '../../assets/home_off.png'; // (아이콘 경로는 assets에서 맞게)
-import camera_icon from '../../assets/camera_off.png';
-import album_icon from '../../assets/album_off.png';
-import mypage_icon from '../../assets/my_off.png';
-import { useAuth } from '../../contexts/AuthContext'; // 2. AuthContext 임포트
+import home_off from '../../assets/home_off.png'; 
+import camera_off from '../../assets/camera_off.png';
+import album_off from '../../assets/album_off.png';
+import mypage_off from '../../assets/my_off.png';
+
+import home_on from '../../assets/home_on.png'; 
+import camera_on from '../../assets/camera_on.png';
+import post from '../../assets/upload.png'; 
+import album_on from '../../assets/album_on.png';
+import mypage_on from '../../assets/my_on.png';
+
+
+import { useAuth } from '../../contexts/AuthContext'; 
 
 const Navbar = () => {
   const locationNow = useLocation();
-  const navigate = useNavigate(); // 3. navigate 훅 사용
-  const { activeTripId } = useAuth(); // 4. AuthContext에서 활성 ID 가져오기
+  const navigate = useNavigate(); 
+  const { activeTripId } = useAuth(); 
+  
+  const path = locationNow.pathname;
 
-  // 5. 카메라 버튼 클릭 핸들러
   const handleCameraClick = () => {
     if (activeTripId) {
-      // 6. 활성 ID가 있으면 카메라 페이지로 이동
       navigate(`/camera/${activeTripId}`);
     } else {
-      // 7. 활성 ID가 없으면 모달(알림) 띄우기
       alert('현재 활성화된 여행이 없습니다.');
     }
   };
+  
+  // 게시물 올리기 (Upload) 핸들러
+  const handlePostClick = () => {
+    navigate('/posting'); 
+  }
 
-  // 8. [수정] Navbar를 숨길 모든 경로 확인
+
   if (
-    locationNow.pathname === "/login" || 
-    locationNow.pathname === "/StartPage" ||
-    locationNow.pathname === "/phone" ||
-    locationNow.pathname === "/verify" ||
-    locationNow.pathname.startsWith("/camera/") // (카메라 페이지에서도 숨김)
+    path === "/login" || 
+    path === "/StartPage" ||
+    path === "/phone" ||
+    path === "/verify" ||
+    path.startsWith("/camera/") 
+   
   ) {
-    return null; 
+    return null; // 해당 경로에서는 네비게이션 바를 렌더링하지 않음 (숨김 처리)
   }
 
   return (
     <nav className="navbar">
-      {/* 👇 9. [수정] 모든 <Link> 태그를 <div onClick>으로 변경 */}
+      
+      {/* 1. 홈 (/) */}
       <div className="nav-link" onClick={() => navigate('/')}>
-        <img src={home_light} alt="홈" className='icon' />
-        <p>홈</p>
+        <img 
+          src={path === '/' ? home_on : home_off} 
+          alt="홈" 
+          className='icon' 
+        />
+        <p className={path === '/' ? 'active' : ''}>홈</p>
       </div>
       
-      {/* 👇 10. [핵심 수정] onClick에 handleCameraClick 연결 */}
+      {/* 2. 촬영 (카메라) */}
       <div className="nav-link" onClick={handleCameraClick}>
-        <img src={camera_icon} alt="사진촬영" className='icon' />
-        <p>사진촬영</p>
+        <img 
+          src={path.startsWith('/camera') ? camera_on : camera_off} 
+          alt="사진촬영" 
+          className='icon' 
+        />
+        <p className={path.startsWith('/camera') ? 'active' : ''}>촬영</p>
       </div>
 
-      {/* 👇 11. [수정] /trips 경로로 수정 */}
-      <div className="nav-link" onClick={() => navigate('/trips')}>
-        <img src={album_icon} alt="앨범" className='icon' /> 
-        <p>앨범</p>
+      {/* 3. 올리기 (게시물) */}
+      <div className="nav-link" onClick={handlePostClick}>
+        <img src={post} alt="올리기" className='icon'
+        />
+        <p> 게시 </p>
       </div>
-      
-      {/* 👇 12. [수정] /mypage/profile 경로로 수정 */}
+
+      {/* 4. 앨범 (/trips) */}
+      <div className="nav-link" onClick={() => navigate('/trips')}>
+        <img 
+          src={path.startsWith('/trips') ? album_on : album_off} 
+          alt="앨범" 
+          className='icon' 
+        /> 
+        <p className={path.startsWith('/trips') ? 'active' : ''}>앨범</p>
+      </div>
+
+      {/* 5. 프로필 (/mypage/profile) */}
       <div className="nav-link" onClick={() => navigate('/mypage/profile')}>
-        <img src={mypage_icon} alt="프로필" className='icon' /> 
-        <p>프로필</p>
+        <img 
+          src={path.startsWith('/mypage') ? mypage_on : mypage_off} 
+          alt="프로필" 
+          className='icon' 
+        /> 
+        <p className={path.startsWith('/mypage') ? 'active' : ''}>프로필</p>
       </div>
     </nav>
   );
-}
+};
 
 export default Navbar;

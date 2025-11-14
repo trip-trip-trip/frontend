@@ -1,44 +1,15 @@
-.sp-content{
-  flex: 1;
-  /* margin-top: 2rem; */
+.startpage {
+  width: 100%;
+  height: 100vh;
+  background: #f6f6f5;
   display: flex;
-  flex-direction: column;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
-}
-
-.logo{
-  width: 22rem;
-  height: auto;
-  display: block;
-  margin: 6rem auto 0.3rem; 
-}
-
-.sp-title {
-  margin: 1rem 0 0.8rem 0;
-  font-size: 2.9rem;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.sp-sub {
-  margin: 1.5rem ;
-  margin-bottom: 6.5rem;
-  font-size: 1.6rem;
-  color: #000000;
-  line-height: 1.6;
-}
-
-.sp-cta {
-  margin-top: auto;
-  margin-left: 2rem;
-  width: 90%;
-  height: 6rem;
-  border: 0;
-  border-radius: 1rem;
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #fff;
-  background: #3A59FF;
   cursor: pointer;
+}
+
+.logo {
+  width: 36rem;
+  object-fit: contain;
+  user-select: none;
 }

@@ -7,7 +7,7 @@
   width: 100%;
   max-width: 43rem;            /* 기기 프레임 폭 */
   height: 7.2rem;
-  background-color: #ffffff;
+  background-color: #fdf9f1;
 
   display: flex;
   justify-content: space-around;
@@ -22,26 +22,31 @@
   z-index: 100;
 }
 
-/* 링크 아이템: float 제거, flex만 사용 */
 .nav-link {
   flex: 1;
   min-width: 0;
   height: 100%;
   text-decoration: none;
-  color: #333333;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
+  color: #333333; 
 }
 
 .nav-link p {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
+  color: #333333; /* 기본 텍스트 색상 (비활성화) */
 }
+
+.nav-link p.active {
+    color: #525b65; 
+    font-weight: 700;
+}
+
 
 .nav-link:active,
 .nav-link:hover {
