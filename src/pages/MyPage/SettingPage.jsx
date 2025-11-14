@@ -1,57 +1,116 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SettingPage.css";
-import {
-  requestNotificationPermission,
-  showPushNotification,
-} from "../../utils/notification";
+
 import NavBar from "../../components/NavBar/NavBar";
+import { useAuth } from "../../contexts/AuthContext"; 
 
 export default function SettingPage() {
   const navigate = useNavigate();
+const {user}=useAuth();
 
   const [isOn, setIsOn] = useState(true);
   const [alertCount, setAlertCount] = useState(3);
   const [selectedTimes, setSelectedTimes] = useState(["오전"]);
-  const timers = useRef([]);
+
 
   //  시간대별 범위 설정
-  const TIME_RANGES = {
-    오전: [7, 12], // 7시 ~ 12시
-    오후: [12, 17], // 12시 ~ 17시
-    저녁: [17, 20], // 17시 ~ 20시
-    밤: [20, 24], // 20시 ~ 24시
-    새벽: [0, 6], // 0시 ~ 6시
-    점심: [11, 13], // 11시 ~ 13시
+const TIME_RANGES = {
+    오전: 7, // 7시
+    오후: 12,
+    저녁: 17,
+    밤: 20,
+    새벽: 0,
+    점심: 11,
   };
 
-  //  랜덤 시각 생성
-  function getRandomTimeInRange(startHour, endHour) {
-    const now = new Date();
-    let target = new Date();
+ // 3. [추가] BE에 알림 설정을 저장하는 함수
+  const saveSettingsToBE = async (count, times) => {
+    if (!user) return; // 로그인 안 했으면 중단
 
-    const hour = Math.floor(Math.random() * (endHour - startHour)) + startHour;
-    const minute = Math.floor(Math.random() * 60);
-    target.setHours(hour, minute, 0, 0);
+    // BE API가 요구하는 'timezone' 배열로 변환 (예: ["오전", "밤"] -> [7, 20])
+    const mappedTimezone = times.map(timeName => TIME_RANGES[timeName]);
 
-    // 이미 지난 시각이면 다음날로
-    if (target < now) {
-      target.setDate(target.getDate() + 1);
+    console.log("BE로 알림 설정 전송:", { count, mappedTimezone });
+
+    try {
+      await fetch('/api/push/settings', { // (Vite 프록시 /api/ 경로 사용)
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id, // (useAuth에서 user.id를 제공한다고 가정)
+          timesPerDay: count,
+          timezone: mappedTimezone,
+        }),
+      });
+      console.log("BE 알림 설정 저장 완료");
+    } catch (err) {
+      console.error("BE 알림 설정 저장 실패:", err);
     }
-    return target;
-  }
+  };
 
-  // ✅ 토글 스위치
+
+  // 4. [수정] 토글 스위치 (BE 연동)
   const handleToggle = async () => {
     const nextState = !isOn;
-    setIsOn(nextState);
-    if (nextState) {
-      await requestNotificationPermission();
-      scheduleRandomNotifications(); // ON으로 바뀌면 즉시 스케줄 시작
-    } else {
-      timers.current.forEach(clearTimeout);
-      timers.current = [];
-      console.log("🛑 알림 스케줄 중단");
+    
+    if (nextState) { // --- 알림 켜기 ---
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        alert("푸시 알림이 지원되지 않는 환경입니다. (홈 화면에 추가 필요)");
+        return;
+      }
+
+      console.log("푸시 알림 구독 시작...");
+      try {
+        // 1. VAPID 공개 키 받아오기
+        const vapidKeyRes = await fetch('/api/push/vapid-key'); // (Vite 프록시)
+        const { vapidPublicKey } = (await vapidKeyRes.json()).result;
+        
+        // 2. 서비스 워커 준비
+        const reg = await navigator.serviceWorker.ready;
+        
+        // 3. Apple/Google에 "구독 주소" 요청
+        const subscription = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: vapidPublicKey, // BE에서 받은 키
+        });
+
+        console.log("구독 성공:", subscription.endpoint);
+        const { endpoint, keys } = subscription.toJSON();
+
+        // 4. BE 서버로 "구독 정보" 전송
+        await fetch('/api/push/subscribe', { // (Vite 프록시)
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id, // (useAuth에서 user.id를 제공한다고 가정)
+            endpoint: endpoint,
+            p256dh: keys.p256dh,
+            auth: keys.auth,
+          }),
+        });
+        console.log("BE 구독 정보 전송 완료");
+
+        // 5. BE 서버로 "설정" 전송
+        await saveSettingsToBE(alertCount, selectedTimes);
+        
+        setIsOn(true); // 모든 게 성공하면 켜짐
+
+      } catch (err) {
+        console.error("푸시 알림 구독 실패:", err);
+        alert("알림을 구독하는 데 실패했습니다.");
+      }
+    } else { // --- 알림 끄기 ---
+      console.log("푸시 알림 구독 취소...");
+      // (BE에 알림 0회, 시간 없음으로 전송하여 "끄기" 처리)
+      await saveSettingsToBE(0, []); 
+      setIsOn(false);
+      
+      // (선택사항: pushManager.unsubscribe() 로직도 추가 가능)
     }
   };
 
@@ -63,60 +122,13 @@ export default function SettingPage() {
         : [...prev, time]
     );
   };
-
-  const scheduleRandomNotifications = () => {
-  console.log("🕒 알림 스케줄 시작...");
-  timers.current.forEach(clearTimeout);
-  timers.current = [];
-
-  // 전체 알림 횟수
-  const totalAlerts = alertCount;
-  const totalSlots = selectedTimes.length;
-
-  if (totalSlots === 0) {
-    console.warn("시간대가 선택되지 않음 — 알림 예약 중단");
-    return;
-  }
-
-  // 각 시간대에 배분할 개수 (랜덤 오차 허용)
-  let remaining = totalAlerts;
-  const counts = selectedTimes.map((_, i) => {
-    const avg = Math.floor(totalAlerts / totalSlots);
-    const isLast = i === totalSlots - 1;
-    const random = Math.random() < 0.5 ? 0 : 1; // 약간 랜덤하게
-    const count = isLast ? remaining : Math.min(avg + random, remaining);
-    remaining -= count;
-    return count;
-  });
-
-  // 각 시간대별로 해당 개수만큼 예약
-  selectedTimes.forEach((timeName, idx) => {
-    const [start, end] = TIME_RANGES[timeName];
-    const count = counts[idx];
-
-    for (let i = 0; i < count; i++) {
-      const randomTime = getRandomTimeInRange(start, end);
-      const delay = randomTime - new Date();
-
-      if (delay > 0) {
-        const timer = setTimeout(() => {
-          showPushNotification(
-            "📸 지금 이 순간을 담아보세요!",
-            `3초 영상으로 여행의 특별한 순간을 기록해보세요.`
-          );
-        }, delay);
-
-        timers.current.push(timer);
-        console.log(`⏰ [${timeName}] ${randomTime.toLocaleTimeString()} 에 알림 예정`);
-      }
+ 
+useEffect(() => {
+    if (isOn) { // 토글이 켜져 있을 때만
+      saveSettingsToBE(alertCount, selectedTimes);
     }
-  });
-};
-
-
-  useEffect(() => {
-    if (isOn) scheduleRandomNotifications();
-  }, [alertCount, selectedTimes]);
+    // (isOn이 false면 토글할 때 이미 0, []으로 저장했으므로 무시)
+  }, [alertCount, selectedTimes, isOn])
  return (
     <div className="setting-page"> {/* 1. className 오타 수정 */}
 

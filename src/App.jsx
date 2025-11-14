@@ -49,16 +49,16 @@ const App = () => {
 		};
 	}, []);
 
-   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/sw.js')
-          .then((reg) => console.log('✅ Service Worker 등록 완료:', reg))
-          .catch((err) => console.error('❌ 등록 실패:', err));
-      });
-    }
-  }, []);
+   //useEffect(() => {
+    //if ('serviceWorker' in navigator) {
+     // window.addEventListener('load', () => {
+       // navigator.serviceWorker
+         /// .register('/sw.js')
+          //.then((reg) => console.log('✅ Service Worker 등록 완료:', reg))
+         // .catch((err) => console.error('❌ 등록 실패:', err));
+   //   });
+    //}
+  //}, []);
   
   return (
     <BrowserRouter>
@@ -66,8 +66,8 @@ const App = () => {
        <AuthProvider>
 <div className="app-container"> 
    <Routes>
-        <Route path='/' element={<Home/>}/>
-
+        <Route path='/' element={<Login/>}/>
+<Route path='/home' element={<Home/>}/>
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail' element={<TripDetail/>}/>
@@ -78,7 +78,6 @@ const App = () => {
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
 
 		{/*/////////// alua /////////////*/}
-        <Route path='/Login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
         <Route path='/post_select' element={<Post_Select/>}/>
         <Route path="/phone" element={<PhoneEnter />} />

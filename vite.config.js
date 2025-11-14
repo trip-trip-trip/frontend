@@ -28,12 +28,12 @@ export default defineConfig({
         // (예: public/icons/icon-192x192.png)
         icons: [
           {
-            src: '/icons/tripshot.png',
+            src: '/icons/tripshot_logo.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icons/tripshot.png',
+            src: '/icons/tripshot_logo.png',
             sizes: '512x512',
             type: 'image/png'
           }

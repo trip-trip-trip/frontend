@@ -1,7 +1,13 @@
+html,body,#root{
+  height:100%;
+    margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
 .camera-page-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100dvh;
   max-width: 43rem; /* 스마트폰 가로 폭 제한 (피그마 390px + 여유) */
   margin: 0 auto; /* 중앙 정렬 */
   background-color: #000; /* 전체 배경을 검은색으로 */
@@ -9,12 +15,16 @@
   overflow: hidden; /* 넘치는 콘텐츠 숨기기 */
 }
 
+.flip-icon {
+  width: 30px;
+  height: 30px;
+}
 /* 헤더 스타일 */
 .camera-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px;
+  padding: 12px;
   background-color: #000; /* 검은색 헤더 */
   color: #fff;
   position: relative;
@@ -66,8 +76,17 @@
   width: 100%; /* 너비는 자동으로, 높이는 컨테이너에 맞춰서 */
   height: 100%; /* 부모 컨테이너의 높이를 꽉 채움 */
   object-fit: cover; /* 화면을 꽉 채우도록 자르면서 확대/축소 */
- transform: scaleX(-1);
+
   transform-origin: center center;
+ filter:none;
+}
+
+.webcam-feed.user {
+  transform: scaleX(-1); /* 전면 카메라일 때 좌우 반전 */
+}
+
+.webcam-feed.environment {
+  transform: scaleX(1); /* 후면 카메라일 때 원래대로 */
 }
 
 /* '3' 카운트다운 오버레이 */
@@ -84,7 +103,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 60px;
+  font-size: 60psx;
   font-weight: bold;
   z-index: 5;
 }
@@ -106,11 +125,11 @@
 .camera-controls-bar {
   background-color: #000; /* 하단바 배경 검은색 */
   padding-top:5px;
-  padding-bottom:25px;
+  padding-bottom:20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 0px;
   position: relative;
   z-index: 10;
 }
@@ -157,6 +176,7 @@
 opacity: 0.5;
 display:flex;
 justify-content: center;
+object-fit:fill;
   }
  .film-texture-overlay {
   position: absolute;
@@ -164,25 +184,28 @@ justify-content: center;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  z-index: 6;
-  mix-blend-mode: overlay;  /* screen → overlay로 변경 */
-  opacity: 0.25;            /* 질감이 좀 더 살아나게 */
-  filter: brightness(110%) contrast(105%) sepia(10%);
+  object-fit: cover; /* 텍스처는 꽉 채움 */
+  z-index: 7; /* 프레임보다 위에 */
+   filter: none; /* (또는 밝기만 살짝: filter: brightness(110%);) */
+ mix-blend-mode: overlay; 
+ opacity: 0.6; 
 }
+
+
 
 
 .film-frame-overlay {
-  display: block; /* 보이도록 */
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 110%;
-  height: 100%;
-  object-fit: fill; 
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: fill;
   z-index: 6;
+  pointer-events: none;
 }
-
 /* 필름 날짜 스탬프 */
 .film-date-stamp {
   position: absolute;

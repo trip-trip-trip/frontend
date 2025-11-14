@@ -3,41 +3,142 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { useNavigate, useParams } from 'react-router-dom';
 import './CameraPage.css';
-//import filmFrame from '../../assets/filmvideo.png';  //notbad
-//import filmFrame from '../../assets/filmstrip2.png'; //세로방향 notbad
-//import filmFrame from '../../assets/cameralens.png'; //카메라렌즈스타일ㄱㅊ
 
-import filmFrame from '../../assets/filmvideo.png';
-import filmTexture from '../../assets/filmgrain.png';
+// 1. 사용할 모든 '재료' 임포트
+import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레임
+import textureAsset from '../../assets/filmeffect.png'; // 님의 고정 텍스처
+import switchmode from '../../assets/switchcam.png';
 
-
+// 2. [핵심] "필터 조합 팩"을 배열로 정의
+// (프레임: null = 없음, 텍스처: null = 없음, cssFilter: 'none' = 없음)
+const FILTERS = [
+  { 
+    name: '코닥 (풀)', 
+    frame: frameAsset,    // 프레임 O
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(15%) contrast(105%) brightness(130%) saturate(100%)' // CSS 색감 O
+  },
+   { 
+    name: '코닥2 (풀)', 
+    frame: frameAsset,    // 프레임 O
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(15%) contrast(125%) brightness(130%) saturate(80%)' // CSS 색감 O
+  },
+  { 
+    name: '프레임만', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(0%) contrast(115%) brightness(100%) saturate(110%)' // CSS 색감 O
+  },
+   { 
+    name: '프레임만2', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(0%) contrast(105%) brightness(120%) saturate(110%)' // CSS 색감 O
+  },
+  { 
+    name: '프레임만3', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(20%) contrast(105%) brightness(85%) saturate(120%)' // CSS 색감 O
+  },
+   { 
+    name: '프레임만4', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(20%) contrast(75%) brightness(105%) saturate(130%)' // CSS 색감 O
+  },
+  { 
+    name: '텍스처 + 색감', 
+    frame: null,            // 프레임 X
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(10%) contrast(100%) brightness(115%) saturate(110%)' // CSS 색감 O
+  },
+   { 
+    name: '텍스처 + 색감2', 
+    frame: null,            // 프레임 X
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(0%) contrast(120%) brightness(125%) saturate(95%)' // CSS 색감 O
+  },
+  { 
+    name: '흑백 (프레임 없음)', 
+    frame: null,            // 프레임 X
+    texture: null,  // 텍스처 O
+    cssFilter: 'grayscale(50%) contrast(150%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
+  },
+   { 
+    name: 'ㅈㄴ흑백 (프레임 없음)', 
+    frame: null,            // 프레임 X
+    texture: null,  // 텍스처 O
+    cssFilter: 'grayscale(70%) contrast(120%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
+  },
+  { 
+    name: '기본', 
+    frame: null,            // 프레임 X
+    texture: null,          // 텍스처 X
+    cssFilter:'sepia(10%) contrast(115%) brightness(105%) saturate(130%)'      // CSS 색감 X
+  },
+  { 
+    name: '기본2', 
+    frame: null,            // 프레임 X
+    texture: null,          // 텍스처 X
+    cssFilter:'sepia(10%) contrast(90%) brightness(120%) saturate(80%)'      // CSS 색감 X
+  }
+];
 
 // 날짜 포맷 함수
 function getFilmDate() {
   const d = new Date();
-  const year = d.getFullYear().toString().slice(-2); // '25'
-  const month = (d.getMonth() + 1).toString().padStart(2, '0'); // '11'
-  const day = d.getDate().toString().padStart(2, '0'); // '02'
-  return `${year} ${month} ${day}`; // "25 11 02"
+  const year = d.getFullYear().toString().slice(-2);
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${year} ${month} ${day}`;
 }
 
-// 최대 총 촬영 횟수
 const MAX_TOTAL_SHOTS = 24;
 
 const CameraPage = () => {
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
-  const [mode, setMode] = useState('photo');
+  const [mode, setMode] = useState('film'); // 3. [수정] 기본 모드를 'film'으로
   const [isRecording, setIsRecording] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
   const [countdown, setCountdown] = useState(0);
   const [shotCount, setShotCount] = useState(0);
   const navigate = useNavigate();
-
-  const [facingMode, setFacingMode] = useState('user'); // 'user' = 전면
-
+  const [facingMode, setFacingMode] = useState('user');
   const { tripId } = useParams();
   const storageKey = `totalShotCount_${tripId}`;
+
+  // 4. 스와이프 및 필터 인덱스 state
+  const [currentFilterIndex, setCurrentFilterIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  
+  const nextFilter = () => setCurrentFilterIndex((prev) => (prev + 1) % FILTERS.length);
+  const prevFilter = () => setCurrentFilterIndex((prev) => (prev - 1 + FILTERS.length) % FILTERS.length);
+
+  // 5. 스와이프 이벤트 핸들러
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = 0;
+  };
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+  const handleTouchEnd = () => {
+    if (mode !== 'film') return; // 필름 모드일 때만
+    if (touchEndX.current === 0) return; 
+    const swipeThreshold = 50; 
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    if (swipeDistance > swipeThreshold) {
+      console.log("Swipe Left (Next Filter)");
+      nextFilter();
+    } else if (swipeDistance < -swipeThreshold) {
+      console.log("Swipe Right (Prev Filter)");
+      prevFilter();
+    }
+  };
 
   useEffect(() => {
     if (tripId) {
@@ -47,146 +148,113 @@ const CameraPage = () => {
     }
   }, [tripId, storageKey]);
 
-  const switchMode = (newMode) => {
-    console.log(`[Debug] 모드 변경 시도: ${newMode}`);
-    setMode(newMode);
-  };
-
+  const switchMode = (newMode) => setMode(newMode);
   const flipCamera = () => {
-    console.log("카메라 전환");
     setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
   };
+  const handleDataAvailable = useCallback(({ data }) => {
+    if (data.size > 0) setRecordedChunks((prev) => prev.concat(data));
+  }, []);
 
-  const handleDataAvailable = useCallback(
-    ({ data }) => {
-      console.log('[Debug] 영상 데이터 수신 (dataavailable 이벤트)');
-      if (data.size > 0) {
-        setRecordedChunks((prev) => prev.concat(data));
-      }
-    },
-    [setRecordedChunks]
-  );
+  // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
+  const applyFilmFrame = async (imageSrc, dateStamp, filterConfig) => {
+    const { cssFilter, frame, texture } = filterConfig; // 필터 설정값 분해
 
-  // 2. [추가] 필름 프레임 합성 함수
-  const applyFilmFrame = async (imageSrc, filmOverlaySrc, dateStamp) => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-
       const originalImg = new Image();
+      originalImg.crossOrigin = "anonymous"; // CORS 문제 방지
       originalImg.src = imageSrc;
-      originalImg.onload = () => {
-        canvas.width = originalImg.width;
-        canvas.height = originalImg.height;
+      originalImg.onload = async () => { // 비동기 처리를 위해 async 추가
+        canvas.width = originalImg.width; canvas.height = originalImg.height;
 
-        // 1. 원본 사진을 캔버스에 그립니다.
-       ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+        // 1. 원본 사진
+        ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
 
-// ✅ Kodak Warm Tone 효과 추가
-const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-const data = imageData.data;
+        // 2. CSS 필터 적용
+        ctx.filter = cssFilter || 'none';
+        ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+        ctx.filter = 'none';
 
-for (let i = 0; i < data.length; i += 4) {
-  // 약간 따뜻한 색감 (Red +5%, Green +2%, Blue -5%)
-  data[i] = Math.min(data[i] * 1.08 + 5, 255);   // Red
-  data[i + 1] = Math.min(data[i + 1] * 1.02 + 2, 255); // Green
-  data[i + 2] = Math.max(data[i + 2] * 0.95 - 3, 0);   // Blue
+        // 3. [수정] 텍스처가 있을 때만 합성
+        if (texture) {
+          await new Promise((textureResolve) => {
+            const textureImg = new Image();
+            textureImg.crossOrigin = "anonymous";
+            textureImg.src = texture;
+            textureImg.onload = () => {
+              ctx.globalAlpha = 0.7; 
+              ctx.globalCompositeOperation = 'overlay';
+              const ratio = textureImg.width / textureImg.height;
+              const canvasRatio = canvas.width / canvas.height;
+              let w, h, x, y;
+              if (ratio > canvasRatio) { 
+                h = canvas.height; w = textureImg.width * (h / textureImg.height);
+                x = (canvas.width - w) / 2; y = 0;
+              } else { 
+                w = canvas.width; h = textureImg.height * (w / textureImg.width);
+                x = 0; y = (canvas.height - h) / 2;
+              }
+              ctx.drawImage(textureImg, x, y, w, h);
+              ctx.globalAlpha = 1.0; 
+              ctx.globalCompositeOperation = 'source-over';
+              textureResolve();
+            };
+            textureImg.onerror = () => textureResolve(); // 텍스처 로드 실패해도 계속
+          });
+        }
 
-  // 약간 대비 낮추기
-  const brightness = (data[i] + data[i+1] + data[i+2]) / 3;
-  data[i] = data[i] * 0.95 + brightness * 0.05;
-  data[i + 1] = data[i + 1] * 0.95 + brightness * 0.05;
-  data[i + 2] = data[i + 2] * 0.95 + brightness * 0.05;
-}
+        // 4. [수정] 프레임이 있을 때만 합성
+        if (frame) {
+          await new Promise((frameResolve) => {
+            const filmOverlayImg = new Image();
+            filmOverlayImg.crossOrigin = "anonymous";
+            filmOverlayImg.src = frame;
+            filmOverlayImg.onload = () => {
+              const overlayRatio = filmOverlayImg.width / filmOverlayImg.height;
+              let drawWidth, drawHeight, offsetX, offsetY;
+              if (overlayRatio > canvasRatio) { 
+                drawHeight = canvas.height; drawWidth = filmOverlayImg.width * (drawHeight / filmOverlayImg.height);
+                offsetX = (canvas.width - drawWidth) / 2; offsetY = 0;
+              } else { 
+                drawWidth = canvas.width; drawHeight = filmOverlayImg.height * (drawWidth / filmOverlayImg.width);
+                offsetX = 0; offsetY = (canvas.height - drawHeight) / 2;
+              }
+              ctx.drawImage(filmOverlayImg, offsetX, offsetY, drawWidth, drawHeight);
+              frameResolve();
+            };
+            filmOverlayImg.onerror = () => frameResolve(); // 프레임 로드 실패해도 계속
+          });
+        }
 
-// 수정된 색감 적용
-ctx.putImageData(imageData, 0, 0);
-        const filmOverlayImg = new Image();
-        filmOverlayImg.src = filmOverlaySrc; // 님이 주신 필름 오버레이 이미지
-        filmOverlayImg.onload = () => {
-          // 2. 그 위에 필름 오버레이 이미지를 그립니다.
-          // 오버레이 이미지가 캔버스 크기에 맞게 꽉 차도록 그립니다.
-          // object-fit: cover 처럼 중앙에 맞춰 확대/축소되도록 합니다.
-          const overlayRatio = filmOverlayImg.width / filmOverlayImg.height;
-          const canvasRatio = canvas.width / canvas.height;
-          
-          let drawWidth, drawHeight, offsetX, offsetY;
-
-          if (overlayRatio > canvasRatio) { 
-            drawHeight = canvas.height;
-            drawWidth = filmOverlayImg.width * (canvas.height / filmOverlayImg.height);
-            offsetX = (canvas.width - drawWidth) / 2;
-            offsetY = 0;
-          } else { 
-            drawWidth = canvas.width;
-            drawHeight = filmOverlayImg.height * (canvas.width / filmOverlayImg.width);
-            offsetX = 0;
-            offsetY = (canvas.height - drawHeight) / 2;
-          }
-
-          ctx.drawImage(filmOverlayImg, offsetX, offsetY, drawWidth, drawHeight);
-          // 3. 날짜 스탬프 추가
-          if (dateStamp) {
-            // 폰트 크기 및 위치 조정 (캔버스 크기에 비례)
-            ctx.font = `${Math.max(16, canvas.width * 0.04)}px Arial`; 
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'bottom';
-            // 적절한 마진을 줍니다. (캔버스 너비의 3~5% 정도)
+        // 5. 날짜 스탬프
+        if (dateStamp) {
+            ctx.font = `${Math.max(16, canvas.width * 0.04)}px Courier`;
+            ctx.fillStyle = '#FFB800';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
             const marginX = canvas.width * 0.05;
             const marginY = canvas.height * 0.05;
             ctx.fillText(dateStamp, canvas.width - marginX, canvas.height - marginY);
-          }
-
-          // 합성된 이미지를 Data URL로 변환
-          resolve(canvas.toDataURL('image/jpeg'));
-        };filmOverlayImg.onerror = () => {
-          console.error("필름 오버레이 이미지 로드 실패:", filmOverlaySrc);
-          resolve(imageSrc); // 오버레이 로드 실패 시 원본 이미지 반환
-        };
-      };
-      originalImg.onerror = () => {
-        console.error("원본 이미지 로드 실패:", imageSrc);
-        resolve(imageSrc); // 원본 이미지 로드 실패 시
+        }
+        resolve(canvas.toDataURL('image/jpeg'));
       };
     });
   };
 
-
+  // 7. [수정] 'photo' 모드 삭제, 'video'와 'film'만 남김
   const handleStartCaptureClick = useCallback(async () => {
-    
-    if (shotCount >= MAX_TOTAL_SHOTS) {
-      alert(`이번 여행의 최대 촬영 횟수(${MAX_TOTAL_SHOTS}회)를 모두 사용했습니다! 📸`);
-      return;
-    }
-
+    if (shotCount >= MAX_TOTAL_SHOTS) { /* ... */ return; }
     console.log(`[Debug] 촬영 버튼 클릭. 현재 모드: ${mode}`);
     
     if (mode === 'video') {
-      // ... (영상 녹화 로직은 기존과 동일) ...
-      if (!webcamRef.current || !webcamRef.current.stream) {
-        console.error('[Debug] Webcam 스트림을 찾을 수 없습니다.');
-        alert('카메라 스트림에 접근할 수 없습니다.');
-        return;
-      }
+      if (!webcamRef.current || !webcamRef.current.stream) { /* ... */ return; }
       const originalStream = webcamRef.current.stream;
       const videoTracks = originalStream.getVideoTracks();
-
-      if (videoTracks.length === 0) {
-        console.error('[Debug] 스트림에서 비디오 트랙을 찾을 수 없습니다.');
-        alert('카메라 비디오를 가져올 수 없습니다.');
-        return;
-      }
-
+      if (videoTracks.length === 0) { /* ... */ return; }
       const videoOnlyStream = new MediaStream(videoTracks);
-      const mimeType = MediaRecorder.isTypeSupported('video/mp4') 
-        ? 'video/mp4' 
-        : 'video/webm';
-      console.log(`[Debug] MimeType: ${mimeType} 사용`);
-
-      setIsRecording(true);
-      setCountdown(3);
-      
+      const mimeType = MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm';
+      setIsRecording(true); setCountdown(3);
       const countdownInterval = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
@@ -196,79 +264,61 @@ ctx.putImageData(imageData, 0, 0);
           return prev - 1;
         });
       }, 1000);
-
       try {
-        mediaRecorderRef.current = new MediaRecorder(videoOnlyStream, {
-          mimeType: mimeType,
-        });
-
-        mediaRecorderRef.current.addEventListener(
-          'dataavailable',
-          handleDataAvailable
-        );
-
+        mediaRecorderRef.current = new MediaRecorder(videoOnlyStream, { mimeType });
+        mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable);
         mediaRecorderRef.current.onerror = (event) => {
           console.error('[Debug] MediaRecorder 에러:', event.error);
           alert(`녹화 중 에러 발생: ${event.error.name}`);
-          setIsRecording(false);
-          setCountdown(0);
+          setIsRecording(false); setCountdown(0);
         };
-
         mediaRecorderRef.current.onstop = () => {
           console.log('[Debug] 녹화 중지됨.');
-          setIsRecording(false);
-          setCountdown(0);
+          setIsRecording(false); setCountdown(0);
         };
-
         mediaRecorderRef.current.start();
-        console.log('[Debug] MediaRecorder.start() 호출됨');
-
         const newCount = shotCount + 1;
         setShotCount(newCount);
         localStorage.setItem(storageKey, newCount.toString());
         console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (영상)`);
-
         setTimeout(() => {
           if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            console.log('[Debug] 3초 경과, 녹화 중지 시도...');
             mediaRecorderRef.current.stop();
           }
         }, 3000);
-
       } catch (e) {
         console.error('[Debug] MediaRecorder 초기화 실패:', e);
         alert(`영상 녹화를 시작할 수 없습니다. (에러: ${e.message})`);
-        setIsRecording(false);
-        setCountdown(0);
+        setIsRecording(false); setCountdown(0);
       }
-
-    } else { 
-      // 사진 또는 필름 모드
-      console.log('[Debug] 사진 촬영');
-      
+    } else if (mode === 'film') { 
       const imageSrc = webcamRef.current.getScreenshot();
-
       if (!imageSrc) {
-        alert('카메라가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+        alert('카메라가 준비되지 않았습니다.');
         return; 
       }
 
       const newCount = shotCount + 1;
       setShotCount(newCount);
       localStorage.setItem(storageKey, newCount.toString());
-      console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (사진/필름)`);
+      console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (${mode})`);
       
-      let processedImageSrc = imageSrc;
-      if (mode === 'film') {
-        console.log('[Debug] 필름 모드 사진 촬영, 효과 적용 예정.');
-        // 3. [수정] 필름 모드일 때만 합성 함수 호출
-        processedImageSrc = await applyFilmFrame(imageSrc, filmFrame, filmTexture,getFilmDate());
-      }
+      console.log('[Debug] 필름 모드 사진 촬영, 효과 적용 예정.');
+      // 8. [수정] 현재 선택된 필터 팩 전체를 전달
+      const selectedFilter = FILTERS[currentFilterIndex];
+        const processedImageSrc = await applyFilmFrame(
+          imageSrc, 
+          selectedFilter.frame,   // 👈 선택된 프레임 (null일 수 있음)
+          selectedFilter.texture, // 👈 선택된 텍스처 (null일 수 있음)
+          getFilmDate(),
+          selectedFilter.cssFilter // 👈 선택된 CSS 필터
+        );
 
       navigate(`/capture-complete/${tripId}`, {
         state: { media: processedImageSrc, type: 'photo', mode: mode },
       });
     }
+    // 9. [삭제] 'else' (photo 모드) 블록 삭제
   }, [
     webcamRef, 
     mediaRecorderRef, 
@@ -277,65 +327,89 @@ ctx.putImageData(imageData, 0, 0);
     handleDataAvailable, 
     shotCount, 
     storageKey,
-    tripId // tripId 의존성 추가
+    tripId,
+    currentFilterIndex // 10. [추가] 의존성 배열
   ]);
 
   useEffect(() => {
     if (recordedChunks.length > 0 && !isRecording) {
-      console.log('[Debug] useEffect: 녹화 완료, 청크 처리 중...');
-      const blob = new Blob(recordedChunks, {
-        type: 'video/webm', // (mimeType과 일치시키는 게 좋지만, webm이 보편적)
-      });
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
       const url = URL.createObjectURL(blob);
       setRecordedChunks([]);
-
       navigate(`/capture-complete/${tripId}`, {
         state: { media: url, type: 'video', blob: blob }, 
       });
     }
-  }, [recordedChunks, isRecording, navigate,tripId]);
+  }, [recordedChunks, isRecording, navigate, tripId]);
 
   const videoConstraints = {
-    width: { ideal: 720 },
-    height: { ideal: 1280 },
-    facingMode: facingMode // state에서 값을 받아옴
+    //width: { ideal: 720 },
+   // height: { ideal: 1280 },
+    facingMode: facingMode
   };
+
   return (
     <div className="camera-page-wrapper">
-  <header className="camera-header">
- <button className="back-button" onClick={() => navigate(-1)}>
-&lt;
-</button>
-<span className="header-title">촬영</span>
-        {/* 5. [추가] 카메라 전환 버튼 */}
+      <header className="camera-header">
+        <button className="back-button" onClick={() => navigate(-1)}>&lt;</button>
+        <span className="header-title">촬영</span>
         <button className="flip-camera-button" onClick={flipCamera}>
-          {/* (아이콘 🔄 대신 임시 텍스트) */}
-          전환
+          <img src={switchmode} alt="Switch Camera" className="flip-icon" />
         </button>
-</header>
+      </header>
 
-      <div className="camera-view-container">
+      {/* 12. [수정] 스와이프 이벤트를 camera-view-container에 바인딩 */}
+      <div 
+        className="camera-view-container"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* 13. [수정] 현재 필터의 CSS 필터 값을 웹캠에 인라인 스타일로 적용 */}
         <Webcam
           audio={true} 
           ref={webcamRef}
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}
-          className="webcam-feed"
+          className={`webcam-feed ${facingMode}`} 
+          style={{ 
+            filter: mode === 'film' ? FILTERS[currentFilterIndex].cssFilter : 'none' 
+          }}
         />
         
-        {/* 4. [수정] 필름 모드일 때만 필름 프레임과 날짜 스탬프 오버레이 */}
-{mode === 'film' && (
-          <>
-            <div className="film-overlay">
-              {/* 프레임 이미지는 웹캠 위에 직접  */}
-              <img src={filmFrame} alt="Film Frame" className="film-frame-overlay" />
-              {/* 질감 오버레이는 프레임보다 위에 오도록 별도의 클래스로 설정 */}
-              <img src={filmTexture} alt="Film Texture" className="film-texture-overlay" />
-              <div className="film-date-stamp">
-                {getFilmDate()}
+        {/* 실시간 오버레이 */}
+        {mode === 'film' && (
+          (() => { // 14. [수정] 현재 필터 설정을 변수로 먼저 선언
+            const currentFilter = FILTERS[currentFilterIndex];
+            return (
+              <div className="film-overlay">
+                {/* 15. [수정] 프레임이 있을 때만 렌더링 */}
+                {currentFilter.frame && (
+                  <img 
+                    src={currentFilter.frame} 
+                    alt="Film Frame" 
+                    className="film-frame-overlay" 
+                  />
+                )}
+                {/* 16. [수정] 텍스처가 있을 때만 렌더링 */}
+                {currentFilter.texture && (
+                  <img 
+                    src={currentFilter.texture} 
+                    alt="Film Texture" 
+                    className="film-texture-overlay"
+                    // (텍스처 CSS는 CameraPage.css에서 관리)
+                  />
+                )}
+                <div className="film-date-stamp">
+                  {getFilmDate()}
+                </div>
+                {/* 17. [수정] 현재 필터 이름 표시 */}
+                <div className="film-filter-name">
+                  {currentFilter.name}
+                </div>
               </div>
-            </div>
-          </>
+            );
+          })()
         )}
 
         {mode === 'video' && isRecording && countdown > 0 && (
@@ -344,23 +418,18 @@ ctx.putImageData(imageData, 0, 0);
           </div>
         )}
         
-        {/* 5. [수정] 필름 모드일 때는 '카메라 뷰' 텍스트를 숨김 */}
-        {!isRecording && mode !== 'film' && (
-            <div className="camera-view-text">
-                카메라 뷰
-            </div>
-        )}
+        {/* 18. [삭제] '사진' 모드가 없으므로 '카메라 뷰' 텍스트 불필요 */}
       </div>
 
       <div className="camera-controls-bar">
         <div className="mode-selector">
+          {/* 19. [삭제] '사진' 모드 버튼 삭제 */}
           <button 
             onClick={() => switchMode('film')} 
             className={mode === 'film' ? 'active' : ''}
           >
             필름
           </button>
-        
           <button 
             onClick={() => switchMode('video')} 
             className={mode === 'video' ? 'active' : ''}

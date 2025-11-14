@@ -27,7 +27,7 @@ export default function SignupWelcome() {
     // });
     // const data = await res.json();
     // setSession(data.accessToken, data.user)
-    navigate('/');
+    navigate('/home');
   };
 
   return (
