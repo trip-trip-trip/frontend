@@ -12,6 +12,7 @@
     "@googlemaps/markerclusterer": "^2.6.2",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
+    "lucide": "^0.553.0",
     "lucide-react": "^0.553.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

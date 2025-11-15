@@ -8,7 +8,7 @@ const Header = ({ title, setTab, currentTab }) => {
     
     const { pathname } = useLocation();
     const navigate = useNavigate();
-    const isHome = pathname === '/';
+    const isHome = pathname === '/home';
     
     return (
         <header className="header">
@@ -21,7 +21,7 @@ const Header = ({ title, setTab, currentTab }) => {
                             src={logoTop}
                             alt="TripShot"
                             className="header-logo"
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/home')}
                         />
                     ) : (
                         <span className="page-title">{title}</span>

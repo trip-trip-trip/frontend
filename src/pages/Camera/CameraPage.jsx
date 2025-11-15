@@ -16,31 +16,31 @@ const FILTERS = [
     name: '코닥 (풀)', 
     frame: frameAsset,    // 프레임 O
     texture: textureAsset,  // 텍스처 O
-    cssFilter: 'sepia(15%) contrast(105%) brightness(130%) saturate(100%)' // CSS 색감 O
+    cssFilter: 'sepia(15%) contrast(85%) brightness(100%) saturate(80%)' // CSS 색감 O
   },
    { 
     name: '코닥2 (풀)', 
     frame: frameAsset,    // 프레임 O
     texture: textureAsset,  // 텍스처 O
-    cssFilter: 'sepia(15%) contrast(125%) brightness(130%) saturate(80%)' // CSS 색감 O
+    cssFilter: 'sepia(15%) contrast(105%) brightness(100%) saturate(90%)' // CSS 색감 O
   },
   { 
     name: '프레임만', 
     frame: frameAsset,    // 프레임 O
     texture: null,          // 텍스처 X
-    cssFilter: 'sepia(0%) contrast(115%) brightness(100%) saturate(110%)' // CSS 색감 O
+    cssFilter: 'sepia(20%) contrast(80%) brightness(85%) saturate(110%)' // CSS 색감 O
   },
    { 
     name: '프레임만2', 
     frame: frameAsset,    // 프레임 O
     texture: null,          // 텍스처 X
-    cssFilter: 'sepia(0%) contrast(105%) brightness(120%) saturate(110%)' // CSS 색감 O
+    cssFilter: 'sepia(0%) contrast(105%) brightness(100%) saturate(80%)' // CSS 색감 O
   },
   { 
     name: '프레임만3', 
     frame: frameAsset,    // 프레임 O
     texture: null,          // 텍스처 X
-    cssFilter: 'sepia(20%) contrast(105%) brightness(85%) saturate(120%)' // CSS 색감 O
+    cssFilter: 'sepia(20%) contrast(85%) brightness(85%) saturate(110%)' // CSS 색감 O
   },
    { 
     name: '프레임만4', 
@@ -52,37 +52,43 @@ const FILTERS = [
     name: '텍스처 + 색감', 
     frame: null,            // 프레임 X
     texture: textureAsset,  // 텍스처 O
-    cssFilter: 'sepia(10%) contrast(100%) brightness(115%) saturate(110%)' // CSS 색감 O
+    cssFilter: 'sepia(10%) contrast(80%) brightness(105%) saturate(110%)' // CSS 색감 O
   },
    { 
     name: '텍스처 + 색감2', 
     frame: null,            // 프레임 X
     texture: textureAsset,  // 텍스처 O
-    cssFilter: 'sepia(0%) contrast(120%) brightness(125%) saturate(95%)' // CSS 색감 O
+    cssFilter: 'sepia(20%) contrast(90%) brightness(115%) saturate(85%)' // CSS 색감 O
+  },
+  { 
+    name: '텍스처 + 색감3', 
+    frame: null,            // 프레임 X
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(0%) contrast(70%) brightness(95%) saturate(75%)' // CSS 색감 O
   },
   { 
     name: '흑백 (프레임 없음)', 
     frame: null,            // 프레임 X
     texture: null,  // 텍스처 O
-    cssFilter: 'grayscale(50%) contrast(150%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
+    cssFilter: 'grayscale(50%) contrast(100%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
   },
    { 
     name: 'ㅈㄴ흑백 (프레임 없음)', 
     frame: null,            // 프레임 X
     texture: null,  // 텍스처 O
-    cssFilter: 'grayscale(70%) contrast(120%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
+    cssFilter: 'grayscale(90%) contrast(100%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
   },
   { 
     name: '기본', 
     frame: null,            // 프레임 X
     texture: null,          // 텍스처 X
-    cssFilter:'sepia(10%) contrast(115%) brightness(105%) saturate(130%)'      // CSS 색감 X
+    cssFilter:'sepia(10%) contrast(100%) brightness(105%) saturate(80%)'      // CSS 색감 X
   },
   { 
     name: '기본2', 
     frame: null,            // 프레임 X
     texture: null,          // 텍스처 X
-    cssFilter:'sepia(10%) contrast(90%) brightness(120%) saturate(80%)'      // CSS 색감 X
+    cssFilter:'sepia(10%) contrast(85%) brightness(120%) saturate(100%)'      // CSS 색감 X
   }
 ];
 

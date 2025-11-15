@@ -55,7 +55,7 @@ export default function PostCreate() {
       });
       writePosts(posts);
 
-      nav('/', { replace: true });
+      nav('/home', { replace: true });
     } finally {
       setLoading(false);
     }

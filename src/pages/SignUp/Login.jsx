@@ -6,28 +6,28 @@ import tripshot_logo from '../../assets/loginLogo.png';
 import googleLogo from '../../assets/Group.png';
 import kakaoLogo from '../../assets/symbol-kakao.png';
 import naverLogo from '../../assets/naver_icon.png';
+import { useAuth } from '../../contexts/AuthContext';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const NAVER_CLIENT_ID = import.meta.env.VITE_NAVER_CLIENT_ID;
-const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_KEY;
+const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
 
 const API_BASE = (import.meta?.env?.VITE_API_BASE || 'http://localhost:4000').replace(/\/$/, ''); 
 const REDIRECT_URI = `${window.location.origin}/login`;
 
-const useAuth = () => ({ 
-  loginWithKakao: async () => true, 
-  loginWithGoogle: async () => true 
-});
-
-
 function decodeJwt(idToken) {
   try {
     const base64 = idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    const json = decodeURIComponent(atob(base64).split('').map(c => {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    const json = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
     return JSON.parse(json);
-  } catch { return {}; }
+  } catch {
+    return {};
+  }
 }
 
 export default function Login() {
@@ -35,48 +35,38 @@ export default function Login() {
   const location = useLocation();
   const { loginWithKakao, loginWithGoogle } = useAuth(); 
 
-  //소셜 로그인 완료 후 다음 스텝으로 넘기기 (임시)
-  const afterSocialLogin = useCallback((provider, token, accountPreview = {}) => {
-    const devTicket = `dev-${provider}-${Date.now()}`;
-    sessionStorage.setItem('auth.provider', provider);
-    sessionStorage.setItem('auth.ticket', devTicket);
-    sessionStorage.setItem('auth.account', JSON.stringify({
-      provider,
-      ...accountPreview,
-    }));
+  // 신규 유저 이동 처리
+  const afterSocialLogin = useCallback(
+    (provider, token, accountPreview = {}) => {
+      const devTicket = `dev-${provider}-${Date.now()}`;
+      sessionStorage.setItem('auth.provider', provider);
+      sessionStorage.setItem('auth.ticket', devTicket);
+      sessionStorage.setItem(
+        'auth.account',
+        JSON.stringify({
+          provider,
+          ...accountPreview,
+        })
+      );
 
+      navigate('/phone', {
+        state: {
+          provider,
+          authTicket: devTicket,
+          account: accountPreview,
+          _devToken: token,
+        },
+      });
+    },
+    [navigate]
+  );
 
-    navigate('/phone', {
-      state: {
-        provider,
-        authTicket: devTicket,
-        account: accountPreview,
-        _devToken: token,
-      },
-    });
-  }, [navigate]);
-
-  //카카오 SDK 초기화
-  useEffect(() => {
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init(KAKAO_JS_KEY); 
-    }
-  }, []);
-
-  // 구글 SDK 초기화 및 콜백 처리
+  // Google SDK 초기화
   useEffect(() => {
     if (window.google?.accounts?.id) {
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (res) => {
-          /*
-          const loginSuccess = loginWithGoogle(res.credential); 
-          if (!loginSuccess) {
-            alert('Google 사용자 정보 처리에 실패했습니다.');
-            return;
-          }
-          */
-          
           const payload = decodeJwt(res.credential);
           afterSocialLogin('google', res.credential, {
             displayName: payload?.name,
@@ -89,18 +79,21 @@ export default function Login() {
         auto_select: false,
       });
     }
-  }, [afterSocialLogin, loginWithGoogle]); 
+  }, [afterSocialLogin, loginWithGoogle]);
 
-  // 리다이렉트 로그인(네이버/구글 OAuth) 처리
+  // 네이버 / 구글 OAuth 토큰 처리
   useEffect(() => {
-    const hash = location.hash.startsWith('#') ? new URLSearchParams(location.hash.slice(1)) : null;
+    const hash = location.hash.startsWith('#')
+      ? new URLSearchParams(location.hash.slice(1))
+      : null;
+
     if (hash?.get('access_token')) {
       const accessToken = hash.get('access_token');
-      // 네이버인지 구글인지 판단
       const state = hash.get('state') || '';
       const provider = state.startsWith('naver_') ? 'naver' : 'google';
 
       window.history.replaceState({}, document.title, location.pathname + location.search);
+
       afterSocialLogin(provider, accessToken, {
         displayName: provider === 'naver' ? '네이버 사용자' : undefined,
         emailMasked: undefined,
@@ -109,47 +102,37 @@ export default function Login() {
     }
   }, [location, afterSocialLogin]);
 
-  /*
-  const startApiLogin = (provider) => {
-      window.location.href = `${API_BASE}/login/start/${provider}`;
-  };
-
-  const handleApiKakao = () => startApiLogin('kakao');
-  const handleApiGoogle = () => startApiLogin('google');
-  const handleApiNaver = () => startApiLogin('naver');
-  */
-
+  // ⭐ 카카오 REST API 로그인 방식
   const handleKakao = () => {
-    if (!window.Kakao) return alert('카카오 SDK 로드 실패');
-    window.Kakao.Auth.login({
-      scope: 'profile_nickname, profile_image', 
-      success: async (authObj) => {
-        /*
-        const loginSuccess = await loginWithKakao(authObj.access_token);
-        if (!loginSuccess) {
-          alert('Kakao 사용자 정보 처리에 실패했습니다.');
-          return;
-        }
-        */
+    if (!KAKAO_REST_API_KEY) {
+      alert('카카오 REST API KEY가 설정되지 않았습니다.');
+      return;
+    }
 
-        let account = {};
-        try {
-          // 카카오 프로필 정보 요청 
-          const me = await window.Kakao.API.request({ url: '/v2/user/me' });
-          account = {
-            displayName: me?.kakao_account?.profile?.nickname,
-            emailMasked: me?.kakao_account?.email, //이메일도 필요할까..?
-            avatarUrl: me?.kakao_account?.profile?.profile_image_url,
-          };
-        } catch {} 
-        afterSocialLogin('kakao', authObj.access_token, account);
-      },
-      fail: (err) => {
-        console.error('Kakao login fail', err);
-        alert('카카오 로그인 실패');
-      },
-    });
+    const redirect = encodeURIComponent(REDIRECT_URI);
+    const authUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_API_KEY}&redirect_uri=${redirect}&response_type=code`;
+
+    window.location.href = authUrl;
   };
+
+  // ⭐ 카카오 code 처리 (백엔드 연동)
+  useEffect(() => {
+    const code = new URLSearchParams(location.search).get('code');
+    if (!code) return;
+
+    loginWithKakao(code).then((result) => {
+      if (!result) {
+        alert("로그인 실패했습니다.");
+        return;
+      }
+
+      if (result.level === "access") {
+        navigate("/home");
+      } else {
+        afterSocialLogin("kakao", result.token, {});
+      }
+    });
+  }, [location.search, loginWithKakao, navigate, afterSocialLogin]);
 
   const handleGoogle = () => {
     if (!window.google?.accounts?.id) {
@@ -157,7 +140,6 @@ export default function Login() {
       return;
     }
     window.google.accounts.id.prompt((n) => {
-      // 프롬프트가 표시되지 않거나 스킵된 경우 OAuth 리다이렉트 방식으로 대체
       if (n.isNotDisplayed() || n.isSkippedMoment()) {
         const url =
           'https://accounts.google.com/o/oauth2/v2/auth' +
@@ -189,23 +171,22 @@ export default function Login() {
       <img src={tripshot_logo} className="logo-login" alt="TripShot" />
 
       <div className="login-buttons">
+
         <button className="social-btn kakao-login" onClick={handleKakao}>
-        {/* onClick={handleApiKakao} */}
           <img src={kakaoLogo} alt="" className="social-icon" />
           카카오 계정으로 계속하기
         </button>
 
         <button className="social-btn google-login" onClick={handleGoogle}>
-        {/* onClick={handleApiGoogle} */}
           <img src={googleLogo} alt="" className="social-icon" />
           구글 계정으로 계속하기
         </button>
 
         <button className="social-btn naver-login" onClick={handleNaver}>
-        {/* onClick={handleApiNaver} */}
           <img src={naverLogo} alt="" className="social-icon" />
           네이버 계정으로 계속하기
         </button>
+
       </div>
     </main>
   );

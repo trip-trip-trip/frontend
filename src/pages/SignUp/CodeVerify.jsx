@@ -42,7 +42,7 @@ export default function CodeVerify() {
 
   const verify = async () => {
     try{
-      navigate('/');
+      navigate('/home');
   }catch (e) {
       console.error(e);
       alert('인증에 실패했습니다.');

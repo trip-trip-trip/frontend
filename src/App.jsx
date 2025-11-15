@@ -35,34 +35,34 @@ import PostCreate from './pages/Home/post/PostCreate';
 const App = () => {
   // 스크린 사이즈 세팅
   function setScreenSize() {
-		let dvh = window.innerHeight * 0.01;
-		document.documentElement.style.setProperty('--dvh', `${dvh}px`);
-	}
+      let dvh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--dvh', `${dvh}px`);
+   }
 
   useEffect(() => {
-		setScreenSize();
+      setScreenSize();
 
-		const handleResize = () => {
-			setScreenSize();
-		};
+      const handleResize = () => {
+         setScreenSize();
+      };
 
-		window.addEventListener('resize', handleResize);
+      window.addEventListener('resize', handleResize);
 
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	}, []);
+      return () => {
+         window.removeEventListener('resize', handleResize);
+      };
+   }, []);
 
-   //useEffect(() => {
-    //if ('serviceWorker' in navigator) {
-     // window.addEventListener('load', () => {
-       // navigator.serviceWorker
-         /// .register('/sw.js')
-          //.then((reg) => console.log('✅ Service Worker 등록 완료:', reg))
-         // .catch((err) => console.error('❌ 등록 실패:', err));
-   //   });
-    //}
-  //}, []);
+   useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then((reg) => console.log('✅ Service Worker 등록 완료:', reg))
+          .catch((err) => console.error('❌ 등록 실패:', err));
+      });
+    }
+  }, []);
   
   return (
     <BrowserRouter>
@@ -70,8 +70,9 @@ const App = () => {
        <AuthProvider>
 <div className="app-container"> 
    <Routes>
-        <Route path='/' element={<Login/>}/>
-<Route path='/home' element={<Home/>}/>
+        <Route path='/' element={<StartPage/>}/>
+        <Route path='/home' element={<Home/>}/>
+
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail' element={<TripDetail/>}/>
@@ -81,7 +82,8 @@ const App = () => {
         <Route path='/scrapbook/create' element={<SelectPic/>}/>
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
 
-		{/*/////////// alua /////////////*/}
+      {/*/////////// alua /////////////*/}
+        <Route path='/Login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
         <Route path="/phone" element={<PhoneEnter />} />
         <Route path="/verify" element={<CodeVerify />} />
@@ -92,7 +94,7 @@ const App = () => {
         <Route path="/post/create" element={< PostCreate/>} />
 
 
-		  {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
+        {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
         <Route path="/mypage/profile" element={<ProfilePage />} />
 
         {/* 프로필 하위 페이지들 */}
