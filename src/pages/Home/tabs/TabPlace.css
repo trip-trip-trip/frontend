@@ -1,0 +1,72 @@
+
+.tabplace {
+  height: 100vh; 
+  padding: 0 1.6rem; 
+  display: flex;
+  flex-direction: column;
+}
+
+.map-container {
+  flex-grow: 1; 
+  width: 100%;
+    
+  min-height: 300px; 
+    
+  background: #e5e7eb;
+  position: relative;
+}
+.map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.info-window {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.info-title {
+  font-weight: 600;
+  font-size: 14px;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.place-header-controls {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 1rem 0; 
+}
+
+.back-to-feed-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+    
+  font-size: 1rem;
+  color: #555; 
+  text-decoration: underline; 
+  text-underline-offset: 4px; 
+  transition: color 0.2s;
+}
+
+.back-to-feed-btn:hover {
+  color: #000;
+}

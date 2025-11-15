@@ -1,195 +1,106 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import tripshot_logo from '../../assets/tripshot_logo.png';
+import back from '../../assets/back.png';
+import wrong_input from '../../assets/wrong_input.png'; 
 import './Auth.css';
 
-const formatKRPhone = (raw) => {
-  const d = raw.replace(/\D/g, '').slice(0, 11);
-  if (d.length <= 3) return d;
-  if (d.length <= 7) return `${d.slice(0,3)}-${d.slice(3)}`;
-  return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}`;
+const formatPhone = (raw) => {
+  return raw.replace(/\D/g, '').slice(0, 11);
 };
- 
+
 const API_BASE = (import.meta?.env?.VITE_API_BASE || 'http://localhost:4000').replace(/\/$/, '');
 
 export default function PhoneEnter() {
-  const { state } = useLocation(); // { provider, token } 가능
+  const { state } = useLocation(); 
   const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isPhoneValid = useMemo(() => phone.replace(/\D/g, '').length >= 10, [phone]);
+  const isPhoneValid = useMemo(
+    () => phone.replace(/\D/g, '').length >= 11,
+    [phone]
+  );
+
+  // const sendCode = async () => {
+  //   if (!isPhoneValid || loading) return;
+  //   setLoading(true);
+  //   try {
+  //     const res = await fetch(`${API_BASE}/login/send-code`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         phone: phone.replace(/\D/g, ''),        
+  //         provider: state?.provider,
+  //       }),
+  //     });
+
+  //     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  //     const data = await res.json();
+
+  //     navigate('/verify', {
+  //       state: {
+  //         phone,
+  //         provider: state?.provider,
+  //         token: state?.token,
+  //       },
+  //     });
+  //   } catch (e) {
+  //     console.error(e);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
 
   const sendCode = async () => {
-    if (!isPhoneValid || loading) return;
-    setLoading(true);
-    // try {
-    //     const res = await fetch(`${API_BASE}/login/send-code`, {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ phone }),
-    //   });
-    //   const data = await res.json();
-    //   // data: { next: 'verify'|'link', providerCandidates?: [...], masked?: '010-1234-5678' }
-    //   if (data.next === 'link') {
-    //     navigate('/link', { state: { phone, candidates: data.providerCandidates, provider: state?.provider, token: state?.token } });
-    //   } else {
-    //     navigate('/verify', { state: { phone, masked: data.masked ?? phone, provider: state?.provider, token: state?.token } });
-    //   }
-    // } finally {
-    //   setLoading(false);
-    // }
-    navigate('/verify')
+    navigate('/verify', {
+        state: {
+            phone: phone,
+            provider: state?.provider, 
+            token: state?.token,
+        },
+    });
   };
 
   return (
-    <main className="login">
+    <main className="login-phone">
       <div className="card">
-        <img src={tripshot_logo} className="logo-login" alt="TripShot" />
-      
-        <h2 className="lg-title">전화번호 인증</h2>
-        <p className="sp-sub">소셜 계정 연동을 위해<br/>전화번호 인증이 필요합니다</p>
-
-        <label className="field-label" htmlFor="phone">전화번호</label>
-        <input
-          id="phone" className="input"
-          placeholder="010-1234-5678" inputMode="tel"
-          value={phone} onChange={(e)=>setPhone(formatKRPhone(e.target.value))}
-          aria-invalid={!isPhoneValid && phone.length>0}
-        />
-
-        <button className="btn primary" disabled={!isPhoneValid || loading} onClick={sendCode}>
-          인증번호 받기
+        <button className="back-btn" onClick={() => navigate(-1)}>
+          <img src={back} alt="뒤로가기" />
         </button>
+        <h2 className="lg-title">전화번호를 인증할게요</h2>
+        <p className="sp-sub">
+        전화번호를 하이픈(-) 없이 입력해주세요.
+        </p>
 
-        <button type="button" className="link-back" onClick={()=>navigate(-1)}>이전으로</button>
+        <input
+          id="phone"
+          className="input phone-input"
+          placeholder="01012345678"
+          inputMode="tel"
+          value={phone}
+          onChange={(e) => setPhone(formatPhone(e.target.value))}
+          // 전화번호가 유효하지 않을 때만 aria-invalid 설정
+          aria-invalid={!isPhoneValid && phone.length > 0} 
+        />
+        
+        {!isPhoneValid && phone.length > 0 && (
+          <p className="error-message">
+            <img src={wrong_input} alt='오류 아이콘' className="error-icon"/>
+            전화번호를 확인해주세요.
+          </p>
+        )}
+       
+
+        <button
+          className="btn primary phone-btn"
+          disabled={!isPhoneValid || loading}
+          onClick={sendCode}
+        >
+          {isPhoneValid ? '인증번호 받기':'전화번호를 입력해주세요'}
+        </button>
       </div>
     </main>
   );
 }
 
-// import React, { useMemo, useState, useEffect } from 'react';
-// import { useLocation, useNavigate } from 'react-router-dom';
-// import tripshot_logo from '../../assets/tripshot_logo.png';
-// import './Auth.css';
-
-// const API_BASE = (import.meta?.env?.VITE_API_BASE || 'http://localhost:4000').replace(/\/$/, '');
-
-// const formatKRPhone = (raw) => {
-//   const d = raw.replace(/\D/g, '').slice(0, 11);
-//   if (d.length <= 3) return d;
-//   if (d.length <= 7) return `${d.slice(0,3)}-${d.slice(3)}`;
-//   return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}`;
-// };
-
-// export default function PhoneEnter() {
-//   const { state } = useLocation(); // { authTicket } expected
-//   const navigate = useNavigate();
-//   const [phone, setPhone] = useState('');
-//   const [loading, setLoading] = useState(false);
-//   const [err, setErr] = useState('');
-
-//   // authTicket 가드
-//   useEffect(() => {
-//     if (!state?.authTicket) {
-//       navigate('/login', { replace: true });
-//     }
-//   }, [state?.authTicket, navigate]);
-
-//   const isPhoneValid = useMemo(
-//     () => phone.replace(/\D/g, '').length >= 10,
-//     [phone]
-//   );
-
-//   const sendCode = async () => {
-//     if (!isPhoneValid || loading) return;
-//     if (!state?.authTicket) return navigate('/login', { replace: true });
-
-//     setLoading(true);
-//     setErr('');
-//     try {
-//       const res = await fetch(`${API_BASE}/login/send-code`, {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         // 쿠키 세션을 쓴다면 주석 해제
-//         // credentials: 'include',
-//         body: JSON.stringify({
-//           phone: phone.replace(/\D/g, ''),
-//           authTicket: state.authTicket,
-//         }),
-//       });
-
-//       if (!res.ok) {
-//         const msg = await res.text().catch(() => '');
-//         throw new Error(msg || 'send-code failed');
-//       }
-
-//       // 서버 계약 예시:
-//       // { next: 'verify' | 'link', masked?: '010-****-1234', candidates?: [...] }
-//       const data = await res.json();
-
-//       if (data.next === 'link') {
-//         navigate('/auth/link', {
-//           state: {
-//             authTicket: state.authTicket,
-//             phone: phone.replace(/\D/g, ''),
-//             candidates: data.candidates || [],
-//           },
-//         });
-//       } else {
-//         navigate('/auth/verify', {
-//           state: {
-//             authTicket: state.authTicket,
-//             phone: phone.replace(/\D/g, ''),
-//             masked: data.masked ?? phone,
-//           },
-//         });
-//       }
-//     } catch (e) {
-//       console.error(e);
-//       setErr('인증번호 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <main className="login">
-//       <div className="card">
-//         <img src={tripshot_logo} className="logo-login" alt="TripShot" />
-
-//         <h2 className="lg-title">전화번호 인증</h2>
-//         <p className="sp-sub">
-//           소셜 계정 연동을 위해
-//           <br />
-//           전화번호 인증이 필요합니다
-//         </p>
-
-//         <label className="field-label" htmlFor="phone">전화번호</label>
-//         <input
-//           id="phone"
-//           className="input"
-//           placeholder="010-1234-5678"
-//           inputMode="tel"
-//           value={phone}
-//           onChange={(e) => setPhone(formatKRPhone(e.target.value))}
-//           aria-invalid={!isPhoneValid && phone.length > 0}
-//         />
-
-//         {err && <p className="field-error">{err}</p>}
-
-//         <button
-//           className="btn primary"
-//           disabled={!isPhoneValid || loading}
-//           onClick={sendCode}
-//         >
-//           {loading ? '전송 중…' : '인증번호 받기'}
-//         </button>
-
-//         <button type="button" className="link-back" onClick={() => navigate(-1)}>
-//           이전으로
-//         </button>
-//       </div>
-//     </main>
-//   );
-// }

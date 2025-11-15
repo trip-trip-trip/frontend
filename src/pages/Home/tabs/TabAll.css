@@ -1,11 +1,8 @@
-.taball { 
-  padding: 1.2rem 1.6rem 10rem; 
-}
 
 .live-card{ 
   background:#DCF7CF; 
   border-radius:1.6rem; 
-  padding:2.2rem 1.4rem; 
+  padding:2.5rem 1.4rem; 
   margin:0 0 1.6rem; 
 }
 .live-head{ 
@@ -51,11 +48,27 @@
   box-shadow:0 0 0 3px #fff, 0 0 0 6px rgba(255,59,48,.18);
 }
 
-.feed-list { 
-  display:flex; 
-  flex-direction:column; 
-  gap:2rem; 
+
+.taball {
+  width: 100%;
+  min-height: 100vh;
+  padding-top: 20px; /* 상단 여백 추가 */
+  background-color: #f6f6f5; /* Image 1의 밝은 배경색 */
 }
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0; /* 상하 패딩 추가 */
+}
+
+.feed-skeleton, .feed-error {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+}
+
+
 
 /* 상단(프로필/지역/시간) */
 .post-header{ 

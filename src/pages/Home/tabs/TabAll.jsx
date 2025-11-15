@@ -1,13 +1,151 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PostItem from '../post/PostItem'; 
 import './TabAll.css';
 
-const TabAll = ({ activeTrip, posts = [] }) => {
+const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+
+// PostCreate에서 사용하는 LS_KEY
+const LS_KEY = 'tripshot_posts'; 
+
+const readLocalPosts = () => {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch { return []; }
+};
+
+const mapLocalPost = (p) => ({
+  id: p.id,
+  author: p.userName ?? 'me', 
+  author_avatar: p.author_avatar ?? 'https://placehold.co/48x48/CCCCCC/FFF?text=ME',
+  caption: p.content ?? '', 
+  image: p.image || null,
+  location: p.lat && p.lng ? '위치 정보 있음' : '위치 정보 없음',                
+  date: new Date(p.createdAt).toLocaleDateString('ko-KR', { 
+    year: 'numeric', month: '2-digit', day: '2-digit' 
+  }).replace(/\./g, '.').trim(), // '2025.11.12' 형식으로 변환
+  like_count: p.likes ?? 0,
+  comment_count: p.comments ?? 0,
+  is_liked: !!p.is_liked,
+  is_mine: p.userName === 'me', 
+});
+
+
+const mapApiPost = (p) => ({
+  id: p.id,
+  author: p.author?.username ?? 'username', 
+  author_avatar: p.author?.avatar_url ?? '/assets/default-avatar.png',
+  caption: p.caption ?? '',
+  image: p.media?.[0]?.thumbnail_url || p.media?.[0]?.url || null,
+  location: p.location ?? '위치 정보 없음',                 
+  date: new Date(p.created_at).toLocaleDateString('ko-KR', { 
+    year: 'numeric', month: '2-digit', day: '2-digit' 
+  }).replace(/\./g, '.').trim(), 
+  like_count: p.like_count ?? 0,
+  comment_count: p.comment_count ?? 0,
+  is_liked: !!p.is_liked,
+  is_mine: p.author?.id === 'current_user_id', 
+});
+
+const writePosts = (arr) => localStorage.setItem(LS_KEY, JSON.stringify(arr));
+
+ const createInitialDummyPosts = (writePosts) => {
+    const now = Date.now();
+    writePosts([
+      { id: String(now - 1), userName: 'demo', image: '/trip-img/trip1.jpeg', title: '경복궁', content: '서울 한 컷', lat: 37.579617, lng: 126.977041, privacy: 'friends', likes: 0, comments: 0, createdAt: now - 1, is_liked: false, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=D1' },
+      { id: String(now - 2), userName: 'demo', image: '/trip-img/trip2.jpeg', title: '제주', content: '한라산', lat: 33.4996, lng: 126.5312, privacy: 'friends', likes: 10, comments: 3, createdAt: now - 2, is_liked: true, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=D2' },
+      { id: String(now - 3), userName: 'me', image: '/trip-img/trip3.jpeg', title: '비공개', content: '내가 올린 게시물', lat: 37.5665, lng: 126.9780, privacy: 'private', likes: 0, comments: 0, createdAt: now - 3, is_liked: false, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=ME' }
+    ]);
+};
+
+const TabAll = ({ activeTrip = null }) => {
   const navigate = useNavigate();
-  const goShoot = () => navigate('/camera');
+
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
+  const [posts, setPosts] = useState([]);
+  
+  const canShoot = useMemo(() => !!activeTrip, [activeTrip]);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      let localPosts = readLocalPosts();
+      
+      if (localPosts.length === 0) {
+          createInitialDummyPosts();
+          localPosts = readLocalPosts(); 
+      }
+      localPosts = localPosts.map(mapLocalPost);
+      if (localPosts.length > 0) {
+          setPosts(localPosts);
+      }
+      
+      try {
+        setLoading(true);
+        setErr('');
+        
+        const url = `${API_BASE}/posts?feed_type=all&limit=20`;
+        const res = await fetch(url, { 
+          signal: ac.signal, credentials: 'include' 
+        });
+        
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        if (!data?.isSuccess || !Array.isArray(data?.result?.posts)) {
+          throw new Error(data?.message || 'Invalid payload');
+        }
+        
+        // API 성공 시: 로컬 데이터와 API 데이터를 병합 (로컬 데이터가 먼저 오도록)
+        const apiPosts = data.result.posts.map(mapApiPost);
+        
+        // API 데이터가 없는 경우를 대비해, 로컬 포스트 목록에서 API 포스트와 ID가 중복되지 않는 포스트만 남김
+        const combinedPosts = [
+            ...localPosts.filter(lp => !apiPosts.some(ap => ap.id === lp.id)), 
+            ...apiPosts
+        ];
+        
+        setPosts(combinedPosts);
+
+      } catch (error) {
+        console.error('API 로드 실패. 로컬 저장소 사용:', error.message);
+        
+        const dummyImages = Array.from({ length: 10 }, (_, i) => `/trip-img/trip${i + 1}.jpeg`);
+        const randomImage = dummyImages[Math.floor(Math.random() * dummyImages.length)];
+
+        //API 실패 시: 로컬 데이터가 없을 경우에만 더미 데이터 로드
+        if (localPosts.length === 0) {
+          setPosts([{
+            id: 'demo-1',
+            author: '여행에미친사람', // PostItem prop
+            author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=A',
+            caption: '도쿄에 다녀왔다!! 너무너무 재밌었다 또 가고 싶다.',
+            image: randomImage, //랜덤으로
+            location: '도쿄',
+            date: '2025.11.12',
+            like_count: 36, 
+            comment_count: 2, 
+            is_liked: false,
+            is_mine: true, 
+          }]);
+        }
+        setErr(error.message || '게시물 로드 실패');
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, []);
+
+  const goShoot = () => {
+    if (!canShoot) 
+      return;
+    navigate('/camera');
+  };
 
   return (
     <section className="taball">
+      {/*진행 중 여행 카드->activeTrip 있을 때만 */}
       {activeTrip && (
         <div className="live-card">
           <div className="live-head">
@@ -18,43 +156,29 @@ const TabAll = ({ activeTrip, posts = [] }) => {
             <span className="live-badge">LIVE</span>
           </div>
 
-          <button className="live-cta" onClick={goShoot} aria-label="지금 촬영하러 가기">
+          <button
+            className={`live-cta ${!canShoot ? 'disabled' : ''}`}
+            onClick={goShoot}
+            aria-label="지금 촬영하러 가기"
+            disabled={!canShoot}
+            title={canShoot ? '' : '여행 진행 중일 때만 촬영 가능합니다'}
+          >
             <span className="rec-dot" />
             지금 촬영하러 가기
           </button>
         </div>
       )}
-      
+
       <div className="feed-list">
-        {posts.map((p) => (
-          <article className="post" key={p.id}>
-            <header className="post-header">
-              <div className="avatar" />
-              <div className="ph-meta">
-                <div className="ph-top">
-                  <strong className="name">{p.userName ?? 'username'}</strong>
-                  <span className="location">{p.location ?? '부산'}</span>
-                </div>
-                <div className="time">{p.timeAgo ?? '3시간 전'}</div>
-              </div>
-            </header>
+        {loading && <div className="feed-skeleton">불러오는 중…</div>}
+        {err && <div className="feed-error">{err}</div>}
 
-            <div className="post-media" />
-
-            <div className="post-reactions">
-              {/* <span className="mag">💬</span> */}
-              <span className="r">❤️ {p.likes ?? 24}</span>
-              <span className="r">😊 {p.smiles ?? 13}</span>
-              <span className="r">👍 {p.thumbs ?? 2}</span>
-              <span className="r">😮 {p.wows ?? 0}</span>
-              <span className="r">😡 {p.angry ?? 0}</span>
-            </div>
-
-            <div className="post-caption">
-              <strong className="name">{p.userName ?? 'username'}</strong>
-              <span className="text">{p.caption ?? '부산에서 여유로운 하루... #여행'}</span>
-            </div>
-          </article>
+        {!loading && posts.map((p) => (
+         <PostItem 
+          key={p.id} 
+          post={p}      
+          isMine={p.is_mine} 
+          />
         ))}
       </div>
     </section>
