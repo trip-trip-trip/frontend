@@ -1,40 +1,64 @@
-.header{
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2rem;
-    max-width: 39rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* padding-bottom: 1.1rem; */
-    /* border-bottom: solid 1px #D4D4D4; */
-    font-size: 2.2rem;
-    font-weight: 500;
-    background-color: #ffffff;
-    color: var(--text-primary);
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 3.2rem;
-    z-index: 1;
+:root{
+  --page-max: 430px;       /* 카드 폭 */
+  --bg-cream: rgba(224, 221, 210);
+  --line: #eee;
 }
 
-/* .back{
-    position: absolute;
-    left: 1.1rem;
-    text-align: left;
-    font-size: 1.7rem;
-    font-weight: 500;
-    margin: 0;
-    padding: 0;
-} */
+.header{
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--page-max);
+  background: var(--bg-cream);
+  z-index: 100;
+}
 
-/* .back:hover{
-    cursor: pointer;
-} */
+.header-inner{
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+.header-divider{ 
+    height:1px; 
+    background: var(--line); 
+}        
 
 .page-name{
-    margin-bottom: 3rem;
-    padding: 0;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo{
+  height: 4.5rem; 
+  padding-top: 0;
+  max-width: 20rem; 
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.page-title{
+  font-size: 18px; 
+  font-weight: 700; 
+  color: var(--ink);
+}
+
+.header-add-btn{
+  width:36px; 
+  height:36px; 
+  border:none; 
+  background:transparent;
+  color: var(--ink); 
+  font-size:28px; 
+  line-height:1; 
+  cursor:pointer;
+  transition: transform .15s ease;
+}
+
+.header-add-btn:hover{ 
+  transform: scale(1.08); 
 }

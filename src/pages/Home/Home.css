@@ -1,45 +1,36 @@
+
 .home { 
   height: auto !important; 
   min-height: 100svh; 
   overflow-y: auto;
-}
-
-.home-header{
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  height: 5.6rem;
-  display: flex;
-  align-items: center;
-  padding: 0 1.6rem;
-  background:#fff;
-  border-bottom: 1px solid #eee;
+  background: #fdf9f1;
 }
 
 .tabs-bar{
-  top: 5.6rem;    
+  margin-top: 5.6rem;    
   justify-self: center;
-  z-index: 19;
   display: flex;
-  gap: .8rem;
-  padding: .8rem 1.6rem;
-  background:#fff;
+  gap: 1.8rem;
+  padding: 0.8rem;
+  background: #fdf9f1;
   border-bottom: 1px solid #eee;
+  justify-content: center;
 }
 
 .tab{
   min-width: 6.4rem;
   padding: .6rem 1.2rem;
   border-radius: 9999px;
-  border: 1px solid #e9e9ef;
-  background: #f6f6f8;
+  border: 1px solid #dddad3;
+  background: #dddad3;
+  color: #4a3f35;
   font-size: 1.3rem;
   font-weight: 600;
 }
-.tab.active{ background:#3a59ff; color:#fff; border-color:#3a59ff; }
-
-/* 본문: 헤더+탭 높이만큼 위 여백 확보 */
-.home-body{
-  padding: 1.2rem 1.6rem 9.6rem;
+.tab.active{ 
+  background:#f1d8bb; color:#4a3f35; border-color:#f1d8bb; 
 }
+
+
+
 
