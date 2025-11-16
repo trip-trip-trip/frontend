@@ -240,3 +240,22 @@
 @media (min-height: 760px) {
   .card { padding-top: 2.8rem; }
 }
+
+/* src/pages/SignUp/Auth.css */
+
+/* ... (기존 .login-phone, .card, .lg-title, .sp-sub 등) ... */
+
+/* [추가] "새로 오셨군요! 환영해요:D" 멘트 스타일 */
+.welcome-text {
+  font-size: 1.4rem; /* 14px */
+  color: #555;
+  text-align: center;
+  margin-bottom: 4px; /* 'ID를 만들어요'와 간격 */
+}
+
+/* [수정] .lg-title (ID를 만들어요) 상단 간격을 줄임 */
+.lg-title {
+  font-size: 2.2rem;
+  margin: 0 0 10px 0; /* 기존 margin-top 제거 */
+  text-align: center;
+}

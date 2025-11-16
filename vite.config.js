@@ -28,12 +28,12 @@ export default defineConfig({
         // (예: public/icons/icon-192x192.png)
         icons: [
           {
-            src: '/icons/tripshot.png',
+            src: '/icons/tripshot_logo.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icons/tripshot.png',
+            src: '/icons/tripshot_logo.png',
             sizes: '512x512',
             type: 'image/png'
           }
@@ -45,6 +45,15 @@ export default defineConfig({
     allowedHosts: [
       '.ngrok-free.dev',
       '.ngrok-free.app'
-    ]
+    ],
+   proxy: {
+  '/api/kakao/start': {
+    target: 'https://tripshot.duckdns.org',
+    changeOrigin: true,
+    secure: false,
+    rewrite: (path) => path.replace(/^\/api\/kakao\/start/, '/login/start/kakao')
+  }
+}
+
   }
 })

@@ -206,8 +206,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PostItem from '../post/PostItem'; 
 import './TabAll.css';
+import { useAuth } from '../../../contexts/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
 // PostCreate에서 사용하는 LS_KEY
 const LS_KEY = 'tripshot_posts'; 
@@ -276,6 +277,7 @@ const createInitialDummyPosts = () => {
 
 const TabAll = ({ activeTrip = null }) => {
   const navigate = useNavigate();
+  const { activeTripId } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -358,7 +360,11 @@ const TabAll = ({ activeTrip = null }) => {
   const goShoot = () => {
     if (!canShoot) 
       return;
-    navigate('/camera');
+if (activeTripId) {
+        navigate(`/camera/${activeTripId}`); 
+    } else {
+      alert("활성 여행 ID를 찾을 수 없습니다.");
+    }
   };
 
   return (

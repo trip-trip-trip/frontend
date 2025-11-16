@@ -29,29 +29,30 @@ import Navbar from './components/NavBar/NavBar';
 import PostItem from './pages/Home/post/PostItem';
 import PostDetails from './pages/Home/post/PostDetails';
 import PostCreate from './pages/Home/post/PostCreate';
+import SetUsername from './pages/SignUp/SetUsername';
 
 
 
 const App = () => {
   // 스크린 사이즈 세팅
   function setScreenSize() {
-		let dvh = window.innerHeight * 0.01;
-		document.documentElement.style.setProperty('--dvh', `${dvh}px`);
-	}
+      let dvh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--dvh', `${dvh}px`);
+   }
 
   useEffect(() => {
-		setScreenSize();
+      setScreenSize();
 
-		const handleResize = () => {
-			setScreenSize();
-		};
+      const handleResize = () => {
+         setScreenSize();
+      };
 
-		window.addEventListener('resize', handleResize);
+      window.addEventListener('resize', handleResize);
 
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	}, []);
+      return () => {
+         window.removeEventListener('resize', handleResize);
+      };
+   }, []);
 
    useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -82,19 +83,19 @@ const App = () => {
         <Route path='/scrapbook/create' element={<SelectPic/>}/>
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
 
-		{/*/////////// alua /////////////*/}
-        <Route path='/Login' element={<Login/>}/>
+      {/*/////////// alua /////////////*/}
+        <Route path='/login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
         <Route path="/phone" element={<PhoneEnter />} />
         <Route path="/verify" element={<CodeVerify />} />
+        <Route path="set-username" element={<SetUsername />} />
         <Route path="/link" element={<AccountFound />} />
-        <Route path="/signup" element={<SignupWelcome />} />
         <Route path="/post" element={< PostItem/>} />
         <Route path="/post/:id" element={< PostDetails/>} />
         <Route path="/post/create" element={< PostCreate/>} />
 
 
-		  {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
+        {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
         <Route path="/mypage/profile" element={<ProfilePage />} />
 
         {/* 프로필 하위 페이지들 */}

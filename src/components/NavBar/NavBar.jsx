@@ -33,7 +33,7 @@ const Navbar = () => {
   
   // 게시물 올리기 (Upload) 핸들러
   const handlePostClick = () => {
-    navigate('/posting'); 
+    navigate('/trips/create'); 
   }
 
 
@@ -52,13 +52,13 @@ const Navbar = () => {
     <nav className="navbar">
       
       {/* 1. 홈 (/) */}
-      <div className="nav-link" onClick={() => navigate('/')}>
+      <div className="nav-link" onClick={() => navigate('/home')}>
         <img 
-          src={path === '/' ? home_on : home_off} 
+          src={path === '/home' ? home_on : home_off} 
           alt="홈" 
           className='icon' 
         />
-        <p className={path === '/' ? 'active' : ''}>홈</p>
+        <p className={path === '/home' ? 'active' : ''}>홈</p>
       </div>
       
       {/* 2. 촬영 (카메라) */}
