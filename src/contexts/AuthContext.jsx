@@ -49,9 +49,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // [수정] login 함수가 Home.jsx에서 호출될 때 토큰만 저장
-  const login = (jwtToken) => {
+  const login = (jwtToken, userObject) => {
     localStorage.setItem("jwtToken", jwtToken);
     setToken(jwtToken);
+    
+    // ⭐ 새로운 사용자 정보를 Context와 LocalStorage에 저장
+    setUser(userObject); 
+    if (userObject) {
+        localStorage.setItem("user", JSON.stringify(userObject));
+    }
   };
 
   const logout = () => {
