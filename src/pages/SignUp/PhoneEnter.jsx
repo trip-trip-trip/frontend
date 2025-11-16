@@ -1,4 +1,4 @@
-// PhoneEnter.jsx — 디자인 원본 그대로, 로직은 최신화
+
 
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';

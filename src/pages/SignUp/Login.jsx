@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
 import welcome_text from '../../assets/Welcome.png'; 
@@ -57,23 +57,17 @@ export default function Login() {
 
       <div className="login-buttons">
 
-    
-
         <button className="social-btn kakao-login" onClick={handleKakao}>
-
           <img src={kakaoLogo} alt="" className="social-icon" />
           카카오 계정으로 계속하기
         </button>
-
 
         <button className="social-btn google-login" onClick={handleGoogle}>
           <img src={googleLogo} alt="" className="social-icon" />
           구글 계정으로 계속하기
         </button>
 
-
         <button className="social-btn naver-login" onClick={handleNaver}>
-
           <img src={naverLogo} alt="" className="social-icon" />
           네이버 계정으로 계속하기
         </button>
