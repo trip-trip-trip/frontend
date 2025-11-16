@@ -1,9 +1,15 @@
+.home {
+    height: 100vh; /* 또는 var(--dvh)를 사용한 100dvh */
+    display: flex;
+    flex-direction: column; /* 세로로 자식 요소 배치 */
+}
 
-.home { 
-  height: auto !important; 
-  min-height: 100svh; 
-  overflow-y: auto;
-  background: #fdf9f1;
+.home-body {
+    flex-grow: 1; 
+    overflow-y: auto; 
+    
+    /* 브라우저별 스크롤 관성 효과를 위한 설정 (선택 사항) */
+    -webkit-overflow-scrolling: touch; 
 }
 
 .tabs-bar{

@@ -77,7 +77,7 @@ const tag=username;
       if (level === 'access') {
         // [회원가입/로그인 성공]
         login(jwtToken, user); // AuthContext에 "진짜" 토큰과 유저 정보 저장
-        navigate('/home'); // 홈으로 이동
+        navigate('/home', { replace: true });// 홈으로 이동
       } else {
         throw new Error("회원가입에 실패했습니다. (Access Level이 아님)");
       }
