@@ -163,8 +163,8 @@ const CameraPage = () => {
   }, []);
 
   // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
-  const applyFilmFrame = async (imageSrc, dateStamp, filterConfig) => {
-    const { cssFilter, frame, texture } = filterConfig; // 필터 설정값 분해
+  const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStamp, cssFilter) => {
+   // const { cssFilter, frame, texture } = filterConfig; // 필터 설정값 분해
 
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
@@ -184,11 +184,11 @@ const CameraPage = () => {
         ctx.filter = 'none';
 
         // 3. [수정] 텍스처가 있을 때만 합성
-        if (texture) {
+        if (filmTextureSrc) {
           await new Promise((textureResolve) => {
             const textureImg = new Image();
             textureImg.crossOrigin = "anonymous";
-            textureImg.src = texture;
+            textureImg.src = filmTextureSrc;
             textureImg.onload = () => {
               ctx.globalAlpha = 0.7; 
               ctx.globalCompositeOperation = 'overlay';
@@ -212,14 +212,16 @@ const CameraPage = () => {
         }
 
         // 4. [수정] 프레임이 있을 때만 합성
-        if (frame) {
+        if (filmOverlaySrc) {
           await new Promise((frameResolve) => {
             const filmOverlayImg = new Image();
             filmOverlayImg.crossOrigin = "anonymous";
-            filmOverlayImg.src = frame;
+            filmOverlayImg.src = filmOverlaySrc;
             filmOverlayImg.onload = () => {
               const overlayRatio = filmOverlayImg.width / filmOverlayImg.height;
               let drawWidth, drawHeight, offsetX, offsetY;
+              
+              const canvasRatio = canvas.width / canvas.height;
               if (overlayRatio > canvasRatio) { 
                 drawHeight = canvas.height; drawWidth = filmOverlayImg.width * (drawHeight / filmOverlayImg.height);
                 offsetX = (canvas.width - drawWidth) / 2; offsetY = 0;
@@ -313,11 +315,12 @@ const CameraPage = () => {
       // 8. [수정] 현재 선택된 필터 팩 전체를 전달
       const selectedFilter = FILTERS[currentFilterIndex];
         const processedImageSrc = await applyFilmFrame(
-          imageSrc, 
-          selectedFilter.frame,   // 👈 선택된 프레임 (null일 수 있음)
-          selectedFilter.texture, // 👈 선택된 텍스처 (null일 수 있음)
-          getFilmDate(),
-          selectedFilter.cssFilter // 👈 선택된 CSS 필터
+        imageSrc, 
+          selectedFilter.frame,   // 👈 2번째 인자 (프레임)
+          selectedFilter.texture, // 👈 3번째 인자 (텍스처)
+          getFilmDate(),          // 👈 4번째 인자 (날짜)
+          selectedFilter.cssFilter
+      
         );
 
       navigate(`/capture-complete/${tripId}`, {
