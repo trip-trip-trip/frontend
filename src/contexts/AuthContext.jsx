@@ -1,29 +1,32 @@
+// src/contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+
+// const API_BASE = import.meta.env.VITE_API_BASE_URL; // (BE API 완성 전까지 주석)
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); 
   const [token, setToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // [수정] 초기값 true
   const [activeTripId, setActiveTripId] = useState(null);
 
+  // BE API가 없으므로 이 함수는 일단 주석 처리
+  /*
   const fetchUserProfile = useCallback(async (currentToken) => {
     if (!currentToken) {
       setIsLoading(false);
       return;
     }
-
     try {
-      const res = await fetch(`/api/user/me`, {
+      const res = await fetch(`${API_BASE}/api/user/me`, {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
-
       if (!res.ok) throw new Error("토큰이 유효하지 않습니다.");
-
       const data = await res.json();
       if (data.isSuccess) {
         setUser(data.result);
+        localStorage.setItem("user", JSON.stringify(data.result));  
       }
     } catch (err) {
       console.error("사용자 정보 로드 실패:", err);
@@ -32,17 +35,20 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(false);
     }
   }, []);
+  */
 
+  // [수정] 앱이 켜질 때 localStorage에서 토큰과 "user"를 바로 로드
   useEffect(() => {
-    const storedToken = localStorage.getItem("jwtToken");
-    if (storedToken) {
-      setToken(storedToken);
-      fetchUserProfile(storedToken);
-    } else {
-      setIsLoading(false);
-    }
-  }, [fetchUserProfile]);
 
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser) {
+      setUser(JSON.parse(savedUser)); 
+    }
+    setIsLoading(false); 
+  }, []);
+
+  // [수정] login 함수가 Home.jsx에서 호출될 때 토큰만 저장
   const login = (jwtToken) => {
     localStorage.setItem("jwtToken", jwtToken);
     setToken(jwtToken);
@@ -50,44 +56,24 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("jwtToken");
+    localStorage.removeItem("user"); 
     setUser(null);
     setToken(null);
     setActiveTripId(null);
   };
 
-  // ⭐ 카카오 로그인 (백엔드 code 방식)
-  const loginWithKakao = async (code) => {
-    try {
-      const response = await fetch(`/api/login/start/kakao?code=${code}`);
-      const data = await response.json();
-
-      if (!data.isSuccess) {
-        throw new Error(data.message);
-      }
-
-      const { level, jwtToken } = data.result;
-
-      if (level === "access") {
-        login(jwtToken);
-        return { level: "access", token: jwtToken };
-      } else {
-        return { level: "signup", token: jwtToken };
-      }
-
-    } catch (err) {
-      console.error("카카오 로그인 연동 실패:", err);
-      return null;
-    }
-  };
+  // (loginWithKakao 함수는 Login.jsx가 사용하지 않으므로 주석 처리)
+  // const loginWithKakao = async (code) => { ... };
 
   return (
     <AuthContext.Provider
       value={{
         user,
         token,
+        setUser, // 👈 Home.jsx가 user를 저장할 수 있게
         login,
         logout,
-        loginWithKakao,
+        // loginWithKakao,
         activeTripId,
         setActiveTripId,
         isLoading,

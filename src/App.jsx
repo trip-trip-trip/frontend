@@ -29,6 +29,7 @@ import Navbar from './components/NavBar/NavBar';
 import PostItem from './pages/Home/post/PostItem';
 import PostDetails from './pages/Home/post/PostDetails';
 import PostCreate from './pages/Home/post/PostCreate';
+import SetUsername from './pages/SignUp/SetUsername';
 
 
 
@@ -83,12 +84,12 @@ const App = () => {
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
 
       {/*/////////// alua /////////////*/}
-        <Route path='/Login' element={<Login/>}/>
+        <Route path='/login' element={<Login/>}/>
         <Route path='/StartPage' element={<StartPage/>}/>
         <Route path="/phone" element={<PhoneEnter />} />
         <Route path="/verify" element={<CodeVerify />} />
+        <Route path="set-username" element={<SetUsername />} />
         <Route path="/link" element={<AccountFound />} />
-        <Route path="/signup" element={<SignupWelcome />} />
         <Route path="/post" element={< PostItem/>} />
         <Route path="/post/:id" element={< PostDetails/>} />
         <Route path="/post/create" element={< PostCreate/>} />

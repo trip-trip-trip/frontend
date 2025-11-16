@@ -45,6 +45,15 @@ export default defineConfig({
     allowedHosts: [
       '.ngrok-free.dev',
       '.ngrok-free.app'
-    ]
+    ],
+   proxy: {
+  '/api/kakao/start': {
+    target: 'https://tripshot.duckdns.org',
+    changeOrigin: true,
+    secure: false,
+    rewrite: (path) => path.replace(/^\/api\/kakao\/start/, '/login/start/kakao')
+  }
+}
+
   }
 })
