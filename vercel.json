@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/kakao/start",
+      "destination": "https://tripshot.duckdns.org/login/start/kakao"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
+}

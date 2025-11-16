@@ -1,0 +1,261 @@
+.login-phone{
+  max-width: 45rem;
+  box-sizing: border-box;
+  background: #f6f6f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  height: 100vh;
+}
+
+.card { 
+  width: 90%;
+}
+
+.brand {
+  margin: 0.6rem 0 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.brand-sub {
+  margin: 0.1rem 0 1.2rem;
+  color: #8f8f95;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+}
+
+.sp-sub {
+  margin: 0 0 1.2rem;
+  color: #5a5a62;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.field-label {
+  width: 100%;
+  align-self: flex-start;
+  font-size: 1.2rem;
+  color: #2b2b32;
+  font-weight: 600;
+  
+}
+
+
+.input {
+  width: 93%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  height: 48px;
+  border: 1px solid #E6E8EF;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 1.4rem;
+  outline: none;
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  background: #fff;
+}
+.phone-display-box{
+    display: flex;
+    align-items: center;
+    /* font-weight: 600; */
+    margin-bottom: 0.8rem;
+}
+.input::placeholder {
+  color: #b6bac7;
+}
+
+
+.back-btn {
+    align-self: flex-start;
+    margin-top: 1.6rem; 
+    margin-bottom: 3.2rem; /* 이미지처럼 제목 위 공간 확보 */
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+
+.btn {
+  width: 100%;
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .02s ease-in, box-shadow .2s, opacity .2s;
+  margin-top: 3.6rem;
+}
+
+.btn.primary {
+  color: #fff;
+  background: #525b65;
+  box-shadow: 0 1px 5px rgba(126, 118, 50, 0.306);
+}
+/* #525b65 */
+
+.btn.primary:hover:not(:disabled) {
+  box-shadow: 0 8px 22px rgba(58, 89, 255, 0.34);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 1;
+  color: #fff;
+  background: #e0ddd2;
+
+  cursor: not-allowed;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: #3A59FF;
+  border: 1px solid #DDE1F5;
+  box-shadow: none;
+}
+
+/* 하단 링크 */
+.link-back {
+  background: transparent;
+  color: #8a8f9d;
+  border: 0;
+  margin-top: 1.4rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.timer { 
+    margin:.2rem 0 1.2rem; 
+    color:#3A59FF; 
+    font-weight:700; 
+    font-size:1.2rem; 
+    justify-self: center;
+}
+
+.account-box {
+  width: 100%;
+  margin: 1.6rem 0 2.0rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: 16px;
+  background: #f7f8ff;             /* 살짝 파스텔 회색/보라 */
+  border: 1px solid #e1e4f5;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* 상단: "카카오톡으로 가입" 행 */
+.provider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.provider-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  object-fit: contain;
+}
+
+/* 하단: "현재 로그인: 구글" */
+.current-login {
+  margin-top: 0.4rem;
+  font-size: 1.2rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.current-provider-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.lg-title {
+  margin-top: 0; 
+  margin-bottom: 0.6rem;
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: left;
+  color: #333; 
+}
+
+.sp-sub {
+  margin-bottom: 2rem;
+  color: #5a5a62;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  text-align: left;
+}
+.error-message {
+    width: 100%;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #f04438; /* 빨간색 텍스트 */
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 0.4rem; /* 인풋 아래쪽 공간 */
+    margin-bottom: 0;
+}
+
+.error-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+    object-fit: contain;
+}
+
+.send-again-login{
+  background: none;
+  color: #555;
+  border: none;
+  margin-top: 1.4rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  text-decoration: underline; 
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+  display: block; 
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+@media (min-height: 760px) {
+  .card { padding-top: 2.8rem; }
+}
+
+/* src/pages/SignUp/Auth.css */
+
+/* ... (기존 .login-phone, .card, .lg-title, .sp-sub 등) ... */
+
+/* [추가] "새로 오셨군요! 환영해요:D" 멘트 스타일 */
+.welcome-text {
+  font-size: 1.4rem; /* 14px */
+  color: #555;
+  text-align: center;
+  margin-bottom: 4px; /* 'ID를 만들어요'와 간격 */
+}
+
+/* [수정] .lg-title (ID를 만들어요) 상단 간격을 줄임 */
+.lg-title {
+  font-size: 2.2rem;
+  margin: 0 0 10px 0; /* 기존 margin-top 제거 */
+  text-align: center;
+}

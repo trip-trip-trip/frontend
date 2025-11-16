@@ -100,7 +100,7 @@ export default function SettingPage() {
           throw new Error(`vapid-key 실패: ${vapidKeyRes.status}`);
         }
 
-        // 🔥 수정: 스펙에 맞게 파싱 (result X)
+        //  수정: 스펙에 맞게 파싱 (result X)
         const vapidJson = await vapidKeyRes.json();
         const vapidPublicKey = vapidJson.vapidPublicKey;
         if (!vapidPublicKey) {
@@ -126,7 +126,7 @@ export default function SettingPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: String(user.id), // 🔥 String으로 맞춰줌
+            userId: String(user.id), //  String으로 맞춰줌
             endpoint,
             p256dh: keys.p256dh,
             auth: keys.auth,
@@ -271,6 +271,8 @@ export default function SettingPage() {
         </section>
 
       </main>
+      
+      <NavBar current="mypage" />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // src/pages/Camera/CaptureCompletePage.jsx
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate,useParams } from 'react-router-dom';
 import './CaptureCompletePage.css'; // CSS 파일 생성
 import { useAuth } from '../../contexts/AuthContext';
 

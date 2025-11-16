@@ -1,0 +1,64 @@
+.create-scrap{
+    padding: 5rem 0;
+}
+
+.create-scrap-container h1{
+    margin: 2.9rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.create-scrap-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.scrap-img-container{
+    position: relative;
+    display: block;
+    width: 32rem;
+    height: 48rem;
+}
+
+.frame-img{
+    position: absolute;
+    z-index: 999;
+    width: 32rem;
+    height: 48rem;
+    object-fit: cover;
+}
+
+.photo-frame {
+    position: absolute;            
+    cursor: pointer;
+    overflow: hidden;
+    z-index: 1;                   
+}
+
+  
+.scrap-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.save-scrap-button{
+    margin: 2.5rem 0;
+    width: 32rem;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: none;
+    /* border: 0.1rem solid black; */
+    font-size: 1.8rem;
+    background-color: #519b63;
+    color: white;
+    cursor: pointer;
+}
+
+.save-scrap-button:hover{
+    background-color: #448153;
+    transition: ease-in-out 0.2s;
+}

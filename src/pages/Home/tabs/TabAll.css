@@ -1,0 +1,136 @@
+
+.live-card{ 
+  background:#DCF7CF; 
+  border-radius:1.6rem; 
+  padding:2.5rem 1.4rem; 
+  margin:0 0 1.6rem; 
+}
+.live-head{ 
+  display:flex; 
+  align-items:flex-start; 
+  justify-content:space-between; 
+  gap:1rem; margin-bottom:0.8rem; 
+}
+.live-title{ 
+  margin:0; 
+  font-size:1.4rem; 
+  font-weight:700; 
+}
+.live-sub{ 
+  margin:.2rem 0 0; 
+  font-size:1.2rem; 
+  color:#6B6B6B; 
+}
+.live-badge{ 
+  font-size:1.1rem; 
+  font-weight:700; 
+  color:#111; 
+}
+.live-cta{
+  width:100%; 
+  height:4.4rem; 
+  border:0; 
+  border-radius:1.2rem;
+  background:#fff; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  gap:.8rem;
+  font-size:1.4rem; 
+  font-weight:700; 
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
+}
+.rec-dot{ 
+  width:1.2rem; 
+  height:1.2rem; 
+  border-radius:50%; 
+  background:#ff3b30;
+  box-shadow:0 0 0 3px #fff, 0 0 0 6px rgba(255,59,48,.18);
+}
+
+
+.taball {
+  width: 100%;
+  min-height: 100vh;
+  padding-top: 20px; /* 상단 여백 추가 */
+  background-color: #f6f6f5; /* Image 1의 밝은 배경색 */
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0; /* 상하 패딩 추가 */
+}
+
+.feed-skeleton, .feed-error {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+}
+
+
+
+/* 상단(프로필/지역/시간) */
+.post-header{ 
+  display:flex; 
+  align-items:center; 
+  gap:1rem; 
+}
+.avatar{ 
+  width:4.2rem; 
+  height:4.2rem;
+  border-radius:50%; 
+  background:#d9d9d9;
+}
+.ph-meta{ 
+  display:flex; 
+  flex-direction:column;
+  gap:.2rem; 
+}
+.ph-top{ 
+  display:flex; 
+  align-items:center; 
+  gap:0.8rem; 
+}
+.name{ 
+  font-size:1.5rem; 
+  font-weight:700; 
+}
+.location{ 
+  font-size:1.2rem; 
+  color:#8f8f8f; 
+}
+.time{ 
+  font-size:1.2rem; 
+  color:#9b9b9b; 
+}
+
+.post-media{
+  height:23rem;                    
+  border-radius:2.4rem;           
+  background:#d9d9d9;
+  margin:1.2rem 0 0;
+}
+
+.post-reactions{
+  display:flex; align-items:center; gap:1.2rem;
+  padding:.9rem .2rem 0;
+  color:#8e7a5f;                   
+  font-size:1.3rem;
+}
+.post-reactions .mag{ 
+  font-size:2.2rem; 
+  line-height:1; 
+}
+
+.post-caption{
+  display:flex; 
+  align-items:baseline; 
+  gap:.6rem;
+  padding:.6rem .2rem 0;
+}
+
+.post-caption .text{ 
+  font-size:1.35rem; 
+  color:#2b2b2b; 
+}
