@@ -80,10 +80,12 @@ body {
   /* 높이 (팀원 설정 dvh 사용) */
   min-height: 100dvh;
   /* App.jsx에서 설정한 --dvh 변수 사용 (fallback으로 1dvh) */
-  height: calc(var(--dvh, 1dvh) * 100); 
+  height: calc(var(--dvh, 1dvh) * 100);
+  height: auto; 
   
   /* 페이지 기본 배경색 */
   background-color: #ffffff;
+
   
   /* [중요] padding: 0 (카메라 페이지 등 꽉 차는 UI용) */
   padding: 0; 
@@ -94,6 +96,7 @@ body {
   overflow: hidden; 
   position: relative;
 }
+
 
 /* 스크롤바 제거 */
 ::-webkit-scrollbar {

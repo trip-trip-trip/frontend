@@ -1,0 +1,15 @@
+.startpage {
+  width: 100%;
+  height: 100vh;
+  background: #f6f6f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo {
+  width: 36rem;
+  object-fit: contain;
+  user-select: none;
+}

@@ -1,0 +1,64 @@
+:root{
+  --page-max: 430px;       /* 카드 폭 */
+  --bg-cream: rgba(224, 221, 210);
+  --line: #eee;
+}
+
+.header{
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--page-max);
+  background: var(--bg-cream);
+  z-index: 100;
+}
+
+.header-inner{
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+.header-divider{ 
+    height:1px; 
+    background: var(--line); 
+}        
+
+.page-name{
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo{
+  height: 4.5rem; 
+  padding-top: 0;
+  max-width: 20rem; 
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.page-title{
+  font-size: 18px; 
+  font-weight: 700; 
+  color: var(--ink);
+}
+
+.header-add-btn{
+  width:36px; 
+  height:36px; 
+  border:none; 
+  background:transparent;
+  color: var(--ink); 
+  font-size:28px; 
+  line-height:1; 
+  cursor:pointer;
+  transition: transform .15s ease;
+}
+
+.header-add-btn:hover{ 
+  transform: scale(1.08); 
+}

@@ -1,10 +1,9 @@
 import React from "react";
 import "./MyPage.css";
-// import BottomNav from "../../components/BottomNav"; //navbar
  import dummyUser from "./dummyUser";
 
 export default function FeedPage() {
-  const posts = dummyUser.posts;
+  const posts = dummyUser.posts||[];
 
   return (
     <div className="page-container">
@@ -26,7 +25,7 @@ export default function FeedPage() {
         ))}
       </section>
 
-      <BottomNav current="feed" />
+      <NavBar current="mypage" />
     </div>
   );
 }

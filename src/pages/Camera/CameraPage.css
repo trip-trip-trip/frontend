@@ -1,10 +1,13 @@
-/* src/pages/Camera/CameraPage.css */
-
-/* 전체 페이지 래퍼 - vh 단위를 사용하여 고정 높이 */
+html,body,#root{
+  height:100%;
+    margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
 .camera-page-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100dvh;
   max-width: 43rem; /* 스마트폰 가로 폭 제한 (피그마 390px + 여유) */
   margin: 0 auto; /* 중앙 정렬 */
   background-color: #000; /* 전체 배경을 검은색으로 */
@@ -12,12 +15,16 @@
   overflow: hidden; /* 넘치는 콘텐츠 숨기기 */
 }
 
+.flip-icon {
+  width: 30px;
+  height: 30px;
+}
 /* 헤더 스타일 */
 .camera-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 15px;
+  justify-content: space-between;
+  padding: 12px;
   background-color: #000; /* 검은색 헤더 */
   color: #fff;
   position: relative;
@@ -25,8 +32,8 @@
 }
 
 .camera-header .back-button {
-  position: absolute;
-  left: 15px;
+  /*position: absolute;
+  left: 15px;*/
   background: none;
   border: none;
   color: #fff;
@@ -40,6 +47,18 @@
 .camera-header .header-title {
   font-size: 18px;
   font-weight: bold;
+  margin: 0 auto;
+}
+.flip-camera-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.6rem; /* (아이콘 폰트 사용 시 2.4rem) */
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  width: 40px; /* 영역 확보 */
+  text-align: right;
 }
 
 /* 카메라 뷰 컨테이너 */
@@ -57,8 +76,17 @@
   width: 100%; /* 너비는 자동으로, 높이는 컨테이너에 맞춰서 */
   height: 100%; /* 부모 컨테이너의 높이를 꽉 채움 */
   object-fit: cover; /* 화면을 꽉 채우도록 자르면서 확대/축소 */
- transform: scaleX(-1);
+
   transform-origin: center center;
+ filter:none;
+}
+
+.webcam-feed.user {
+  transform: scaleX(-1); /* 전면 카메라일 때 좌우 반전 */
+}
+
+.webcam-feed.environment {
+  transform: scaleX(1); /* 후면 카메라일 때 원래대로 */
 }
 
 /* '3' 카운트다운 오버레이 */
@@ -75,7 +103,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 60px;
+  font-size: 60psx;
   font-weight: bold;
   z-index: 5;
 }
@@ -96,11 +124,12 @@
 /* 하단 컨트롤 바 */
 .camera-controls-bar {
   background-color: #000; /* 하단바 배경 검은색 */
-  padding: 20px 0;
+  padding-top:5px;
+  padding-bottom:20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 0px;
   position: relative;
   z-index: 10;
 }
@@ -135,37 +164,60 @@
   height: 2px;
   background-color: #fff; /* 흰색 밑줄 */
 }
+
 .film-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* 클릭 방해하지 않도록 */
-  z-index: 3; /* 웹캠 위에 오도록 */
-  
-/* 1. 비네팅 (가장자리를 더 어둡게) */
-  background: 
-    radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.6) 100%);
-  
-  /* 2. 효과 강도 (기존 0.5 -> 0.8로 증가) */
-  opacity: 0.8; 
-  
-  /* 3. 필터 (기존보다 강하게 : 세피아/채도 증가) */
-  filter: grayscale(40%) sepia(70%) contrast(110%) saturate(130%);
+  pointer-events: none; /* 클릭 방해 금지 */
+  z-index: 5;
+opacity: 0.5;
+display:flex;
+justify-content: center;
+object-fit:fill;
+  }
+ .film-texture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 텍스처는 꽉 채움 */
+  z-index: 7; /* 프레임보다 위에 */
+   filter: none; /* (또는 밝기만 살짝: filter: brightness(110%);) */
+ mix-blend-mode: overlay; 
+ opacity: 0.6; 
 }
+
+
+
+
+.film-frame-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: fill;
+  z-index: 6;
+  pointer-events: none;
+}
+/* 필름 날짜 스탬프 */
 .film-date-stamp {
   position: absolute;
-  bottom: 20px; /* 위치 조정 가능 */
-  right: 20px; /* 위치 조정 가능 */
-  color: #FFB800; /* 필름 날짜 특유의 주황색 */
-  font-size: 1.6rem; /* 16px */
-  /* 'DSEG7' 같은 7세그먼트 폰트가 있다면 좋지만, 기본 폰트로 대체 */
-  font-family: 'Courier New', Courier, monospace; 
-  font-weight: bold;
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8); /* 가독성 */
-  z-index: 4;
-  letter-spacing: 2px; /* 자간 */
+  /* (위치/스타일은 새 프레임 디자인에 맞춰서 조정하세요) */
+  bottom: 1%; 
+  right: 8%;
+  color: #FFB800; /* 날짜 주황색 */
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.6rem;
+  font-weight:600; 
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  z-index: 7; /* 프레임보다 위에 오도록 */
 }
 
 /* 촬영 버튼 영역 */
@@ -220,7 +272,7 @@
   background-color: #333; /* 바의 기본 배경색 */
   border-radius: 3px;
   position: relative; /* 텍스트와 채움 바의 기준 */
-  margin-top: 15px; /* 촬영 버튼과의 간격 */
+  margin-top: 3px; /* 촬영 버튼과의 간격 */
 }
 
 .progress-bar-fill {

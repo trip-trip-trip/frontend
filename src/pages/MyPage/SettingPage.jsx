@@ -271,6 +271,8 @@ export default function SettingPage() {
         </section>
 
       </main>
+      
+      <NavBar current="mypage" />
     </div>
   );
 }

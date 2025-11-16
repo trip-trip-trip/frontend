@@ -272,7 +272,6 @@ const CameraPage = () => {
           return prev - 1;
         });
       }, 1000);
-
       try {
         mediaRecorderRef.current = new MediaRecorder(videoOnlyStream, {
           mimeType: MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm'
@@ -290,7 +289,6 @@ const CameraPage = () => {
             mediaRecorderRef.current.stop();
           }
         }, 3000);
-
       } catch (e) {
         console.error('MediaRecorder error:', e);
         setIsRecording(false);
@@ -356,28 +354,65 @@ const CameraPage = () => {
   return (
     <div className="camera-page-wrapper">
       <header className="camera-header">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          &lt;
-        </button>
+        <button className="back-button" onClick={() => navigate(-1)}>&lt;</button>
         <span className="header-title">촬영</span>
+        <button className="flip-camera-button" onClick={flipCamera}>
+          <img src={switchmode} alt="Switch Camera" className="flip-icon" />
+        </button>
       </header>
 
-      <div className="camera-view-container">
+      {/* 12. [수정] 스와이프 이벤트를 camera-view-container에 바인딩 */}
+      <div 
+        className="camera-view-container"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* 13. [수정] 현재 필터의 CSS 필터 값을 웹캠에 인라인 스타일로 적용 */}
         <Webcam
-         audio={true} 
+          audio={true} 
           ref={webcamRef}
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}
-          className="webcam-feed"
-          // (레이아웃 밀림은 CameraPage.css의 .webcam-feed { width: 100%; } 로 해결)
+          className={`webcam-feed ${facingMode}`} 
+          style={{ 
+            filter: mode === 'film' ? FILTERS[currentFilterIndex].cssFilter : 'none' 
+          }}
         />
         
+        {/* 실시간 오버레이 */}
         {mode === 'film' && (
-          <div className="film-overlay">
-            <div className="film-date-stamp">
-              {getFilmDate()}
-            </div>
-          </div>
+          (() => { // 14. [수정] 현재 필터 설정을 변수로 먼저 선언
+            const currentFilter = FILTERS[currentFilterIndex];
+            return (
+              <div className="film-overlay">
+                {/* 15. [수정] 프레임이 있을 때만 렌더링 */}
+                {currentFilter.frame && (
+                  <img 
+                    src={currentFilter.frame} 
+                    alt="Film Frame" 
+                    className="film-frame-overlay" 
+                  />
+                )}
+                {/* 16. [수정] 텍스처가 있을 때만 렌더링 */}
+                {currentFilter.texture && (
+                  <img 
+                    src={currentFilter.texture} 
+                    alt="Film Texture" 
+                    className="film-texture-overlay"
+                    // (텍스처 CSS는 CameraPage.css에서 관리)
+                  />
+                )}
+                <div className="film-date-stamp">
+                  {getFilmDate()}
+                </div>
+                {/* 17. [수정] 현재 필터 이름 표시 */}
+                <div className="film-filter-name">
+                  {currentFilter.name}
+                </div>
+              </div>
+            );
+          })()
         )}
 
         {mode === 'video' && isRecording && countdown > 0 && (
@@ -386,26 +421,17 @@ const CameraPage = () => {
           </div>
         )}
         
-        {!isRecording && mode !== 'film' && (
-            <div className="camera-view-text">
-                카메라 뷰
-            </div>
-        )}
+        {/* 18. [삭제] '사진' 모드가 없으므로 '카메라 뷰' 텍스트 불필요 */}
       </div>
 
       <div className="camera-controls-bar">
         <div className="mode-selector">
+          {/* 19. [삭제] '사진' 모드 버튼 삭제 */}
           <button 
             onClick={() => switchMode('film')} 
             className={mode === 'film' ? 'active' : ''}
           >
             필름
-          </button>
-          <button 
-            onClick={() => switchMode('photo')} 
-            className={mode === 'photo' ? 'active' : ''}
-          >
-            사진
           </button>
           <button 
             onClick={() => switchMode('video')} 
