@@ -18,36 +18,50 @@ export default function Login() {
    const startOAuth = (socialName) => {
     window.location.href = `${API_BASE}/login/start/${socialName}`;
   };
+  const {login} = useAuth();
  
   const handleKakao = () => startOAuth("kakao");
   const handleGoogle = () => startOAuth("google");
   const handleNaver = () => startOAuth("naver");
 
   // // 🔥 2) BE 콜백 처리
-  // useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search);
-  //   const jwt = params.get("jwt");
-  //   const level = params.get("level");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const jwt = params.get("jwt");
+    const level = params.get("level");
+    const userStr = params.get("user");
 
-  //   if (!jwt||!level) return;
+    if (!jwt||!level) return;
+
+    window.history.replaceState({}, document.title, window.location.pathname); 
+
+    let userObj = null;
+    if (userStr) {
+        try {
+            userObj = JSON.parse(decodeURIComponent(userStr));
+        } catch(e) {
+            console.error("User data parse error:", e);
+        }
+    }
   
-  //   if (level === "access") {
-  //     // 바로 로그인
-  //     login(jwt);
-  //     navigate("/home");
-  //     return;
-  //   }
+    if (level === "access") {
+      //
+      login(jwt, userObj);
+      navigate("/home", { replace: true });      
+      return;
+    }
 
-  //   if (level === "signup") {
-  //     // 전화번호 인증 단계로
-  //     navigate("/phone", {
-  //       state: {
-  //         token: jwt,
-  //       }
-  //     });
-  //     return;
-  //   }
-  // }, [login, navigate]);
+    if (level === "signup") {
+      // 전화번호 인증 단계로
+      navigate("/phone", {
+        state: {
+          token: jwt,
+          user: userObj,
+        }
+      });
+      return;
+    }
+  }, [login, navigate]);
 
   return (
     <main className="login">

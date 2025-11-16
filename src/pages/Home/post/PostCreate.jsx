@@ -5,7 +5,8 @@ import './Post.css';
 
 // 환경 변수에서 API 키 가져오기
 const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:4000';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000').replace(/\/$/, '');
+
 
 const LS_KEY = 'tripshot_posts';
 
@@ -119,7 +120,9 @@ export default function PostCreate() {
             lng: lng,
         };
 
-        const jwtToken = sessionStorage.getItem('auth.jwt');
+        // const jwtToken = sessionStorage.getItem('auth.jwt');
+        const jwtToken = localStorage.getItem('jwtToken');
+
         
         // 3. API 호출 (POST 요청)
         const response = await fetch(`${API_BASE}/posts`, {
@@ -170,12 +173,13 @@ export default function PostCreate() {
             console.error('Local storage save failed:', e);
         }
     // 홈 이동
-            // 5. 홈으로 이동
     if (apiSuccess || !API_BASE) {
         nav('/home', { replace: true });
     }
       setLoading(false);
     }
+    console.log("jwt in PostCreate:", localStorage.getItem("auth.jwt"));
+
   };
 
   return (
@@ -256,7 +260,7 @@ export default function PostCreate() {
                 value="friends"
                 checked={privacy === 'friends'}
                 onChange={() => setPrivacy('friends')}
-              /> 친구만
+              /> 친구만 
             </label>
             <label>
               <input

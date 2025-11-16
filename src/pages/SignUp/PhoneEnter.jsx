@@ -1,7 +1,5 @@
-
-
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import back from '../../assets/back.png';
 import wrong_input from '../../assets/wrong_input.png';
 import './Auth.css';
@@ -13,11 +11,17 @@ export default function PhoneEnter() {
 
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
-
-  
-  const searchParams = new URLSearchParams(location.search);
-  const queryToken = searchParams.get('token') || searchParams.get('jwt');
-  const level = searchParams.get('level');
+  const {state} = useLocation();
+  // Login에서 받은 token과 user 정보를 state에서 가져옵니다.
+  const queryToken = state?.token;
+  const userObject = state?.user; // 
+    
+  //토큰이 없으면 로그인 페이지로 강제 이동 (인증 보호)
+  useEffect(() => {
+    if (!queryToken) {
+        navigate('/login', { replace: true });
+    }
+  }, [queryToken, navigate]);
 
   const cleanPhone = phone.replace(/\D/g, '');
   const isPhoneValid = useMemo(() => cleanPhone.length === 11, [cleanPhone]);
@@ -38,6 +42,7 @@ export default function PhoneEnter() {
           phone: `+82${cleanPhone.slice(1)}`,
           
           token: queryToken,
+          user: userObject, 
         }
       });
     } catch (e) {
