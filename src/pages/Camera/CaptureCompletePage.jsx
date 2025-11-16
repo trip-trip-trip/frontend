@@ -2,61 +2,116 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './CaptureCompletePage.css'; // CSS 파일 생성
+import { useAuth } from '../../contexts/AuthContext';
+
+const API_BASE = import.meta.env.PROD 
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+  : '/api';
 
 const CaptureCompletePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { tripId } = useParams();
+  const { token } = useAuth();
+
   const { media, type, blob } = location.state || {}; // CameraPage에서 넘긴 state
   const [comment, setComment] = useState('');
+const [isLoading, setIsLoading] = useState(false);
 
   if (!media) {
-    // 잘못된 접근 처리
-    navigate('/camera');
-    return null;
-  }
+navigate('/trips');
+ return null;
+ }
 
-  // 저장하기 버튼 클릭 시
   const handleSave = async () => {
-    // 1. FormData 생성
-    const formData = new FormData();
-    formData.append('comment', comment);
-    formData.append('type', type);
-
-    // 2. 미디어 파일 추가
-    if (type === 'photo') {
-      // Base64 이미지를 Blob으로 변환
-      const res = await fetch(media);
-      const photoBlob = await res.blob();
-      formData.append('mediaFile', photoBlob, 'capture.jpg');
-    } else {
-      // 비디오 Blob (state로 blob을 못 넘겼다면 media(url)을 fetch)
-      if (blob) {
-         formData.append('mediaFile', blob, 'capture.webm');
-      } else {
-         const res = await fetch(media);
-         const videoBlob = await res.blob();
-         formData.append('mediaFile', videoBlob, 'capture.webm');
-      }
+    // 1. tripId가 있는지 확인 (URL에서)
+    if (!tripId) {
+      alert("유효하지 않은 여행입니다. (tripId 없음)");
+      return;
     }
+if (!token) {
+      alert("로그인 토큰이 없습니다.");
+      setIsLoading(false);
+      return;
+    }
+  let meta;
+  let endpoint;
 
-    // 3. 백엔드로 FormData 전송 (axios 예시)
-    try {
-      // const response = await axios.post('/api/travel/media', formData, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //     // 로그인 토큰 등도 헤더에 추가
-      //   },
-      // });
-      console.log('서버로 전송할 데이터:', formData);
-      alert('저장되었습니다! (여행이 끝나면 확인하세요)');
+   if (type === "photo") {
+    endpoint = `${API_BASE}/media/upload`;
+    meta = {
+      tripId: Number(tripId),
+      mediaKind: "PHOTO",
+      captureType: "NORMAL",
+      comment: comment || "",
+    };
+  } else {
+    // VIDEO
+    endpoint = `${API_BASE}/media/upload/reelItem`;
+    meta = {
       
-      // 저장이 완료되면 메인 페이지 등으로 이동
-      navigate('/'); // 혹은 여행 메인 페이지
-    } catch (error) {
-      console.error('업로드 실패:', error);
-      alert('저장에 실패했습니다.');
+      media: {
+        tripId: Number(tripId),
+        mediaKind: "VIDEO",
+        captureType: "VIDEO",
+        comment: comment || null,
+      },
+      tripId: Number(tripId)
+    };
+  }
+  const formData = new FormData();
+  formData.append(
+    "meta",
+    new Blob([JSON.stringify(meta)], { type: "application/json" })
+  );
+   function dataURLtoBlob(dataURL) {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new Blob([u8arr], { type: mime });
+}
+
+
+  if (type === "photo") {
+const photoBlob = dataURLtoBlob(media);
+formData.append("file", photoBlob, "photo.jpg");
+
+  } else {
+    const videoBlob = blob
+      ? blob
+      : await (await fetch(media)).blob();
+
+    formData.append("file", videoBlob, "video.webm");
+  }
+   try {
+    //  업로드 요청 (사진/영상 구분)
+   const response = await fetch(endpoint, {
+ method: "POST",
+   headers: {
+          // 'Content-Type'은 FormData가 자동으로 설정함
+   Authorization: `Bearer ${token}`,
+   },
+   body: formData,
+    });
+
+    const data = await response.json();
+    console.log("업로드 완료:", data);
+
+    if (!data.isSuccess) {
+      throw new Error(data.message);
     }
-  };
+
+    alert("저장되었습니다!");
+
+    navigate("/trips");
+     } catch (err) {
+    console.error("업로드 실패:", err);
+    alert("업로드에 실패했습니다.");
+  }
+};
 return (
     <div className="capture-complete-wrapper">
       

@@ -46,24 +46,103 @@ const CameraPage = () => {
     }
   }, [currentTripId, storageKey]);
 
-  // 모드 변경
-  const switchMode = (newMode) => {
-    console.log(`[Debug] 모드 변경 시도: ${newMode}`);
-    setMode(newMode);
+  const switchMode = (newMode) => setMode(newMode);
+  const flipCamera = () => {
+    setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
+  };
+  const handleDataAvailable = useCallback(({ data }) => {
+    if (data.size > 0) setRecordedChunks((prev) => prev.concat(data));
+  }, []);
+
+  // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
+  const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStamp, cssFilter) => {
+   // const { cssFilter, frame, texture } = filterConfig; // 필터 설정값 분해
+
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const originalImg = new Image();
+      originalImg.crossOrigin = "anonymous"; // CORS 문제 방지
+      originalImg.src = imageSrc;
+      originalImg.onload = async () => { // 비동기 처리를 위해 async 추가
+        canvas.width = originalImg.width; canvas.height = originalImg.height;
+
+        // 1. 원본 사진
+        ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+
+        // 2. CSS 필터 적용
+        ctx.filter = cssFilter || 'none';
+        ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+        ctx.filter = 'none';
+
+        // 3. [수정] 텍스처가 있을 때만 합성
+        if (filmTextureSrc) {
+          await new Promise((textureResolve) => {
+            const textureImg = new Image();
+            textureImg.crossOrigin = "anonymous";
+            textureImg.src = filmTextureSrc;
+            textureImg.onload = () => {
+              ctx.globalAlpha = 0.7; 
+              ctx.globalCompositeOperation = 'overlay';
+              const ratio = textureImg.width / textureImg.height;
+              const canvasRatio = canvas.width / canvas.height;
+              let w, h, x, y;
+              if (ratio > canvasRatio) { 
+                h = canvas.height; w = textureImg.width * (h / textureImg.height);
+                x = (canvas.width - w) / 2; y = 0;
+              } else { 
+                w = canvas.width; h = textureImg.height * (w / textureImg.width);
+                x = 0; y = (canvas.height - h) / 2;
+              }
+              ctx.drawImage(textureImg, x, y, w, h);
+              ctx.globalAlpha = 1.0; 
+              ctx.globalCompositeOperation = 'source-over';
+              textureResolve();
+            };
+            textureImg.onerror = () => textureResolve(); // 텍스처 로드 실패해도 계속
+          });
+        }
+
+        // 4. [수정] 프레임이 있을 때만 합성
+        if (filmOverlaySrc) {
+          await new Promise((frameResolve) => {
+            const filmOverlayImg = new Image();
+            filmOverlayImg.crossOrigin = "anonymous";
+            filmOverlayImg.src = filmOverlaySrc;
+            filmOverlayImg.onload = () => {
+              const overlayRatio = filmOverlayImg.width / filmOverlayImg.height;
+              let drawWidth, drawHeight, offsetX, offsetY;
+              
+              const canvasRatio = canvas.width / canvas.height;
+              if (overlayRatio > canvasRatio) { 
+                drawHeight = canvas.height; drawWidth = filmOverlayImg.width * (drawHeight / filmOverlayImg.height);
+                offsetX = (canvas.width - drawWidth) / 2; offsetY = 0;
+              } else { 
+                drawWidth = canvas.width; drawHeight = filmOverlayImg.height * (drawWidth / filmOverlayImg.width);
+                offsetX = 0; offsetY = (canvas.height - drawHeight) / 2;
+              }
+              ctx.drawImage(filmOverlayImg, offsetX, offsetY, drawWidth, drawHeight);
+              frameResolve();
+            };
+            filmOverlayImg.onerror = () => frameResolve(); // 프레임 로드 실패해도 계속
+          });
+        }
+
+        // 5. 날짜 스탬프
+        if (dateStamp) {
+            ctx.font = `${Math.max(16, canvas.width * 0.04)}px Courier`;
+            ctx.fillStyle = '#FFB800';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+            const marginX = canvas.width * 0.05;
+            const marginY = canvas.height * 0.05;
+            ctx.fillText(dateStamp, canvas.width - marginX, canvas.height - marginY);
+        }
+        resolve(canvas.toDataURL('image/jpeg'));
+      };
+    });
   };
 
-  // 영상 데이터 조각 저장
-  const handleDataAvailable = useCallback(
-    ({ data }) => {
-      console.log('[Debug] 영상 데이터 수신 (dataavailable 이벤트)');
-      if (data.size > 0) {
-        setRecordedChunks((prev) => prev.concat(data));
-      }
-    },
-    [setRecordedChunks]
-  );
-
-  // 촬영 버튼 핸들러 (async)
+  // 7. [수정] 'photo' 모드 삭제, 'video'와 'film'만 남김
   const handleStartCaptureClick = useCallback(async () => {
     
     // 1. 횟수 검사
@@ -175,17 +254,24 @@ const CameraPage = () => {
       localStorage.setItem(storageKey, newCount.toString());
       console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (사진/필름)`);
       
-      let processedImageSrc = imageSrc;
-      if (mode === 'film') {
-        console.log('[Debug] 필름 모드 사진 촬영, 효과 적용 예정.');
-        // (필요시) processedImageSrc = await applyFilmEffect(imageSrc);
-      }
+      console.log('[Debug] 필름 모드 사진 촬영, 효과 적용 예정.');
+      // 8. [수정] 현재 선택된 필터 팩 전체를 전달
+      const selectedFilter = FILTERS[currentFilterIndex];
+        const processedImageSrc = await applyFilmFrame(
+        imageSrc, 
+          selectedFilter.frame,   // 👈 2번째 인자 (프레임)
+          selectedFilter.texture, // 👈 3번째 인자 (텍스처)
+          getFilmDate(),          // 👈 4번째 인자 (날짜)
+          selectedFilter.cssFilter
+      
+        );
 
-navigate('/capture-complete', {
-state: { media: processedImageSrc, type: 'photo', mode: mode },
-});
-}
-}, [
+      navigate(`/capture-complete/${tripId}`, {
+        state: { media: processedImageSrc, type: 'photo', mode: mode },
+      });
+    }
+    // 9. [삭제] 'else' (photo 모드) 블록 삭제
+  }, [
     webcamRef, 
     mediaRecorderRef, 
     mode, 
