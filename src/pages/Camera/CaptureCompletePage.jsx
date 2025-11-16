@@ -1,125 +1,115 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import './CaptureCompletePage.css';
+import { useLocation, useNavigate,useParams } from 'react-router-dom';
+import './CaptureCompletePage.css'; // CSS 파일 생성
 import { useAuth } from '../../contexts/AuthContext';
 
-const API_BASE = import.meta.env.PROD
-  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org')
+const API_BASE = import.meta.env.PROD 
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
   : '/api';
 
 const CaptureCompletePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { tripId } = useParams();
+  const { token } = useAuth();
 
-  const { token } = useAuth(); // AuthContext에서 token 가져오기
-  const { media, type, blob } = location.state || {};
+  const { media, type, blob } = location.state || {}; // CameraPage에서 넘긴 state
   const [comment, setComment] = useState('');
+const [isLoading, setIsLoading] = useState(false);
 
   if (!media) {
-    navigate('/trips');
-    return null;
-  }
-
-  // 🔥 dataURL → Blob 변환
-  const dataURLtoBlob = (dataURL) => {
-    const [header, data] = dataURL.split(',');
-    const mime = header.match(/:(.*?);/)[1];
-    const binary = atob(data);
-    const array = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      array[i] = binary.charCodeAt(i);
-    }
-    return new Blob([array], { type: mime });
-  };
+navigate('/trips');
+ return null;
+ }
 
   const handleSave = async () => {
     if (!tripId) {
       alert("유효하지 않은 여행입니다. (tripId 없음)");
       return;
     }
-
-    if (!token) {
-      alert("로그인이 필요합니다.");
+if (!token) {
+      alert("로그인 토큰이 없습니다.");
+      setIsLoading(false);
       return;
     }
+  let meta;
+  let endpoint;
 
-    console.log("[업로드 시작] tripId =", tripId);
-
-    // -------------------------------
-    // 📌 meta 구조 BE 스펙에 정확히 맞춤
-    // -------------------------------
-    let meta = {};
-    let endpoint = "";
-
-    if (type === "photo") {
-      endpoint = `${API_BASE}/media/upload`;
-      meta = {
-        tripId: Number(tripId),
-        mediaKind: "PHOTO",
-        captureType: "NORMAL",
-        comment: comment || "",
-      };
-    } 
-    else if (type === "video") {
-      endpoint = `${API_BASE}/media/upload/reelItem`;
-      meta = {
-        media:{
+   if (type === "photo") {
+    endpoint = `${API_BASE}/media/upload`;
+    meta = {
+      tripId: Number(tripId),
+      mediaKind: "PHOTO",
+      captureType: "NORMAL",
+      comment: comment || "",
+    };
+  } else {
+    // VIDEO
+    endpoint = `${API_BASE}/media/upload/reelItem`;
+    meta = {
+      
+      media: {
         tripId: Number(tripId),
         mediaKind: "VIDEO",
         captureType: "VIDEO",
-        comment: comment || "",
+        comment: comment || null,
       },
-      tripId:Number(tripId),
+      tripId: Number(tripId)
     };
+  }
+  const formData = new FormData();
+  formData.append(
+    "meta",
+    new Blob([JSON.stringify(meta)], { type: "application/json" })
+  );
+   function dataURLtoBlob(dataURL) {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new Blob([u8arr], { type: mime });
+}
+
+
+  if (type === "photo") {
+const photoBlob = dataURLtoBlob(media);
+formData.append("file", photoBlob, "photo.jpg");
+
+  } else {
+    const videoBlob = blob
+      ? blob
+      : await (await fetch(media)).blob();
+
+    formData.append("file", videoBlob, "video.webm");
+  }
+   try {
+    //  업로드 요청 (사진/영상 구분)
+   const response = await fetch(endpoint, {
+ method: "POST",
+   headers: {
+          // 'Content-Type'은 FormData가 자동으로 설정함
+   Authorization: `Bearer ${token}`,
+   },
+   body: formData,
+    });
+
+    const data = await response.json();
+    console.log("업로드 완료:", data);
+
+    if (!data.isSuccess) {
+      throw new Error(data.message);
     }
 
-    // -------------------------------
-    // 📌 FormData 구성
-    // -------------------------------
-    const formData = new FormData();
-    formData.append(
-      "meta",
-      new Blob([JSON.stringify(meta)], { type: "application/json" })
-    );
+    alert("저장되었습니다!");
 
-    // 사진 업로드
-    if (type === "photo") {
-      const photoBlob = dataURLtoBlob(media);
-      formData.append("file", photoBlob, "photo.jpg");
-    }
-
-    // 영상 업로드
-    else {
-      const videoBlob = blob ? blob : await (await fetch(media)).blob();
-      formData.append("file", videoBlob, "video.webm");
-    }
-
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log("업로드 응답:", data);
-
-      if (!data.isSuccess) {
-        throw new Error(data.message || "업로드 실패");
-      }
-
-      alert("저장되었습니다!");
-      navigate("/trips");
-
-    } catch (err) {
-      console.error("업로드 실패:", err);
-      alert("업로드에 실패했습니다.");
-    }
-  };
-
+    navigate("/trips");
+     } catch (err) {
+    console.error("업로드 실패:", err);
+    alert("업로드에 실패했습니다.");
+  }
+};
 return (
     <div className="capture-complete-wrapper">
       

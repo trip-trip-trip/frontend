@@ -161,7 +161,11 @@ const CameraPage = () => {
   const handleDataAvailable = useCallback(({ data }) => {
     if (data.size > 0) setRecordedChunks((prev) => prev.concat(data));
   }, []);
-const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStamp, cssFilter) => {
+
+  // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
+  const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStamp, cssFilter) => {
+   // const { cssFilter, frame, texture } = filterConfig; // 필터 설정값 분해
+
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -182,13 +186,12 @@ const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStam
         ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
         ctx.filter = 'none';
 
-        // 텍스처 적용
+        // 3. [수정] 텍스처가 있을 때만 합성
         if (filmTextureSrc) {
           await new Promise((textureResolve) => {
             const textureImg = new Image();
             textureImg.crossOrigin = "anonymous";
             textureImg.src = filmTextureSrc;
-
             textureImg.onload = () => {
               ctx.globalAlpha = 0.7;
               ctx.globalCompositeOperation = 'overlay';
@@ -221,36 +224,30 @@ const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStam
           });
         }
 
-        // 프레임 합성
+        // 4. [수정] 프레임이 있을 때만 합성
         if (filmOverlaySrc) {
           await new Promise((frameResolve) => {
-            const overlayImg = new Image();
-            overlayImg.crossOrigin = "anonymous";
-            overlayImg.src = filmOverlaySrc;
-
-            overlayImg.onload = () => {
-              const overlayRatio = overlayImg.width / overlayImg.height;
-              const canvasRatio = canvas.width / canvas.height;
-
+            const filmOverlayImg = new Image();
+            filmOverlayImg.crossOrigin = "anonymous";
+            filmOverlayImg.src = filmOverlaySrc;
+            filmOverlayImg.onload = () => {
+              const overlayRatio = filmOverlayImg.width / filmOverlayImg.height;
               let drawWidth, drawHeight, offsetX, offsetY;
-
-              if (overlayRatio > canvasRatio) {
-                drawHeight = canvas.height;
-                drawWidth = overlayImg.width * (drawHeight / overlayImg.height);
-                offsetX = (canvas.width - drawWidth) / 2;
-                offsetY = 0;
-              } else {
-                drawWidth = canvas.width;
-                drawHeight = overlayImg.height * (drawWidth / overlayImg.width);
-                offsetX = 0;
-                offsetY = (canvas.height - drawHeight) / 2;
+              
+              const canvasRatio = canvas.width / canvas.height;
+              if (overlayRatio > canvasRatio) { 
+                drawHeight = canvas.height; drawWidth = filmOverlayImg.width * (drawHeight / filmOverlayImg.height);
+                offsetX = (canvas.width - drawWidth) / 2; offsetY = 0;
+              } else { 
+                drawWidth = canvas.width; drawHeight = filmOverlayImg.height * (drawWidth / filmOverlayImg.width);
+                offsetX = 0; offsetY = (canvas.height - drawHeight) / 2;
               }
 
-              ctx.drawImage(overlayImg, offsetX, offsetY, drawWidth, drawHeight);
+              ctx.drawImage(filmOverlayImg, offsetX, offsetY, drawWidth, drawHeight);
               frameResolve();
             };
 
-            overlayImg.onerror = () => frameResolve();
+            filmOverlayImg.onerror = () => frameResolve();
           });
         }
 
@@ -338,11 +335,12 @@ const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStam
       // 8. [수정] 현재 선택된 필터 팩 전체를 전달
       const selectedFilter = FILTERS[currentFilterIndex];
         const processedImageSrc = await applyFilmFrame(
-          imageSrc, 
-          selectedFilter.frame,   // 👈 선택된 프레임 (null일 수 있음)
-          selectedFilter.texture, // 👈 선택된 텍스처 (null일 수 있음)
-          getFilmDate(),
-          selectedFilter.cssFilter // 👈 선택된 CSS 필터
+        imageSrc, 
+          selectedFilter.frame,   // 👈 2번째 인자 (프레임)
+          selectedFilter.texture, // 👈 3번째 인자 (텍스처)
+          getFilmDate(),          // 👈 4번째 인자 (날짜)
+          selectedFilter.cssFilter
+      
         );
 
       navigate(`/capture-complete/${tripId}`, {
