@@ -1,75 +1,125 @@
-// src/pages/Camera/CaptureCompletePage.jsx
 import React, { useState } from 'react';
-import { useLocation, useNavigate,useParams } from 'react-router-dom';
-import './CaptureCompletePage.css'; // CSS 파일 생성
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import './CaptureCompletePage.css';
+import { useAuth } from '../../contexts/AuthContext';
+
+const API_BASE = import.meta.env.PROD
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org')
+  : '/api';
 
 const CaptureCompletePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { tripId } = useParams();
-  
-  const { media, type, blob } = location.state || {}; // CameraPage에서 넘긴 state
+
+  const { token } = useAuth(); // AuthContext에서 token 가져오기
+  const { media, type, blob } = location.state || {};
   const [comment, setComment] = useState('');
 
+  if (!media) {
+    navigate('/trips');
+    return null;
+  }
+
+  // 🔥 dataURL → Blob 변환
+  const dataURLtoBlob = (dataURL) => {
+    const [header, data] = dataURL.split(',');
+    const mime = header.match(/:(.*?);/)[1];
+    const binary = atob(data);
+    const array = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      array[i] = binary.charCodeAt(i);
+    }
+    return new Blob([array], { type: mime });
+  };
+
   const handleSave = async () => {
-    // 1. tripId가 있는지 확인 (URL에서)
     if (!tripId) {
       alert("유효하지 않은 여행입니다. (tripId 없음)");
       return;
     }
 
-  // 저장하기 버튼 클릭 시
-  const formData = new FormData();
-    formData.append('comment', comment);
-    formData.append('type', type);
-
-    // 2. 미디어 파일 추가
-    if (type === 'photo') {
-      // Base64 이미지를 Blob으로 변환
-      const res = await fetch(media);
-      const photoBlob = await res.blob();
-      formData.append('mediaFile', photoBlob, 'capture.jpg');
-    } else {
-      // 비디오 Blob (state로 blob을 못 넘겼다면 media(url)을 fetch)
-      if (blob) {
-         formData.append('mediaFile', blob, 'capture.webm');
-      } else {
-         const res = await fetch(media);
-         const videoBlob = await res.blob();
-         formData.append('mediaFile', videoBlob, 'capture.webm');
-      }
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
     }
 
-  try {
-      // 2. 이 여행의 미디어 저장 키 
-      const mediaStorageKey = `media_${tripId}`;
-      
-      // 3. 기존에 저장된 미디어 불러오기 (없으면 빈 배열)
-      const existingMedia = JSON.parse(localStorage.getItem(mediaStorageKey)) || [];
-      
-      // 4. 새로 저장할 미디어 객체
-      // (Blob은 localStorage에 저장이 안되므로, base64(사진)나 url(영상)인 'media'를 저장)
-      const newMedia = {
-        id: new Date().getTime(), // 고유 ID
-        type: type, // 'photo' or 'video'
-        dataUrl: media, // base64 이미지 또는 Blob URL
-        comment: comment,
-        timestamp: new Date().toISOString()
-      };
+    console.log("[업로드 시작] tripId =", tripId);
 
-      // 5. 새 미디어를 기존 배열에 추가해서 다시 저장
-      localStorage.setItem(mediaStorageKey, JSON.stringify([...existingMedia, newMedia]));
-      
-      console.log(`[${tripId}] 미디어 저장 완료. 총 ${existingMedia.length + 1}개`);
-      alert('저장되었습니다!');
-      
-      // 6. 저장이 완료되면 앨범 메인 페이지로 이동
-      navigate('/trips'); 
-    } catch (error) {
-      console.error('localStorage 저장 실패:', error);
-      alert('저장에 실패했습니다.');
+    // -------------------------------
+    // 📌 meta 구조 BE 스펙에 정확히 맞춤
+    // -------------------------------
+    let meta = {};
+    let endpoint = "";
+
+    if (type === "photo") {
+      endpoint = `${API_BASE}/media/upload`;
+      meta = {
+        tripId: Number(tripId),
+        mediaKind: "PHOTO",
+        captureType: "NORMAL",
+        comment: comment || "",
+      };
+    } 
+    else if (type === "video") {
+      endpoint = `${API_BASE}/media/upload/reelItem`;
+      meta = {
+        media:{
+        tripId: Number(tripId),
+        mediaKind: "VIDEO",
+        captureType: "VIDEO",
+        comment: comment || "",
+      },
+      tripId:Number(tripId),
+    };
+    }
+
+    // -------------------------------
+    // 📌 FormData 구성
+    // -------------------------------
+    const formData = new FormData();
+    formData.append(
+      "meta",
+      new Blob([JSON.stringify(meta)], { type: "application/json" })
+    );
+
+    // 사진 업로드
+    if (type === "photo") {
+      const photoBlob = dataURLtoBlob(media);
+      formData.append("file", photoBlob, "photo.jpg");
+    }
+
+    // 영상 업로드
+    else {
+      const videoBlob = blob ? blob : await (await fetch(media)).blob();
+      formData.append("file", videoBlob, "video.webm");
+    }
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log("업로드 응답:", data);
+
+      if (!data.isSuccess) {
+        throw new Error(data.message || "업로드 실패");
+      }
+
+      alert("저장되었습니다!");
+      navigate("/trips");
+
+    } catch (err) {
+      console.error("업로드 실패:", err);
+      alert("업로드에 실패했습니다.");
     }
   };
+
 return (
     <div className="capture-complete-wrapper">
       
