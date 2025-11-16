@@ -15,41 +15,41 @@ export default function CodeVerify() {
 
   const isCodeValid = useMemo(() => code.trim().length >= 6, [code]);
 
-  // const verify = async () => {
-  //   if (!isCodeValid || loading) return;
-  //   setLoading(true);
-  //   try {
-  //     const res = await fetch(`${API_BASE}/login/verify-code`, {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         phone: state?.phone?.replace(/\D/g, ''),
-  //         code,
-  //         provider: state?.provider,
-  //         token: state?.token,
-  //       }),
-  //     });
-  //     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  //     const data = await res.json();
-  //     navigate('/');
-  //   } catch (e) {
-  //     console.error(e);
-  //     // alert('인증에 실패했습니다.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const verify = async () => {
-    try{
+    if (!isCodeValid || loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/login/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: state?.phone?.replace(/\D/g, ''),
+          code,
+          provider: state?.provider,
+          token: state?.token,
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
       navigate('/');
-  }catch (e) {
+    } catch (e) {
       console.error(e);
-      alert('인증에 실패했습니다.');
+      // alert('인증에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
+
+  // const verify = async () => {
+  //   try{
+  //     navigate('/');
+  // }catch (e) {
+  //     console.error(e);
+  //     alert('인증에 실패했습니다.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const resend = async () => {
     if (loading) return;

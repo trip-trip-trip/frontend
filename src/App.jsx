@@ -70,7 +70,8 @@ const App = () => {
        <AuthProvider>
 <div className="app-container"> 
    <Routes>
-        <Route path='/' element={<Home/>}/>
+        <Route path='/' element={<StartPage/>}/>
+        <Route path='/home' element={<Home/>}/>
 
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>

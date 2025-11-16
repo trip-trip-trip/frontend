@@ -21,46 +21,46 @@ export default function PhoneEnter() {
     [phone]
   );
 
-  // const sendCode = async () => {
-  //   if (!isPhoneValid || loading) return;
-  //   setLoading(true);
-  //   try {
-  //     const res = await fetch(`${API_BASE}/login/send-code`, {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         phone: phone.replace(/\D/g, ''),        
-  //         provider: state?.provider,
-  //       }),
-  //     });
-
-  //     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  //     const data = await res.json();
-
-  //     navigate('/verify', {
-  //       state: {
-  //         phone,
-  //         provider: state?.provider,
-  //         token: state?.token,
-  //       },
-  //     });
-  //   } catch (e) {
-  //     console.error(e);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
   const sendCode = async () => {
-    navigate('/verify', {
+    if (!isPhoneValid || loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/login/send-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: phone.replace(/\D/g, ''),        
+          provider: state?.provider,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      navigate('/verify', {
         state: {
-            phone: phone,
-            provider: state?.provider, 
-            token: state?.token,
+          phone,
+          provider: state?.provider,
+          token: state?.token,
         },
-    });
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
+
+
+  // const sendCode = async () => {
+  //   navigate('/verify', {
+  //       state: {
+  //           phone: phone,
+  //           provider: state?.provider, 
+  //           token: state?.token,
+  //       },
+  //   });
+  // };
 
   return (
     <main className="login-phone">
