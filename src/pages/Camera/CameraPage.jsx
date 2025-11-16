@@ -1,58 +1,158 @@
-// src/pages/Camera/CameraPage.jsx
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './CameraPage.css';
- import { applyFilmEffect } from '../../utils/imageProcessing';
 
-const videoConstraints = {
-  width: { ideal: 720 },
-  height: { ideal: 1280 },
-  facingMode: 'user',
-};
+// 1. 사용할 모든 '재료' 임포트
+import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레임
+import textureAsset from '../../assets/filmeffect.png'; // 님의 고정 텍스처
+import switchmode from '../../assets/switchcam.png';
+
+// 2. [핵심] "필터 조합 팩"을 배열로 정의
+// (프레임: null = 없음, 텍스처: null = 없음, cssFilter: 'none' = 없음)
+const FILTERS = [
+  { 
+    name: '코닥 (풀)', 
+    frame: frameAsset,    // 프레임 O
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(15%) contrast(85%) brightness(100%) saturate(80%)' // CSS 색감 O
+  },
+   { 
+    name: '코닥2 (풀)', 
+    frame: frameAsset,    // 프레임 O
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(15%) contrast(105%) brightness(100%) saturate(90%)' // CSS 색감 O
+  },
+  { 
+    name: '프레임만', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(20%) contrast(80%) brightness(85%) saturate(110%)' // CSS 색감 O
+  },
+   { 
+    name: '프레임만2', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(0%) contrast(105%) brightness(100%) saturate(80%)' // CSS 색감 O
+  },
+  { 
+    name: '프레임만3', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(20%) contrast(85%) brightness(85%) saturate(110%)' // CSS 색감 O
+  },
+   { 
+    name: '프레임만4', 
+    frame: frameAsset,    // 프레임 O
+    texture: null,          // 텍스처 X
+    cssFilter: 'sepia(20%) contrast(75%) brightness(105%) saturate(130%)' // CSS 색감 O
+  },
+  { 
+    name: '텍스처 + 색감', 
+    frame: null,            // 프레임 X
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(10%) contrast(80%) brightness(105%) saturate(110%)' // CSS 색감 O
+  },
+   { 
+    name: '텍스처 + 색감2', 
+    frame: null,            // 프레임 X
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(20%) contrast(90%) brightness(115%) saturate(85%)' // CSS 색감 O
+  },
+  { 
+    name: '텍스처 + 색감3', 
+    frame: null,            // 프레임 X
+    texture: textureAsset,  // 텍스처 O
+    cssFilter: 'sepia(0%) contrast(70%) brightness(95%) saturate(75%)' // CSS 색감 O
+  },
+  { 
+    name: '흑백 (프레임 없음)', 
+    frame: null,            // 프레임 X
+    texture: null,  // 텍스처 O
+    cssFilter: 'grayscale(50%) contrast(100%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
+  },
+   { 
+    name: 'ㅈㄴ흑백 (프레임 없음)', 
+    frame: null,            // 프레임 X
+    texture: null,  // 텍스처 O
+    cssFilter: 'grayscale(90%) contrast(100%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
+  },
+  { 
+    name: '기본', 
+    frame: null,            // 프레임 X
+    texture: null,          // 텍스처 X
+    cssFilter:'sepia(10%) contrast(100%) brightness(105%) saturate(80%)'      // CSS 색감 X
+  },
+  { 
+    name: '기본2', 
+    frame: null,            // 프레임 X
+    texture: null,          // 텍스처 X
+    cssFilter:'sepia(10%) contrast(85%) brightness(120%) saturate(100%)'      // CSS 색감 X
+  }
+];
 
 // 날짜 포맷 함수
 function getFilmDate() {
   const d = new Date();
-  const year = d.getFullYear().toString().slice(-2); // '25'
-  const month = (d.getMonth() + 1).toString().padStart(2, '0'); // '11'
-  const day = d.getDate().toString().padStart(2, '0'); // '02'
-  return `${year} ${month} ${day}`; // "25 11 02"
+  const year = d.getFullYear().toString().slice(-2);
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${year} ${month} ${day}`;
 }
 
-// 최대 총 촬영 횟수
 const MAX_TOTAL_SHOTS = 24;
 
 const CameraPage = () => {
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
-  const [mode, setMode] = useState('photo');
+  const [mode, setMode] = useState('film'); // 3. [수정] 기본 모드를 'film'으로
   const [isRecording, setIsRecording] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
   const [countdown, setCountdown] = useState(0);
   const [shotCount, setShotCount] = useState(0);
   const navigate = useNavigate();
+  const [facingMode, setFacingMode] = useState('user');
+  const { tripId } = useParams();
+  const storageKey = `totalShotCount_${tripId}`;
 
+  // 4. 스와이프 및 필터 인덱스 state
+  const [currentFilterIndex, setCurrentFilterIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  
+  const nextFilter = () => setCurrentFilterIndex((prev) => (prev + 1) % FILTERS.length);
+  const prevFilter = () => setCurrentFilterIndex((prev) => (prev - 1 + FILTERS.length) % FILTERS.length);
 
-  const [currentTripId] = useState('trip123'); 
-  const storageKey = `totalShotCount_${currentTripId}`;
+  // 5. 스와이프 이벤트 핸들러
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = 0;
+  };
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+  const handleTouchEnd = () => {
+    if (mode !== 'film') return; // 필름 모드일 때만
+    if (touchEndX.current === 0) return; 
+    const swipeThreshold = 50; 
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    if (swipeDistance > swipeThreshold) {
+      console.log("Swipe Left (Next Filter)");
+      nextFilter();
+    } else if (swipeDistance < -swipeThreshold) {
+      console.log("Swipe Right (Prev Filter)");
+      prevFilter();
+    }
+  };
 
-  // 마운트 시 localStorage에서 횟수 불러오기
   useEffect(() => {
-    if (currentTripId) {
+    if (tripId) {
       const savedCount = localStorage.getItem(storageKey);
       setShotCount(Number(savedCount) || 0);
-      console.log(`[총 촬영] ${currentTripId} 여행, 현재 ${savedCount || 0}회 촬영`);
+      console.log(`[총 촬영] ${tripId} 여행, 현재 ${savedCount || 0}회 촬영`);
     }
-  }, [currentTripId, storageKey]);
+  }, [tripId, storageKey]);
 
-  const switchMode = (newMode) => setMode(newMode);
-  const flipCamera = () => {
-    setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
-  };
-  const handleDataAvailable = useCallback(({ data }) => {
-    if (data.size > 0) setRecordedChunks((prev) => prev.concat(data));
-  }, []);
 
   // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
   const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStamp, cssFilter) => {
@@ -142,45 +242,27 @@ const CameraPage = () => {
     });
   };
 
-  // 7. [수정] 'photo' 모드 삭제, 'video'와 'film'만 남김
-  const handleStartCaptureClick = useCallback(async () => {
-    
-    // 1. 횟수 검사
-    if (shotCount >= MAX_TOTAL_SHOTS) {
-      alert(`이번 여행의 최대 촬영 횟수(${MAX_TOTAL_SHOTS}회)를 모두 사용했습니다! 📸`);
-      return;
+    const handleDataAvailable = useCallback(({ data }) => {
+    if (data.size > 0) {
+      setRecordedChunks((prev) => prev.concat(data));
     }
+  }, []);
+  const handleStartCaptureClick = useCallback(async () => {
 
-    console.log(`[Debug] 촬영 버튼 클릭. 현재 모드: ${mode}`);
-    
-    // 2. 영상 모드
+    if (shotCount >= MAX_TOTAL_SHOTS) return;
+
     if (mode === 'video') {
-      console.log('[Debug] 영상 녹화 시작...');
+      if (!webcamRef.current || !webcamRef.current.stream) return;
 
-      if (!webcamRef.current || !webcamRef.current.stream) {
-        console.error('[Debug] Webcam 스트림을 찾을 수 없습니다.');
-        alert('카메라 스트림에 접근할 수 없습니다.');
-        return;
-      }
       const originalStream = webcamRef.current.stream;
       const videoTracks = originalStream.getVideoTracks();
-
-      if (videoTracks.length === 0) {
-        console.error('[Debug] 스트림에서 비디오 트랙을 찾을 수 없습니다.');
-        alert('카메라 비디오를 가져올 수 없습니다.');
-        return;
-      }
+      if (videoTracks.length === 0) return;
 
       const videoOnlyStream = new MediaStream(videoTracks);
-      // 👇 [수정] Safari 호환성 MimeType 검사
-      const mimeType = MediaRecorder.isTypeSupported('video/mp4') 
-        ? 'video/mp4' 
-        : 'video/webm';
-      console.log(`[Debug] MimeType: ${mimeType} 사용`);
 
       setIsRecording(true);
       setCountdown(3);
-      
+
       const countdownInterval = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
@@ -193,111 +275,84 @@ const CameraPage = () => {
 
       try {
         mediaRecorderRef.current = new MediaRecorder(videoOnlyStream, {
-          mimeType: mimeType,
+          mimeType: MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm'
         });
 
-        mediaRecorderRef.current.addEventListener(
-          'dataavailable',
-          handleDataAvailable
-        );
-
-        mediaRecorderRef.current.onerror = (event) => {
-          console.error('[Debug] MediaRecorder 에러:', event.error);
-          alert(`녹화 중 에러 발생: ${event.error.name}`);
-          setIsRecording(false);
-          setCountdown(0);
-        };
-
-        mediaRecorderRef.current.onstop = () => {
-          console.log('[Debug] 녹화 중지됨.');
-          setIsRecording(false);
-          setCountdown(0);
-        };
-
+        mediaRecorderRef.current.ondataavailable = handleDataAvailable;
         mediaRecorderRef.current.start();
-        console.log('[Debug] MediaRecorder.start() 호출됨');
 
-        // 3. (영상) 녹화 *시작 성공 시* 카운트 증가
         const newCount = shotCount + 1;
         setShotCount(newCount);
-        localStorage.setItem(storageKey, newCount.toString());
-        console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (영상)`);
+        localStorage.setItem(storageKey, newCount);
 
         setTimeout(() => {
-          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            console.log('[Debug] 3초 경과, 녹화 중지 시도...');
+          if (mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
           }
         }, 3000);
 
       } catch (e) {
-        console.error('[Debug] MediaRecorder 초기화 실패:', e);
-        alert(`영상 녹화를 시작할 수 없습니다. (에러: ${e.message})`);
+        console.error('MediaRecorder error:', e);
         setIsRecording(false);
         setCountdown(0);
       }
+    }
 
-    } else { 
-      // 2. 사진 또는 필름 모드
-      console.log('[Debug] 사진 촬영');
-      
+    else if (mode === 'film') {
       const imageSrc = webcamRef.current.getScreenshot();
-
       if (!imageSrc) {
-        alert('카메라가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
-        return; 
+        alert("카메라 준비 중입니다.");
+        return;
       }
 
-      // 3. (사진/필름) *촬영 성공 시* 카운트 증가
       const newCount = shotCount + 1;
       setShotCount(newCount);
-      localStorage.setItem(storageKey, newCount.toString());
-      console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (사진/필름)`);
-      
-      console.log('[Debug] 필름 모드 사진 촬영, 효과 적용 예정.');
-      // 8. [수정] 현재 선택된 필터 팩 전체를 전달
+      localStorage.setItem(storageKey, newCount);
+
       const selectedFilter = FILTERS[currentFilterIndex];
-        const processedImageSrc = await applyFilmFrame(
-        imageSrc, 
-          selectedFilter.frame,   // 👈 2번째 인자 (프레임)
-          selectedFilter.texture, // 👈 3번째 인자 (텍스처)
-          getFilmDate(),          // 👈 4번째 인자 (날짜)
-          selectedFilter.cssFilter
-      
-        );
+
+      const processedImageSrc = await applyFilmFrame(
+        imageSrc,
+        selectedFilter.frame,
+        selectedFilter.texture,
+        getFilmDate(),
+        selectedFilter.cssFilter
+      );
 
       navigate(`/capture-complete/${tripId}`, {
-        state: { media: processedImageSrc, type: 'photo', mode: mode },
+        state: { media: processedImageSrc, type: 'photo', mode }
       });
     }
-    // 9. [삭제] 'else' (photo 모드) 블록 삭제
+
   }, [
-    webcamRef, 
-    mediaRecorderRef, 
-    mode, 
-    navigate, 
-    handleDataAvailable, 
-    shotCount, 
+    mode,
+    shotCount,
     storageKey,
-    //currentTripId // currentTripId 의존성 추가 (StorageKey 생성)
+    navigate,
+    tripId,
+    handleDataAvailable,
+    currentFilterIndex
   ]);
 
-  // 영상 녹화 완료 시 페이지 이동
+  // -------------------------------
+  // 📌 영상 파일 생성 & 이동
+  // -------------------------------
   useEffect(() => {
     if (recordedChunks.length > 0 && !isRecording) {
-      console.log('[Debug] useEffect: 녹화 완료, 청크 처리 중...');
-      const blob = new Blob(recordedChunks, {
-        type: 'video/webm', // (mimeType과 일치시키는 게 좋지만, webm이 보편적)
-      });
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
       const url = URL.createObjectURL(blob);
+
       setRecordedChunks([]);
 
-      navigate('/capture-complete', {
-        state: { media: url, type: 'video', blob: blob }, 
+      navigate(`/capture-complete/${tripId}`, {
+        state: { media: url, type: 'video', blob }
       });
     }
-  }, [recordedChunks, isRecording, navigate]);
+  }, [recordedChunks, isRecording, navigate, tripId]);
 
+  const videoConstraints = {
+    facingMode
+  };
   return (
     <div className="camera-page-wrapper">
       <header className="camera-header">
