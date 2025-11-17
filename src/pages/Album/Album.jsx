@@ -8,9 +8,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/NavBar/NavBar';
 import { useAuth } from '../../contexts/AuthContext'; // 1. AuthContext 임포트
 import Header from '../../components/Header/Header';
+import new_trip from '/new_trip.png';
+import plus_btn from '/icons/plus_icon.png'
 
 
 const Album = () => {
+  const todayDate = new Date();
   const location = useLocation();
   const navigate = useNavigate();
   const { activeTripId, setActiveTripId } = useAuth();
@@ -90,19 +93,24 @@ const Album = () => {
       title: '부산 여행',
       startDate: '2024-02-20',
       endDate: '2024-02-23',
-      members: ['김친구', '김멋사'],
+      members: [{ name: '김멋사', profile: '/profile-img.png'},
+        { name: '김친구', profile: '/profile-img.png'}],
       count: 24,
-      image: ['/trip-img/trip1.jpeg'],
-      thumbnail: '/trip-img/trip1.jpeg',
+      image: ['/trip-img/trip1.jpeg', '/trip-img/trip2.jpeg','/trip-img/trip3.jpeg','/trip-img/trip4.jpeg'],
+      coverImage: '/trip-img/trip1.jpeg',
     },
     {
       title: '경주 여행',
       startDate: '2021-03-05',
       endDate: '2021-03-06',
-      members: ['최친구', '최멋사', '최이름'],
+      members: [{ name: '김멋사', profile: '/profile-img.png'},
+        { name: '김친구', profile: '/profile-img.png'},
+        { name: '이친구', profile: '/profile-img.png'}],
       count: 24,
-      image: ['/trip-img/trip2.jpeg'],
-      thumbnail: '/trip-img/trip2.jpeg',
+      image: ['/trip-img/trip1.jpeg', '/trip-img/trip2.jpeg','/trip-img/trip3.jpeg','/trip-img/trip4.jpeg',
+        '/trip-img/trip1.jpeg', '/trip-img/trip2.jpeg','/trip-img/trip3.jpeg','/trip-img/trip4.jpeg'
+      ],
+      coverImage: '/trip-img/trip2.jpeg',
     },
   ];
 
@@ -167,12 +175,15 @@ const Album = () => {
   //   }
   // }, [location.state, activeTrip]);
 
+
   
 
+  
+  
 return(
     <div className='album'>
-      <Header title={"여행 모아보기"}/>
-        <button className='add-trip-btn' onClick={handleCreateBtn}>+</button>
+      <Header/>
+        {/* <button className='add-trip-btn' onClick={handleCreateBtn}>+</button> */}
         <div className="album-container">
         {/* 친구 초대 요청이 있으면 요청 표시 */}
         { hasInviteRequest
@@ -184,11 +195,28 @@ return(
               onReject={handleRejectRequest}/> 
           : <></>}
         {/* 활성화된 여행 있으면 표시 */}
-        {activeTrip ? <ActiveTrip tripName={activeTrip?.title} members={activeTrip?.members || []} img={activeTrip?.image || []} count={activeTrip.count || 0} /> : <></> }
-
+        <div className="album-active-cont">
+          {activeTrip 
+            ? <ActiveTrip tripName={activeTrip?.title}
+                          members={activeTrip?.members || []}
+                          img={activeTrip?.image || []}
+                          count={activeTrip.count || 0}
+                          startDate={activeTrip?.startDate}
+                          endDate={activeTrip?.endDate}
+                          />
+            : <div className="new-trip-container" onClick={()=>navigate('/trips/create')}>
+                <div className="new-trip-img">
+                  <img src={new_trip} alt="" />
+                </div>
+                <div className="new-trip-text">
+                  <img src={plus_btn} alt="" />
+                  <h1>새로운 여행 만들기</h1>
+                </div>
+            </div> }
+        </div>
         {/* --- 완료된 여행 섹션 --- */}
         <div className="completed-album">
-          <h2 className="section-title">완료된 여행</h2>
+          <h2 className="section-title">지난 여행 기록</h2>
           <div className="completed-trips-list">
             {completedTrips.map((trip, index) => (
               <div 
@@ -200,7 +228,8 @@ return(
                   endDate={trip.endDate}
                   members={trip.members}
                   count={trip.count}
-                  image={trip.image}
+                  coverImage={trip.coverImage}
+                  images={trip.image}
                 />
               </div>
             ))}

@@ -11,7 +11,6 @@ const SharedFriends = ({ data }) => {
           </div>
         ))}
       </div>
-      <p className='shared-friends-count'>나 + 친구 {data.length}명</p>
     </div>
   );
 };

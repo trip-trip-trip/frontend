@@ -5,7 +5,7 @@ import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import Login from './pages/SignUp/Login';
 import StartPage from './pages/SignUp/StartPage';
 import Album from './pages/Album/Album';
-import CreateTrip from './pages/Album/CreateTrip';
+import CreateTrip from './pages/Album/CreateTrip/CreateTrip';
 import TripDetail from './pages/Album/TripDetails/TripDetail';
 import VideoDetail from './pages/Album/TripDetails/VideoDetail';
 import PhotoDetail from './pages/Album/TripDetails/PhotoDetail';
@@ -30,6 +30,7 @@ import PostItem from './pages/Home/post/PostItem';
 import PostDetails from './pages/Home/post/PostDetails';
 import PostCreate from './pages/Home/post/PostCreate';
 import SetUsername from './pages/SignUp/SetUsername';
+import AddFriend from './pages/Album/CreateTrip/AddFriend';
 
 
 
@@ -75,6 +76,7 @@ const App = () => {
         <Route path='/home' element={<Home/>}/>
 
         <Route path='/trips' element={<Album/>}/>
+        <Route path='/trips/friends' element={<AddFriend/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail' element={<TripDetail/>}/>
         <Route path='/trips/detail/vid' element={<VideoDetail/>}/>

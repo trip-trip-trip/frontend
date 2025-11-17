@@ -4,9 +4,13 @@ import Navbar from '../../../components/NavBar/NavBar';
 import './PickFrame.css'
 import { useNavigate } from 'react-router-dom';
 
+
 // 프레임 목록 더미
 const FrameList = [
   { id: 1, url: '/frame1.PNG', picNum: 4 },
+  { id: 2, url: '/frame1.PNG', picNum: 4 },
+  { id: 3, url: '/frame1.PNG', picNum: 4 },
+  { id: 4, url: '/frame1.PNG', picNum: 4 },
 ];
 const PickFrame = () => {
   const navigate = useNavigate();
@@ -25,11 +29,10 @@ const PickFrame = () => {
 
   return (
     <div className='pick-frame'>
-      <Header title={"스크랩북 만들기"}/>
+        <Header toBack={true}/>
       <div className="frame-container">
         <div className="select-frame-title">
-            <h1>템플릿</h1>
-            <p>1개의 템플릿을 선택해주세요</p>
+            <p>스크랩북 템플릿을 고르세요</p>
         </div>
         <div className='frame-grid'>
           {FrameList.map((frame)=>(

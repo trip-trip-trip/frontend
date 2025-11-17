@@ -1,80 +1,251 @@
-.active-album-box{
-    border-radius: 20px;
-    background: #DCF7CF;
-    padding: 2rem 2.3rem;
+.active-trip-container{
+    height: 22rem;
+    padding: 2rem 2rem;
     display: flex;
     flex-direction: column;
-    margin: 0 0 1.5rem 0;
-    gap: 1.5rem;
+    background-color: #E0DDD2;
 }
 
-.active-album-head{
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.active-album-title{
-    display: flex;
-    justify-content: space-between;
-}
-
-.album-photo-grid{
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 1rem;
-    padding: 0.3rem 0.5rem 0.3rem 0;
-    justify-content: center;
-    align-items: center;
-}
-
-.album-photo-grid img{
-    width: 3.6rem;
-    height: 2.7rem;
-    object-fit: cover;
-}
-
-.photo-placeholder-item{
-    width: 2.5rem;
-    height: 2.3rem;
-    background-color: #D9D9D9;
-    /* margin: 1rem 1rem 1rem 0; */
-    /* border-radius: 0.2rem; */
-}
-
-.album-release{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.album-shots{
-    color: #888787;
-}
-
-
-.active-trip-container h2{
-    font-size: 1.9rem;
-    font-style: normal;
-    font-weight: 600;
-    margin: 1.6rem 0;
-    padding: 0;
-}
-
-
-
-.active-trip-container h3{
+.active-trip-container h5{
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
     padding: 0;
 }
 
-.active-trip-container p{
-    font-size: 1.2rem;
-    font-weight: 400;
+.active-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.active-trip-members h5{
     margin: 0;
     padding: 0;
+    color: #525B65;
+    font-weight: 400;
+    font-size: 1.6rem;
+}
+
+.active-trip-title span{
+    font-weight: 700;
+}
+
+.active-trip-title h2{
+    font-weight: 300;
+    margin: 1.6rem 0;
+    padding: 0;
+    color: #525B65;
+    font-family: Pretendard;
+    font-size: 1.8rem;
+    font-style: normal;
+    line-height: normal;
+}
+
+.active-trip-members span{
+    font-weight: 700;    
+}
+
+.active-album-box{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 14rem;
+    position: relative; 
+}
+
+.active-box-img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.active-box-img img{
+    height: 12.6rem;
+    width: 100%;
+}
+
+.ticket-content{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-content h1{
+    color: #F6F6F5;
+    font-family: "Fredericka the Great";
+    font-size: 1.1rem;
+    font-weight: 300;
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+}
+
+.active-info-cont{
+    width: 100%;
+    z-index: 2;
+    color: #525B65;
+    display: flex;
+    justify-content: center;
+}
+
+.active-ticket-detail{
+    display: flex;
+    flex-direction: column;
+    width: 71%;
+    align-items: center;
+}
+
+
+.active-box{
+    left: 0;
+    top: 0;
+}
+
+/* .active-album-head{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+} */
+
+.active-album-date{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-family: 'Orbit';
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.active-album-date h5{
+    font-size:1rem;
+    font-style: normal;
+    font-weight: 400;
+    padding: 0.5rem 0;
+    margin: 0;
+}
+
+.active-trip-info{
+    display: flex;
+    flex-direction: column;
+    top: 30%;
+    gap: 1.3rem;
+}
+
+.active-line{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    gap: 1.5rem;
+}
+
+.active-item{
+    display: flex;
+    align-items: center;
+    border-bottom: 0.1rem solid #525B65;
+    justify-content: space-between;
+    width: 10rem;
+}
+
+.info-box{
+    width: auto;
+    text-align: right;
+    color: #525B65;
+    font-family: Pretendard;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.ticket-icon{
+    width: 1.6rem;
+    height: auto;
+}
+
+.ticket-icon.big{
+    height: 1.5rem;
+    width: auto;
+}
+
+.info-box span{
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.goto-camera-btn{
+    width: 100%;
+    cursor: pointer;
+}
+
+.goto-camera{
+    width: 26%;
+    margin: 0.2rem 0.8rem;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.goto-camera-btn{
+    position: absolute;
+    height: 9.2rem;
+    width: 100%;
+    z-index: -1;
+}
+
+.goto-camera-cont{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 0.2rem;
+}
+
+.goto-camera-cont img{
+    width: 4.2rem;
+    height: 4.2rem;
+    align-self: center;
+    margin-top: 0.6rem;
+}
+
+.goto-camera-cont h6{
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.left-pic-num{
+    font-size: 0.9rem;
+    font-weight: 400;
+    text-align: center;
+}
+
+.main-edit-btn{
+    display: flex;
+    justify-content: end;
+    gap: 0.7rem;
+    align-items: center;
+}
+
+.main-edit-btn button{
+    border-bottom: 0.1rem solid #525B65;
+    background: none;
+}
+
+.main-edit-btn img{
+    width: 1.35rem;
+    height: 1.35rem;
+}
+
+.main-edit-btn p{
+    font-size: 1.2rem;
+    font-weight: 400;
 }

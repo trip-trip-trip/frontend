@@ -2,6 +2,9 @@
     padding: 5rem 0 17rem 0;
     color: #17171B;
     position: relative;
+    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
+    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+    background: #F6F6F5;
 }
 
 .add-trip-btn{
@@ -17,8 +20,6 @@
 }
 
 .album-container{
-    margin: 0;
-    padding: 0rem 2rem;
     display: flex;
     flex-direction: column;
     height: auto;
@@ -30,6 +31,9 @@
     font-weight: 600;
     margin: 1.6rem 0;
     padding: 0;
+}
+
+.album-active-cont{
 }
 
 /* .album-box{
@@ -120,9 +124,42 @@
     }
 */
 
+.new-trip-container{
+    padding: 3rem 2rem 0 2rem;
+    position: relative;
+    cursor: pointer;
+}
+
+.new-trip-container img{
+    width: 100%;
+}
+
+.new-trip-text{
+    position: absolute;
+    display: flex;
+    top: 56%;
+    align-items: center;
+    gap: 1.1rem;
+    width: 90%;
+    justify-content: center;
+}
+
+.new-trip-text img{
+    width: 2.2rem;
+    height: 2.2rem;
+}
+
+.new-trip-text h1{
+    color: #525B65;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+}
     
 .completed-album{
     margin-bottom: 5rem;
+    margin: 0;
+    padding: 0rem 2rem;
 }
 
 .completed-trips-list{

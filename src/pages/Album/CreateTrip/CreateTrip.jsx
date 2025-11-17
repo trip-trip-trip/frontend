@@ -146,11 +146,11 @@
 import React from 'react';
 import './CreateTrip.css';
 import { useState, useEffect } from 'react'; 
-import search_icon from '/search.png';
-import Header from '../../components/Header/Header';
-import Navbar from '../../components/NavBar/NavBar';
+import search_icon from '/icons/search.png';
+import Header from '../../../components/Header/Header';
+import Navbar from '../../../components/NavBar/NavBar';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext'; 
+import { useAuth } from '../../../contexts/AuthContext'; 
 
 // 1. API_BASE 정의 (다른 파일에서 가져옴)
 const API_BASE = import.meta.env.PROD 
@@ -159,13 +159,15 @@ const API_BASE = import.meta.env.PROD
 
 
 const CreateTrip = () => {
-    const [name, setName] = useState("");
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [location, setLocation] = useState("");
-    const [image, setImage] = useState("");
-    const [searchFriend, setSearchFriend] = useState("");
-    const [selectedFriend, setSelectedFriend] = useState([]);
+
+  const [name, setName] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [location, setLocation] = useState("");
+  // const [image, setImage] = useState("");
+  // const [searchFriend, setSearchFriend] = useState("");
+  // const [selectedFriend, setSelectedFriend] = useState([]);
+  const [oneday, setOneday] = useState(false);
 
     const navigate = useNavigate();
     
@@ -181,15 +183,15 @@ const CreateTrip = () => {
     { name: '최친구', profile: '/profile-img.png'},
   ];
 
-  const filteredFriendList = friendList.filter(friend => friend.name.includes(searchFriend));
+  // const filteredFriendList = friendList.filter(friend => friend.name.includes(searchFriend));
 
-  const toggleFriend = (friendName) => {
-    setSelectedFriend((prev) =>
-      prev.includes(friendName)
-        ? prev.filter((name) => name !== friendName)
-        : [...prev, friendName]
-    );
-  };
+  // const toggleFriend = (friendName) => {
+  //   setSelectedFriend((prev) =>
+  //     prev.includes(friendName)
+  //       ? prev.filter((name) => name !== friendName)
+  //       : [...prev, friendName]
+  //   );
+  // };
 
     // 3. [핵심 수정] 여행 생성 버튼 핸들러 (API 연동)
     const handleCreateBtn = async () => { // 👈 async 함수로 변경
@@ -268,68 +270,51 @@ const CreateTrip = () => {
 
     }
 
-    return (
-    // ... (JSX 코드는 수정할 필요 없습니다. 그대로 둡니다) ...
-        <div className='create-trip page-with-nav'> 
-            <Header title={"새 여행"}/>
-            <div className='create-trip-container'>
-                    <form action="" className='create-trip-form' onSubmit={(e) => e.preventDefault()}>
-                    <div className="create-trip-name">
-                        <h3>여행 이름</h3>
-                        <div className="input-field">
-                            <input type="text" value={name} placeholder='예: 제주도 가족여행' onChange={(e)=>setName(e.target.value)}/>
-                        </div>
-                        <h3>여행 기간</h3>
-                        <div className="date-form">
-                            <input type="date" value={startDate} date-placeholder='여행 시작일' onChange={(e)=>setStartDate(e.target.value)}/>
-                            <p>~</p>
-                            <input type="date" value={endDate} date-placeholder='여행 종료일' onChange={(e)=>setEndDate(e.target.value)}/>
-                        </div>
-                        <h3>위치</h3>
-                        <div className="input-field">
-                            <input type="text" value={location} placeholder='여행지를 입력하세요' onChange={(e)=>setLocation(e.target.value)}/>
-                        </div>
-            {/* ... (나머지 폼 동일) ... */}
-                        <h3>앨범 커버사진</h3>
-                        <div className="input-field">
-                                <input
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (!file) return;
-                                        setImage(file); 
-                                    }}
-                                />
-                        </div>
-                        <div className="add-friend">
-                            <div className="friend-head">
-                                <h3>친구 초대</h3>
-                                    <div className="friend-search">
-                                        <img src={search_icon} alt="검색" className='search-icon'/>
-                                        <input type="search" placeholder='친구 검색' onChange={(e)=>setSearchFriend(e.target.value)} className='friend-search-bar'/>
-                                    </div>
-                            </div>
-                            <div className="friend-list">
-                                {filteredFriendList.map((friend) => (
-                                    <div className="friend-list-row" key={friend.name}>
-                                        <div className="friend-profile">
-                                            <img src={friend.profile} alt="" className='profile-img'/>
-                                            <p>{friend.name}</p>
-                                        </div>
-                                        <input type="checkbox" 
-                                            checked={selectedFriend.includes(friend.name)}
-                                            onChange={() => toggleFriend(friend.name)}/>
-                            _MODIFIED_AT 2024-06-19T06:40:40.812Z
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    <button className='create-trip-btn' onClick={handleCreateBtn}>만들기</button>
-                </div>
-                </form>
+
+  return (
+    <div className='create-trip page-with-nav'> {/* .page-with-nav 추가 (Navbar 하단 여백) */}
+      <Header toBack={true}/>
+      <div className='create-trip-container'>
+          <form action="" className='create-trip-form' onSubmit={(e) => e.preventDefault()}>
+          <div className="create-trip-name">
+            <h3>여행, 어디로 떠나시나요?</h3>
+            <div className="input-field">
+              <input type="text" value={name} placeholder='예: 제주도 가족여행' onChange={(e)=>setName(e.target.value)}/>
             </div>
-            <Navbar/>
+            <h3>여행 일정을 알려주세요</h3>
+            <div className="oneday-check">
+              <input type="checkbox" onClick={()=>setOneday(!oneday)}/>
+              <h4>당일치기</h4>
+            </div>
+            { oneday
+            ? <div className="date-form oneday">
+                <input type="date" value={startDate} date-placeholder='여행 시작일' onChange={(e)=>{setStartDate(e.target.value), setEndDate(e.target.value)}}/>
+              </div> 
+            : <div className="date-info">
+                <div className="date-form">
+                  <input type="date" value={startDate} date-placeholder='여행 시작일' onChange={(e)=>setStartDate(e.target.value)}/>
+                  <p>부터</p>
+                </div>
+                <div className="date-form">
+                  <input type="date" value={endDate} date-placeholder='여행 종료일' onChange={(e)=>setEndDate(e.target.value)}/>
+                  <p>까지</p>
+                </div>
+              </div>
+            }
+            
+            <h3>위치</h3>
+            <div className="input-field">
+              <input type="text" value={location} placeholder='여행지를 입력하세요' onChange={(e)=>setLocation(e.target.value)}/>
+            </div>
+            
+          {/* [수정] <form>이 <button>을 감싸도록 수정 */}
+          {
+            name && startDate && endDate && location &&
+            <button className='create-trip-btn' onClick={handleCreateBtn}>여행 만들기!</button>
+          }
+        </div>
+        </form>
+        </div>
         </div>
     )
 }
