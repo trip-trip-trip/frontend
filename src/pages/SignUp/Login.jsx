@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
-import welcome_text from '../../assets/Welcome.png'; 
+import welcome_text from '../../assets/Welcome.png';
 import tripshot_logo from '../../assets/loginLogo.png';
 import googleLogo from '../../assets/Group.png';
 import kakaoLogo from '../../assets/symbol-kakao.png';
@@ -15,11 +15,11 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000').
 export default function Login() {
   const navigate = useNavigate();
 
-   const startOAuth = (socialName) => {
+  const startOAuth = (socialName) => {
     window.location.href = `${API_BASE}/login/start/${socialName}`;
   };
-  const {login} = useAuth();
- 
+  const { login } = useAuth();
+
   const handleKakao = () => startOAuth("kakao");
   const handleGoogle = () => startOAuth("google");
   const handleNaver = () => startOAuth("naver");
@@ -27,27 +27,30 @@ export default function Login() {
   // // 🔥 2) BE 콜백 처리
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const jwt = params.get("jwt");
+    
+    // 백엔드 응답 예시(token=...)와 일치하도록 'jwt'를 'token'으로 변경
+    const jwt = params.get("token"); 
     const level = params.get("level");
     const userStr = params.get("user");
 
-    if (!jwt||!level) return;
+    // jwt (토큰 값) 또는 level이 없으면 중단
+    if (!jwt || !level) return;
 
-    window.history.replaceState({}, document.title, window.location.pathname); 
+    window.history.replaceState({}, document.title, window.location.pathname);
 
     let userObj = null;
     if (userStr) {
-        try {
-            userObj = JSON.parse(decodeURIComponent(userStr));
-        } catch(e) {
-            console.error("User data parse error:", e);
-        }
+      try {
+        userObj = JSON.parse(decodeURIComponent(userStr));
+      } catch (e) {
+        console.error("User data parse error:", e);
+      }
     }
-  
+
     if (level === "access") {
       //
       login(jwt, userObj);
-      navigate("/home", { replace: true });      
+      navigate("/home", { replace: true });
       return;
     }
 
@@ -90,3 +93,4 @@ export default function Login() {
     </main>
   );
 }
+
