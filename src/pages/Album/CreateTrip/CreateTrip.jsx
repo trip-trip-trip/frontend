@@ -253,10 +253,11 @@ const CreateTrip = () => {
               startDate: startDate,
               endDate: endDate,
               location: location,
-              members: selectedFriend,
-              count: 0,
+              members: [],
+              vid_count: 0,
+              film_count: 0,
               image: [],
-              coverImage: image, 
+              coverImage: '', 
           }
           localStorage.setItem(`tripInfo_${numericTripId}`, JSON.stringify(newActiveTrip));
 
