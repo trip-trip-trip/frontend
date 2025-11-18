@@ -13,33 +13,23 @@ import plus_btn from '/icons/plus_icon.png'
 
 
 const Album = () => {
-  const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
   const todayDate = new Date().toISOString().split('T')[0];
   const navigate = useNavigate();
-  const { activeTripId, setActiveTripId } = useAuth();
+  const { token, activeTripId, setActiveTripId } = useAuth();
 
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
-  const [activeTrip, setActiveTrip] = useState(null); 
   const [activeShotCount, setActiveShotCount] = useState(0);
-  const [activeMediaList, setActiveMediaList] = useState([])
-  const [isLoading, setIsLoading] = useState(true);
   const [tripData, setTripData] = useState({});
 
-  const [activeTripInfo, setActiveTripInfo] = useState({
-    tripId: '',
-    title: '',
-    startDate: '',
-    endDate: '',
-    members: [],
-    vid_count: 0,
-    film_count: 0,
-    image: [],
-    coverImage: '',
-  });
+  const [activeTripInfo, setActiveTripInfo] = useState(null);
   const [completedTrips, setCompletedTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // 친구 초대 요청 존재 여부
-  const [hasInviteRequest, setHasInviteRequest]=useState(true);
+  const [hasInviteRequest, setHasInviteRequest]=useState(false);
 
   // 친구 초대 요청 정보 - 요청받기 위해 일단 더미값 채워둠
   const [tripRequest, setTripRequest] = useState({
@@ -60,38 +50,105 @@ const Album = () => {
   //   image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
   // });
 
-  useEffect(() => {
-    console.log("Album 페이지 로드/재방문됨.");
-    
+  useEffect(() => {    
     if (activeTripId) {
-      // 4. localStorage에서 '여행 정보' 불러오기
-      console.log({activeTripId})
-      const tripInfoKey = `tripInfo_${activeTripId}`;
-      const savedTripInfo = JSON.parse(localStorage.getItem(tripInfoKey));
-      setActiveTrip(savedTripInfo);
-
-      // 5. localStorage에서 '촬영 횟수' 불러오기
+      // 촬영 횟수 불러오기
       const countKey = `totalShotCount_${activeTripId}`;
       const savedCount = localStorage.getItem(countKey);
       setActiveShotCount(Number(savedCount) || 0);
 
-      // 6. localStorage에서 '미디어 목록' 불러오기
-      const mediaKey = `media_${activeTripId}`;
-      const rawMedia = JSON.parse(localStorage.getItem(mediaKey)) || [];
-      const validMedia = rawMedia.filter(item => item && item.dataUrl && item.type);
-      setActiveMediaList(validMedia);
-      
+      // 4. localStorage에서 '여행 정보' 불러오기
+      console.log({activeTripId})
+      const tripInfoKey = `tripInfo_${activeTripId}`;
+      const savedTripInfo = JSON.parse(localStorage.getItem(tripInfoKey));
+
     } else {
       // 7. 활성 여행이 없으면 모든 데이터 초기화
-      setActiveTrip(null);
       setActiveShotCount(0);
-      setActiveMediaList([]);
     }
   }, [location, activeTripId]); // 8. activeTripId가 바뀔 때마다 실행
 
-  
+ 
+////-----------
+
+  useEffect(() => {
+    async function fetchTrips() {
+      setIsLoading(true);
+      
+      if (!token) {
+        console.error("인증 토큰(accessToken)이 로컬 스토리지에 없습니다. 로그인 상태를 확인하세요.");
+        setIsLoading(false);
+        // navigate('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/trips`,
+          {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`여행 목록 조회 실패: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const fetchedTrips = data.result || [];
+
+        let completedList =[];
+        let newActiveTrip = null;
+
+        fetchedTrips.forEach(item => {
+          const trip = item.trip;
+          const contents = item.contents;
+          const isCompleted = trip.endDate < todayDate;
+          
+          const tripData = {
+            id: trip.id,
+            title: trip.title,
+            startDate: trip.startDate.split('T')[0], // 시간 정보 제거
+            endDate: trip.endDate.split('T')[0],   // 시간 정보 제거
+            members: (trip.inviteesNameList || []).map((name, index) => ({
+                name: name,
+                profile: trip.inviteesProfileImgList[index] || '',
+                tag: trip.inviteesTagList[index] || ''
+            })),
+            film_count: contents.photos.length,
+            vid_count: contents.reelItems.length,
+            image: contents.photos.map(p => p.media.url),
+            coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
+          };
+
+          if (isCompleted) {
+            completedList.push(tripData);
+          } else if (trip.endDate > todayDate) {
+            if (trip.id === activeTripId) {
+              newActiveTrip = tripData;
+            }
+          }
+
+        });
+
+        setActiveTripInfo(newActiveTrip);
+        setCompletedTrips(completedList);
+
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }finally{
+        setIsLoading(false);
+      }
+    }
+    fetchTrips();
+  }, [token, activeTripId]);
 
 
+   
   // 친구 초대 요청에서 <거절> 클릭 시 동작
   const handleRejectRequest = () => {
     setHasInviteRequest(false);
@@ -118,7 +175,7 @@ const Album = () => {
       localStorage.setItem(`tripInfo_${newTripId}`, JSON.stringify(newTripInfo));
       const ids = JSON.parse(localStorage.getItem('tripIds') || '[]');
       localStorage.setItem('tripIds', JSON.stringify([...new Set([...ids, newTripId])]));
-      setActiveTrip(newTripInfo);
+      // setActiveTrip(newTripInfo);
       setActiveTripId(newTripId);
       setHasInviteRequest(false);
       
@@ -154,83 +211,6 @@ const Album = () => {
   //   }
   // }, [location.state, activeTrip]);
 
-////-----------
-
-  useEffect(() => {
-    async function fetchTrips() {
-      setIsLoading(true);
-      const accessToken = window.localStorage.getItem("accessToken");
-      
-      if (!accessToken) {
-        console.error("인증 토큰(accessToken)이 로컬 스토리지에 없습니다. 로그인 상태를 확인하세요.");
-        setIsLoading(false);
-        // navigate('/login');
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `${import.meta.env.API_BASE}/trips`,
-          {
-            method: "GET",
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("something went wrong");
-        }
-
-        const data = await response.json();
-        const fetchedTrips = data.result || [];
-
-        let completedList =[];
-        let newActiveTrip = null;
-
-        fetchedTrips.forEach(item => {
-          const trip = item.trip;
-          const contents = item.contents;
-          const isCompleted = trip.endDate < todayDate;
-          
-          const tripData = {
-            id: trip.id,
-            title: trip.title,
-            startDate: trip.startDate,
-            endDate: trip.endDate,
-            members: (trip.inviteesNameList || []).map((name, index) => ({
-                name: name,
-                profile: trip.inviteesProfileImgList[index] || '',
-                tag: trip.inviteesTagList[index] || ''
-            })),
-            film_count: contents.photos.length,
-            vid_count: contents.reelItems.length,
-            image: contents.photos.map(p => p.media.url),
-            coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
-          };
-
-          if (isCompleted) {
-            completedList.push(tripData);
-          } else if (trip.endDate > todayDate) {
-            if (!newActiveTrip) {
-              newActiveTrip = tripData;
-            }
-          }
-        });
-
-        setActiveTripInfo(newActiveTrip);
-        setCompletedTrips(completedList);
-
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }finally{
-        setIsLoading(false);
-      }
-    }
-    fetchTrips();
-  }, []);
 
   
   
@@ -250,7 +230,7 @@ return(
           : <></>}
         {/* 활성화된 여행 있으면 표시 */}
         <div className="album-active-cont">
-          {activeTrip 
+          {activeTripInfo
             ? <ActiveTrip tripName={activeTripInfo?.title}
                           members={activeTripInfo?.members || []}
                           img={activeTripInfo?.image || []}
@@ -273,7 +253,8 @@ return(
         <div className="completed-album">
           <h2 className="section-title">지난 여행 기록</h2>
           <div className="completed-trips-list">
-            {completedTrips.map((trip, index) => (
+          {completedTrips.length > 0 ? (
+            completedTrips.map((trip, index) => (
               <div 
                 key = {index}
                 className="completed-trip-item">
@@ -287,7 +268,10 @@ return(
                   images={trip.image}
                 />
               </div>
-            ))}
+            ))
+          ) : (
+            <p className="no-completed-trips">아직 지난 여행 기록이 없어요.</p>
+        )}
           </div> 
         </div>
       </div>
@@ -298,29 +282,3 @@ return(
 
 
 export default Album
-
-  // const completedTrips = [
-  //   {
-  //     title: '부산 여행',
-  //     startDate: '2024-02-20',
-  //     endDate: '2024-02-23',
-  //     members: [{ name: '김멋사', profile: '/profile-img.png'},
-  //       { name: '김친구', profile: '/profile-img.png'}],
-  //     count: 24,
-  //     image: ['/trip-img/trip1.jpeg', '/trip-img/trip2.jpeg','/trip-img/trip3.jpeg','/trip-img/trip4.jpeg'],
-  //     coverImage: '/trip-img/trip1.jpeg',
-  //   },
-  //   {
-  //     title: '경주 여행',
-  //     startDate: '2021-03-05',
-  //     endDate: '2021-03-06',
-  //     members: [{ name: '김멋사', profile: '/profile-img.png'},
-  //       { name: '김친구', profile: '/profile-img.png'},
-  //       { name: '이친구', profile: '/profile-img.png'}],
-  //     count: 24,
-  //     image: ['/trip-img/trip1.jpeg', '/trip-img/trip2.jpeg','/trip-img/trip3.jpeg','/trip-img/trip4.jpeg',
-  //       '/trip-img/trip1.jpeg', '/trip-img/trip2.jpeg','/trip-img/trip3.jpeg','/trip-img/trip4.jpeg'
-  //     ],
-  //     coverImage: '/trip-img/trip2.jpeg',
-  //   },
-  // ];
