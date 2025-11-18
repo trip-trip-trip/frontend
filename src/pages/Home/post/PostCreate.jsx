@@ -222,10 +222,21 @@ export default function PostCreate() {
         location_text: locationText,
         lat,
         lng,
-        media: selectedMedia.map((media) => ({
-          media_id: media.mediaAssetId,
-          object_type: media.contentType,
-        })),
+        media: selectedMedia.map((media) => {
+            // 서버가 'PHOTO'를 모르므로 'MEDIA'로 변환해서 보내야 함
+            let serverType = media.contentType;
+            
+            if (serverType === 'PHOTO') {
+                serverType = 'MEDIA';
+            } else if (serverType === 'VIDEO') {
+                serverType = 'MEDIA'; // 비디오라면
+            }
+
+            return {
+                media_id: media.mediaAssetId,
+                object_type: serverType, // 변환된 타입을 전송
+            };
+        })
       };
       
       console.log("--- 실제 API 호출: 공유 페이로드 ---", payload);
