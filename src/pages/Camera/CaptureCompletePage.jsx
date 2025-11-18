@@ -1,4 +1,3 @@
-// src/pages/Camera/CaptureCompletePage.jsx
 import React, { useState } from 'react';
 import { useLocation, useNavigate,useParams } from 'react-router-dom';
 import './CaptureCompletePage.css'; // CSS 파일 생성
@@ -11,9 +10,8 @@ const API_BASE = import.meta.env.PROD
 const CaptureCompletePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { tripId } = useParams();
-  const { token } = useAuth();
-
+ const { tripId: tripIdParam } = useParams();
+ const { token, activeTripId } = useAuth();
   const { media, type, blob } = location.state || {}; // CameraPage에서 넘긴 state
   const [comment, setComment] = useState('');
 const [isLoading, setIsLoading] = useState(false);
@@ -22,13 +20,23 @@ const [isLoading, setIsLoading] = useState(false);
 navigate('/trips');
  return null;
  }
+ //console.log("Current tripId:", tripId, "Converted:", Number(tripId));
 
+  const effectiveTripId = tripIdParam
+   ? Number(tripIdParam)
+   : (typeof activeTripId === "number" ? activeTripId : Number(activeTripId));
+
+ console.log("Current tripIdParam:", tripIdParam,
+             "activeTripId:", activeTripId,
+
+             "effectiveTripId:", effectiveTripId);
   const handleSave = async () => {
-    // 1. tripId가 있는지 확인 (URL에서)
-    if (!tripId) {
-      alert("유효하지 않은 여행입니다. (tripId 없음)");
-      return;
-    }
+   
+    if (!effectiveTripId || Number.isNaN(effectiveTripId)) {
+     alert("유효하지 않은 여행입니다. (tripId 없음 / 숫자 아님)");
+    console.error("잘못된 tripId:", { tripIdParam, activeTripId, effectiveTripId });
+     return;
+   }
 if (!token) {
       alert("로그인 토큰이 없습니다.");
       setIsLoading(false);
@@ -40,30 +48,29 @@ if (!token) {
    if (type === "photo") {
     endpoint = `${API_BASE}/media/upload`;
     meta = {
-      tripId: Number(tripId),
+      tripId: effectiveTripId,
       mediaKind: "PHOTO",
       captureType: "NORMAL",
-      comment: comment || "",
+      comment: comment || " ",
     };
   } else {
     // VIDEO
     endpoint = `${API_BASE}/media/upload/reelItem`;
     meta = {
       
-      media: {
-        tripId: Number(tripId),
+     media: {
+        tripId: effectiveTripId,
         mediaKind: "VIDEO",
         captureType: "VIDEO",
-        comment: comment || null,
-      },
-      tripId: Number(tripId)
+        comment: comment || " ",
+     },
+     tripId: effectiveTripId,
     };
   }
   const formData = new FormData();
-  formData.append(
-    "meta",
-    new Blob([JSON.stringify(meta)], { type: "application/json" })
-  );
+  
+  let finalFileBlob;
+
    function dataURLtoBlob(dataURL) {
   const arr = dataURL.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -77,15 +84,26 @@ if (!token) {
 
   if (type === "photo") {
 const photoBlob = dataURLtoBlob(media);
-formData.append("file", photoBlob, "photo.jpg");
-
+formData.append("file", photoBlob);
+ finalFileBlob=photoBlob;
   } else {
     const videoBlob = blob
       ? blob
       : await (await fetch(media)).blob();
 
-    formData.append("file", videoBlob, "video.webm");
+    formData.append("file", videoBlob);
+     finalFileBlob=videoBlob;
   }
+  formData.append(
+     "meta",
+     new Blob([JSON.stringify(meta)], { type: "application/json" })
+    );
+    console.log("--- [업로드 요청 직전 데이터] ---");
+    console.log("Endpoint:", endpoint);
+    console.log("Token:", token ? `Bearer ${token.substring(0, 15)}...` : "TOKEN 없음!");
+    console.log("Meta (JSON):", JSON.stringify(meta, null, 2));
+    console.log("File (Blob):", finalFileBlob);
+    console.log("-------------------------------");
    try {
     //  업로드 요청 (사진/영상 구분)
    const response = await fetch(endpoint, {

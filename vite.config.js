@@ -21,6 +21,7 @@ export default defineConfig({
         name: 'TripShot', // 앱 이름
         short_name: 'TripShot', // 홈 화면에 표시될 짧은 이름
         description: '우리의 여행 기록 앱',
+        display:"standalone",
         theme_color: '#ffffff', // 앱 테마 색상
         
         // 5. 앱 아이콘 (필수!)

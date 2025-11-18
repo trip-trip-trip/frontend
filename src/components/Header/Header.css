@@ -1,5 +1,5 @@
-:root{
-  --page-max: 430px;       /* 카드 폭 */
+/* :root{
+  --page-max: 430px;    
   --bg-cream: rgba(224, 221, 210);
   --line: #eee;
 }
@@ -13,6 +13,7 @@
   background: var(--bg-cream);
   z-index: 100;
 }
+
 
 .header-inner{
   height: 56px;
@@ -59,6 +60,116 @@
   transition: transform .15s ease;
 }
 
+.header-logout-btn{
+  
+  border:none; 
+  background:transparent;
+}
+
 .header-add-btn:hover{ 
   transform: scale(1.08); 
+}  */
+
+/* Header.css */
+:root{
+  --page-max: 430px;    
+  --bg-cream: rgba(224, 221, 210);
+  --line: #eee;
 }
+
+.header{
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--page-max);
+  background: var(--bg-cream);
+  z-index: 100;
+}
+
+.header-inner{
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 양쪽 끝 정렬 */
+}
+
+.header-divider{ 
+    height:1px; 
+    background: var(--line); 
+}        
+
+/* 1. 왼쪽/오른쪽 버튼 컨테이너 (대칭 구조 확보) */
+.header-left, .header-right {
+  flex-basis: 45px; /* 버튼 영역 크기 고정 */
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 버튼은 왼쪽/오른쪽 끝에 배치 */
+}
+.header-right {
+    justify-content: flex-end; /* 오른쪽은 끝에 붙임 */
+}
+
+/* 2. 중앙 로고 컨테이너 */
+.header-center {
+  flex-grow: 1; /* 남은 공간 모두 차지하여 로고를 중앙에 배치 */
+  text-align: center;
+}
+
+.header-logo{
+  height: 4.5rem; /* 로고 높이 */
+  padding-top: 0;
+  max-width: 20rem; 
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.page-name{
+    /* PostItem을 위한 .page-name 스타일이 필요하다면 여기에 추가 */
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-title{
+  font-size: 18px; 
+  font-weight: 700; 
+  color: var(--ink);
+}
+
+/* 3. 아이콘 버튼 컨테이너 */
+.header-icon-btn{
+  width: 40px; /* 버튼 자체의 클릭 영역 */
+  height: 40px; 
+  border: none; 
+  background: transparent;
+  color: var(--ink); 
+  font-size: 28px; 
+  line-height: 1; 
+  cursor: pointer;
+  transition: transform .15s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-logout-btn{
+  border:none; 
+  background:transparent;
+}
+
+.header-icon-btn:hover{ 
+  transform: scale(1.08); 
+}
+
+/* ⭐⭐ 4. 이미지 크기 강제 제한 (문제 해결의 핵심) ⭐⭐ */
+.header-icon-btn img, 
+.header-icon {
+    width: 26px; /* 이미지 크기 조정 */
+    height: 26px;
+    object-fit: contain;
+}
+

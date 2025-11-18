@@ -2,6 +2,10 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { useNavigate, useParams } from 'react-router-dom';
 import './CameraPage.css';
+import {useAuth} from'../../contexts/AuthContext';
+
+
+
 
 // 1. 사용할 모든 '재료' 임포트
 import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레임
@@ -112,8 +116,12 @@ const CameraPage = () => {
   const [shotCount, setShotCount] = useState(0);
   const navigate = useNavigate();
   const [facingMode, setFacingMode] = useState('user');
-  const { tripId } = useParams();
-  const storageKey = `totalShotCount_${tripId}`;
+
+  const [videoMimeType, setVideoMimeType] = useState('video/webm');
+
+  //const { tripId } = useParams();
+  const { activeTripId } = useAuth();
+  const storageKey = `totalShotCount_${activeTripId}`;
 
   // 4. 스와이프 및 필터 인덱스 state
   const [currentFilterIndex, setCurrentFilterIndex] = useState(0);
@@ -146,12 +154,12 @@ const CameraPage = () => {
   };
 
   useEffect(() => {
-    if (tripId) {
+    if (activeTripId) {
       const savedCount = localStorage.getItem(storageKey);
       setShotCount(Number(savedCount) || 0);
-      console.log(`[총 촬영] ${tripId} 여행, 현재 ${savedCount || 0}회 촬영`);
+      console.log(`[총 촬영] ${activeTripId} 여행, 현재 ${savedCount || 0}회 촬영`);
     }
-  }, [tripId, storageKey]);
+  }, [activeTripId, storageKey]);
 
 
   // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
@@ -161,16 +169,19 @@ const CameraPage = () => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const originalImg = new Image();
-      originalImg.crossOrigin = "anonymous"; // CORS 문제 방지
-      originalImg.src = imageSrc;
-      originalImg.onload = async () => { // 비동기 처리를 위해 async 추가
-        canvas.width = originalImg.width; canvas.height = originalImg.height;
 
-        // 1. 원본 사진
+      const originalImg = new Image();
+      originalImg.crossOrigin = "anonymous";
+      originalImg.src = imageSrc;
+
+      originalImg.onload = async () => {
+        canvas.width = originalImg.width;
+        canvas.height = originalImg.height;
+
+        // 원본 이미지
         ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
 
-        // 2. CSS 필터 적용
+        // CSS 필터 적용
         ctx.filter = cssFilter || 'none';
         ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
         ctx.filter = 'none';
@@ -182,24 +193,34 @@ const CameraPage = () => {
             textureImg.crossOrigin = "anonymous";
             textureImg.src = filmTextureSrc;
             textureImg.onload = () => {
-              ctx.globalAlpha = 0.7; 
+              ctx.globalAlpha = 0.7;
               ctx.globalCompositeOperation = 'overlay';
+
               const ratio = textureImg.width / textureImg.height;
               const canvasRatio = canvas.width / canvas.height;
+
               let w, h, x, y;
-              if (ratio > canvasRatio) { 
-                h = canvas.height; w = textureImg.width * (h / textureImg.height);
-                x = (canvas.width - w) / 2; y = 0;
-              } else { 
-                w = canvas.width; h = textureImg.height * (w / textureImg.width);
-                x = 0; y = (canvas.height - h) / 2;
+
+              if (ratio > canvasRatio) {
+                h = canvas.height;
+                w = textureImg.width * (h / textureImg.height);
+                x = (canvas.width - w) / 2;
+                y = 0;
+              } else {
+                w = canvas.width;
+                h = textureImg.height * (w / textureImg.width);
+                x = 0;
+                y = (canvas.height - h) / 2;
               }
+
               ctx.drawImage(textureImg, x, y, w, h);
-              ctx.globalAlpha = 1.0; 
+              ctx.globalAlpha = 1.0;
               ctx.globalCompositeOperation = 'source-over';
+
               textureResolve();
             };
-            textureImg.onerror = () => textureResolve(); // 텍스처 로드 실패해도 계속
+
+            textureImg.onerror = () => textureResolve();
           });
         }
 
@@ -221,32 +242,35 @@ const CameraPage = () => {
                 drawWidth = canvas.width; drawHeight = filmOverlayImg.height * (drawWidth / filmOverlayImg.width);
                 offsetX = 0; offsetY = (canvas.height - drawHeight) / 2;
               }
+
               ctx.drawImage(filmOverlayImg, offsetX, offsetY, drawWidth, drawHeight);
               frameResolve();
             };
-            filmOverlayImg.onerror = () => frameResolve(); // 프레임 로드 실패해도 계속
+
+            filmOverlayImg.onerror = () => frameResolve();
           });
         }
 
-        // 5. 날짜 스탬프
+        // 날짜 스탬프
         if (dateStamp) {
-            ctx.font = `${Math.max(16, canvas.width * 0.04)}px Courier`;
-            ctx.fillStyle = '#FFB800';
-            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
-            const marginX = canvas.width * 0.05;
-            const marginY = canvas.height * 0.05;
-            ctx.fillText(dateStamp, canvas.width - marginX, canvas.height - marginY);
+          ctx.font = `${Math.max(16, canvas.width * 0.04)}px Courier`;
+          ctx.fillStyle = '#FFB800';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'bottom';
+
+          const marginX = canvas.width * 0.05;
+          const marginY = canvas.height * 0.05;
+
+          ctx.fillText(dateStamp, canvas.width - marginX, canvas.height - marginY);
         }
+
         resolve(canvas.toDataURL('image/jpeg'));
       };
     });
   };
 
-    const handleDataAvailable = useCallback(({ data }) => {
-    if (data.size > 0) {
-      setRecordedChunks((prev) => prev.concat(data));
-    }
-  }, []);
+  
+  // 7. [수정] 'photo' 모드 삭제, 'video'와 'film'만 남김
   const handleStartCaptureClick = useCallback(async () => {
 
     if (shotCount >= MAX_TOTAL_SHOTS) return;
@@ -259,10 +283,11 @@ const CameraPage = () => {
       if (videoTracks.length === 0) return;
 
       const videoOnlyStream = new MediaStream(videoTracks);
-
-      setIsRecording(true);
-      setCountdown(3);
-
+      const mimeType = MediaRecorder.isTypeSupported('video/mov') ? 'video/mov' : 'video/webm';
+      
+      setVideoMimeType(mimeType);
+      console.log(`[Debug] 사용할 MIME 타입: ${mimeType}`);
+      setIsRecording(true); setCountdown(3);
       const countdownInterval = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
@@ -308,28 +333,31 @@ const CameraPage = () => {
       localStorage.setItem(storageKey, newCount);
 
       const selectedFilter = FILTERS[currentFilterIndex];
+        const processedImageSrc = await applyFilmFrame(
+        imageSrc, 
+          selectedFilter.frame,   // 👈 2번째 인자 (프레임)
+          selectedFilter.texture, // 👈 3번째 인자 (텍스처)
+          getFilmDate(),          // 👈 4번째 인자 (날짜)
+          selectedFilter.cssFilter
+      
+        );
 
-      const processedImageSrc = await applyFilmFrame(
-        imageSrc,
-        selectedFilter.frame,
-        selectedFilter.texture,
-        getFilmDate(),
-        selectedFilter.cssFilter
-      );
-
-      navigate(`/capture-complete/${tripId}`, {
-        state: { media: processedImageSrc, type: 'photo', mode }
+      navigate(`/capture-complete/${activeTripId}`, {
+        state: { media: processedImageSrc, type: 'photo', mode: mode },
       });
     }
 
   }, [
-    mode,
-    shotCount,
+    webcamRef, 
+    mediaRecorderRef, 
+    mode, 
+    navigate, 
+    handleDataAvailable, 
     storageKey,
-    navigate,
-    tripId,
-    handleDataAvailable,
-    currentFilterIndex
+    shotCount,
+    currentFilterIndex ,
+    activeTripId,
+    setVideoMimeType
   ]);
 
   // -------------------------------
@@ -337,19 +365,22 @@ const CameraPage = () => {
   // -------------------------------
   useEffect(() => {
     if (recordedChunks.length > 0 && !isRecording) {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const blob = new Blob(recordedChunks, { type: videoMimeType });
+      console.log(`[Debug] 생성된 Blob 타입: ${blob.type}`);
+
       const url = URL.createObjectURL(blob);
 
       setRecordedChunks([]);
-
-      navigate(`/capture-complete/${tripId}`, {
-        state: { media: url, type: 'video', blob }
+      navigate(`/capture-complete/${activeTripId}`, {
+        state: { media: url, type: 'video', blob: blob }, 
       });
     }
-  }, [recordedChunks, isRecording, navigate, tripId]);
+  }, [recordedChunks, isRecording, navigate, activeTripId,videoMimeType]);
 
   const videoConstraints = {
-    facingMode
+   width: { ideal: 720 },
+   height: { ideal: 1280 },
+    facingMode: facingMode
   };
   return (
     <div className="camera-page-wrapper">
@@ -370,7 +401,7 @@ const CameraPage = () => {
       >
         {/* 13. [수정] 현재 필터의 CSS 필터 값을 웹캠에 인라인 스타일로 적용 */}
         <Webcam
-          audio={true} 
+          audio={false} 
           ref={webcamRef}
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}

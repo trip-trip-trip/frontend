@@ -1,7 +1,8 @@
 .create-trip{
     padding: 5rem 0;
     color: #17171B;
-    display: flex;
+    /*display: flex;*/
+    flex-direction: column;
 }
 
 .create-trip-container{
@@ -41,8 +42,8 @@ form.create-trip-form{
     width: 100%;
 }
 
-/* 헤더에 <만들기> 위치할 때 CSS */
-/* .create-trip-btn{
+
+.create-trip-btn{
     position: absolute;
     background: none;
     border: none;
@@ -53,7 +54,7 @@ form.create-trip-form{
     z-index: 999;
     cursor: pointer;
     color: #131BF6;
-} */
+}
 
 .create-trip-btn{
     font-size: 1.8rem;

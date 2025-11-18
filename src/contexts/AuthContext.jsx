@@ -1,88 +1,120 @@
 // src/contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
-// const API_BASE = import.meta.env.VITE_API_BASE_URL; // (BE API 완성 전까지 주석)
+const API_BASE = import.meta.env.PROD
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org')
+  : '/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // [수정] 초기값 true
-  const [activeTripId, setActiveTripId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  // 🔽 1. [수정] 초기값을 localStorage에서 읽어오기
+const [activeTripId, setActiveTripId] = useState(() => {
+    const savedTripId = localStorage.getItem("activeTripId");
+    return savedTripId ? Number(savedTripId) : null;
+  });
 
-  // BE API가 없으므로 이 함수는 일단 주석 처리
-  /*
+  // 🔽 2. [추가] ID를 저장/삭제하는 새 래퍼(wrapper) 함수
+  const selectActiveTrip = (tripId) => {
+    const idAsNumber = Number(tripId);
+    if (tripId && !Number.isNaN(idAsNumber)) {
+      localStorage.setItem("activeTripId", idAsNumber);
+      setActiveTripId(idAsNumber);
+    } else {
+      // tripId가 null, 0, undefined, NaN일 경우
+      localStorage.removeItem("activeTripId");
+      setActiveTripId(null);
+    }
+  };
   const fetchUserProfile = useCallback(async (currentToken) => {
     if (!currentToken) {
       setIsLoading(false);
       return;
     }
+
     try {
-      const res = await fetch(`${API_BASE}/api/user/me`, {
+      const res = await fetch(`${API_BASE}/users/me`, {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
-      if (!res.ok) throw new Error("토큰이 유효하지 않습니다.");
-      const data = await res.json();
-      if (data.isSuccess) {
-        setUser(data.result);
-        localStorage.setItem("user", JSON.stringify(data.result));  
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.error("토큰 만료 또는 인증 실패");
+          return;
+        }
+        throw new Error(`서버 오류: ${res.status}`);
       }
+
+      // 🔥 여기서 단 한번만 json() 호출해야 함
+      const json = await res.json();
+
+      if (json?.result?.id) {
+        setUser(json.result);
+        localStorage.setItem("user", JSON.stringify(json.result));
+      } else {
+        throw new Error("서버 데이터 형식 오류");
+      }
+
     } catch (err) {
-      console.error("사용자 정보 로드 실패:", err);
-      logout();
+      console.error("사용자 프로필 로드 실패:", err);
     } finally {
       setIsLoading(false);
     }
   }, []);
-  */
 
-  // [수정] 앱이 켜질 때 localStorage에서 토큰과 "user"를 바로 로드
   useEffect(() => {
+    const savedToken = localStorage.getItem("jwtToken");
 
-    const savedUser = localStorage.getItem("user");
-
-    if (savedUser) {
-      setUser(JSON.parse(savedUser)); 
+    if (savedToken) {
+      setToken(savedToken);
+      fetchUserProfile(savedToken);
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false); 
-  }, []);
+  }, [fetchUserProfile]);
 
-  // [수정] login 함수가 Home.jsx에서 호출될 때 토큰만 저장
+  // 로그인
   const login = (jwtToken, userObject) => {
     localStorage.setItem("jwtToken", jwtToken);
     setToken(jwtToken);
-    
-    // ⭐ 새로운 사용자 정보를 Context와 LocalStorage에 저장
-    setUser(userObject); 
-    if (userObject) {
-        localStorage.setItem("user", JSON.stringify(userObject));
+
+    // 백엔드 응답 형식 맞춤
+    const profile =
+      userObject?.result?.user ??
+      userObject?.user ??
+      userObject;
+
+    if (profile) {
+      setUser(profile);
+      localStorage.setItem("user", JSON.stringify(profile));
     }
+
+    fetchUserProfile(jwtToken);
   };
 
   const logout = () => {
     localStorage.removeItem("jwtToken");
-    localStorage.removeItem("user"); 
+    localStorage.removeItem("user");
     setUser(null);
     setToken(null);
-    setActiveTripId(null);
+    selectActiveTrip(null);
   };
-
-  // (loginWithKakao 함수는 Login.jsx가 사용하지 않으므로 주석 처리)
-  // const loginWithKakao = async (code) => { ... };
 
   return (
     <AuthContext.Provider
       value={{
         user,
         token,
-        setUser, // 👈 Home.jsx가 user를 저장할 수 있게
+        setUser,
         login,
         logout,
-        // loginWithKakao,
         activeTripId,
-        setActiveTripId,
+        setActiveTripId:selectActiveTrip,
         isLoading,
+        fetchUserProfile,
       }}
     >
       {children}

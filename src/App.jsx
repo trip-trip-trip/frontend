@@ -97,7 +97,7 @@ const App = () => {
 
         {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
         <Route path="/mypage/profile" element={<ProfilePage />} />
-
+<Route path="/mypage/edit" element={<ProfileEditPage />} />
         {/* 프로필 하위 페이지들 */}
         <Route path="/mypage/friends" element={<FriendListPage />} />
         <Route path="/mypage/settings" element={<SettingsPage />} />

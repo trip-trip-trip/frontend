@@ -1,4 +1,6 @@
-/* 전체 카드 스타일 */
+/* ---------------------------------------------------
+   📌 공통 레이아웃 (Post Card)
+--------------------------------------------------- */
 .post-item {
     width: 100%;
     margin: 0 0 20px;
@@ -8,12 +10,20 @@
     overflow: hidden;
     border: 1px solid #eee;
 }
+.post-detail-page {
+    height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
-/* 헤더 */
+/* ---------------------------------------------------
+   📌 Header (유저 정보)
+--------------------------------------------------- */
 .post-header {
     display: flex;
     align-items: center;
     padding: 16px;
+    cursor: pointer;
 }
 
 .user-info {
@@ -31,12 +41,6 @@
     border: 1px solid #ddd;
 }
 
-.user-details {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
 .username {
     font-weight: 600;
     font-size: 15px;
@@ -46,9 +50,14 @@
 .location {
     font-size: 13px;
     color: #777;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-/* 미디어 영역 */
+/* ---------------------------------------------------
+   📌 Media Area (이미지 슬라이드)
+--------------------------------------------------- */
 .post-media-container {
     position: relative;
     width: 100%;
@@ -56,16 +65,17 @@
     background: #000;
     aspect-ratio: 1 / 1;
     border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
 .post-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;     /* ← Safari 렌더링 glitch 방지 */
+    display: block;
 }
 
-/* 슬라이더 화살표 */
+/* Slider arrows */
 .slider-arrow {
     position: absolute;
     top: 50%;
@@ -81,20 +91,11 @@
     justify-content: center;
     backdrop-filter: blur(3px);
 }
+.slider-arrow:hover { background: rgba(0,0,0,0.55); }
+.slider-arrow.left { left: 12px; }
+.slider-arrow.right { right: 12px; }
 
-.slider-arrow:hover {
-    background: rgba(0,0,0,0.55);
-}
-
-.slider-arrow.left {
-    left: 12px;
-}
-
-.slider-arrow.right {
-    right: 12px;
-}
-
-/* 이미지 인디케이터 */
+/* Image dots */
 .post-media-indicators {
     position: absolute;
     bottom: 14px;
@@ -109,14 +110,14 @@
     height: 7px;
     border-radius: 50%;
     background: rgba(255,255,255,0.5);
-    transition: 0.3s;
 }
-
 .post-media-indicators .dot.active {
     background: rgba(255,255,255,0.9);
 }
 
-/* 버튼 및 액션 */
+/* ---------------------------------------------------
+   📌 Actions (좋아요 / 날짜 / 캡션)
+--------------------------------------------------- */
 .post-actions {
     padding: 14px 16px 8px;
 }
@@ -133,7 +134,6 @@
     padding: 4px;
     cursor: pointer;
 }
-
 .like-btn.liked svg {
     fill: #f04438;
 }
@@ -144,17 +144,19 @@
     color: #333;
 }
 
-/* 텍스트 영역 */
+/* ⬇️ 캡션 영역 */
 .post-caption-block {
     padding: 0 16px 10px;
 }
 
-.post-caption-block strong {
-    font-weight: 600;
+.post-date {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+    display: block;
 }
 
 .post-content-text {
-    margin-top: 6px;
     color: #444;
     font-size: 14px;
     line-height: 1.45;
@@ -162,79 +164,99 @@
     word-break: break-word;
 }
 
-.post-date {
-    font-size: 12px;
-    color: #999;
-    margin-top: 6px;
-}
-
-/* 댓글 요약 */
+/* ---------------------------------------------------
+   📌 댓글 요약(목록 화면)
+--------------------------------------------------- */
 .post-comments-section {
     padding: 0 16px 14px;
 }
 
-.comment-toggle-btn {
+.comment-link-btn {
     background: none;
     border: none;
     color: #666;
     font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #666;
+    padding-bottom: 2px;
     cursor: pointer;
-    padding: 4px 0;
 }
 
-.comment-toggle-btn:hover {
-    text-decoration: underline;
-}
-
-/* 댓글 리스트 */
-.comments-list {
-    margin-top: 8px;
-}
-
-.comment-item {
+/* 수정하기 */
+.edit-link-btn {
+    background: none;
+    border: none;
+    color: #666;
     font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.comment-username {
-    font-weight: 600;
-}
-
-.comment-text {
-    color: #555;
-}
-
-/* 상세 페이지 (통일된 스타일) */
-.post-detail-page {
-    background: #fff;
-}
-
-.detail-comments-area {
-    padding: 20px 16px 100px;
-    border-top: 1px solid #eee;
-}
-
-.comments-title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 12px;
-}
-
-.comment-item.detail-item {
+    font-weight: 500;
+    border-bottom: 1px solid #666;
+    padding-bottom: 2px;
     display: flex;
-    gap: 10px;
-    border-bottom: 1px solid #f1f1f1;
-    padding-bottom: 16px;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+.edit-icon {
+    width: 16px;
+    height: 16px;
 }
 
-.small-avatar {
-    width: 38px;
-    height: 38px;
+/* ---------------------------------------------------
+   📌 상세 페이지 댓글 디자인 (두 번째 예시 스타일)
+--------------------------------------------------- */
+.detail-comments-area {
+    padding: 16px 16px 120px;
+}
+
+.comments-list-detail {
+    padding: 0 4px;
+    margin-top: 14px;
+}
+
+.detail-item {
+    margin-bottom: 16px;
+}
+
+.comment-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.comment-avatar-circle {
+    width: 40px;
+    height: 40px;
+    background: #e3e3e3;
     border-radius: 50%;
-    object-fit: cover;
 }
 
-/* 댓글 입력 */
+.comment-right {
+    flex: 1;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 14px;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: #999;
+}
+
+.comment-body {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.45;
+}
+
+/* 댓글 입력창 */
 .comment-input-area.detail-input {
     display: flex;
     gap: 10px;
@@ -257,190 +279,53 @@
     border-radius: 20px;
     border: none;
 }
-
 .comment-submit-btn:hover {
     background: #007cd4;
 }
 
-/* 이미지 업로드 미리보기 */
+/* ---------------------------------------------------
+   📌 이미지 업로드 미리보기 (중복 제거 완료)
+--------------------------------------------------- */
 .preview-multi {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 14px;
-  margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 14px;
 }
 
 .preview-thumb-wrapper {
-  position: relative;
+    position: relative;
 }
 
 .preview-thumb {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 1px solid #ddd;
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #ddd;
 }
 
-/* + 버튼 */
 .add-thumb-btn {
-  width: 90px;
-  height: 90px;
-  border-radius: 12px;
-  border: 2px dashed #bbb;
-  background: #fafafa;
-  color: #aaa;
-  font-size: 34px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    border: 2px dashed #bbb;
+    background: #fafafa;
+    font-size: 32px;
+    color: #aaa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }
-
 .add-thumb-btn:hover {
-  background: #f0f0f0;
-  border-color: #999;
-}
-/* 전체 Compose 영역 */
-.compose {
-  background: #fff;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+    background: #f0f0f0;
+    border-color: #999;
 }
 
-/* 상단 헤더 */
-.compose-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid #eee;
-  font-size: 16px;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 20;
-}
-
-.compose-header button {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.share {
-  font-size: 15px;
-  color: #0095f6;
-  font-weight: 600;
-}
-
-.share:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* 본문 */
-.compose-body {
-  padding: 16px;
-  overflow-y: auto;
-}
-
-/* 이미지 업로드 전체 영역 */
-.picker-row {
-  margin-bottom: 20px;
-}
-
-/* 미리보기 영역 */
-.preview-multi {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-}
-
-.preview-thumb-wrapper {
-  position: relative;
-}
-
-.preview-thumb {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-}
-
-/* + 버튼 */
-.add-thumb-btn {
-  width: 90px;
-  height: 90px;
-  border-radius: 12px;
-  border: 2px dashed #bbb;
-  background: #fafafa;
-  color: #aaa;
-  font-size: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.add-thumb-btn:hover {
-  background: #f0f0f0;
-  border-color: #999;
-}
-
-/* 입력 폼 한 줄 */
-.form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 20px;
-}
-
-.form-row label {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
-}
-
-/* input 기본 스타일 통일 */
-.form-row input,
-.form-row textarea {
-  width: 92%;
-  padding: 12px 14px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  font-size: 14px;
-  background: #fafafa;
-  outline: none;
-  transition: 0.2s;
-}
-
-.form-row input:focus,
-.form-row textarea:focus {
-  border-color: #0095f6;
-  background: #fff;
-}
-
-/* 라디오 버튼 */
-.radios {
-  display: flex;
-  gap: 18px;
-  margin-top: 4px;
-}
-
-.radios label {
-  font-size: 14px;
-  color: #444;
-}
-
-/* 테스트 입력 영역 */
-.form-row input[readonly] {
-  background: #f4f4f4;
-  color: #777;
+.post-footer-actions {
+    display: flex;
+    justify-content: space-between;   /* ← 양쪽 끝으로 정렬 */
+    align-items: center;
+    padding: 0 0 14px;
 }
