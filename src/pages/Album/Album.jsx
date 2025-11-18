@@ -107,7 +107,8 @@ const Album = () => {
         id: newTripId,
         title : tripRequest.title,
         startDate : tripRequest.startDate,
-        count: 0,
+        vid_count: 0,
+        film_count: 0,
         endDate : tripRequest.endDate,
         members : tripRequest.members,
         coverImage : tripRequest.coverImage || '',
@@ -277,11 +278,11 @@ return(
                 key = {index}
                 className="completed-trip-item">
                 <EndedTripItem
+                  id = {trip.id}
                   title={trip.title}
                   startDate={trip.startDate}
                   endDate={trip.endDate}
                   members={trip.members}
-                  count={trip.count}
                   coverImage={trip.coverImage}
                   images={trip.image}
                 />

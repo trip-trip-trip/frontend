@@ -4,11 +4,12 @@ import React from 'react'
 import ended_trip from '/complete_trip.png'
 import SharedFriends from './sharedFriends'
 
-const EndedTripItem = ( {title, startDate, endDate, members, count, coverImage, images} ) => {
+const EndedTripItem = ( {id, title, startDate, endDate, members, coverImage, images} ) => {
     const navigate = useNavigate();
   return (
     <div className='EndedTripItem' onClick={()=>navigate('/trips/detail', {
       state: {
+          id: id,
           title: title,  
           startDate: startDate,
           endDate: endDate,
@@ -32,7 +33,7 @@ const EndedTripItem = ( {title, startDate, endDate, members, count, coverImage, 
           <div className="end-trip-info">
             <div className="end-info-line">
               <h1>Location</h1>
-              <h2>제주도</h2>
+              <h2>{title}</h2>
             </div>
             <div className="end-info-line">
               <h1>People</h1>
