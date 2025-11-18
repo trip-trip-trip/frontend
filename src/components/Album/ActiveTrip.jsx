@@ -10,15 +10,14 @@ import members_icon from '/icons/members_icon.png'
 import camera_icon from '/icons/camera_icon.png'
 import write_icon from '/icons/write_icon.png'
 
-const ActiveTrip = ({tripName, startDate, endDate, members, img, count, vidCount}) => {
-    console.log(tripName, members, img, count);
+const ActiveTrip = ({tripName, startDate, endDate, members, img, filmCount, vidCount}) => {
     const navigate = useNavigate();
   return (
     <div className='active-trip-container'>
 
       <div className="active-header">
         <div className="active-trip-title">
-          <h2>지금 <span>제주도</span> 여행중 </h2>
+          <h2>지금 <span>{tripName}</span> 여행중 </h2>
         </div>
         <div className="active-trip-members">
           {/* 친구 수 + 1명(본인) 추가 */}
@@ -46,11 +45,11 @@ const ActiveTrip = ({tripName, startDate, endDate, members, img, count, vidCount
                 <div className="active-line">
                   <div className="active-item">
                     <img src={location_icon} alt="" className='ticket-icon big'/>
-                    <h4 className='info-box'>제주도</h4>
+                    <h4 className='info-box'>{tripName}</h4>
                   </div>
                   <div className="active-item">
                     <img src={film_icon} alt="" className='ticket-icon'/>
-                    <h4 className='info-box'>{count}<span> / 24</span></h4>
+                    <h4 className='info-box'>{filmCount}<span> / 24</span></h4>
                   </div>
                 </div>
                 <div className="active-line">

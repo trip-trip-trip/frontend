@@ -45,7 +45,7 @@ const videoList = [
 const TripDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showShared, setShowShared] = useState('false');
+  const [showShared, setShowShared] = useState(false);
   const handleToggleShared = (e) => {
     setShowShared(e.target.checked);
   };

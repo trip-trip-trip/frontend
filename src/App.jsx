@@ -31,6 +31,7 @@ import PostDetails from './pages/Home/post/PostDetails';
 import PostCreate from './pages/Home/post/PostCreate';
 import SetUsername from './pages/SignUp/SetUsername';
 import AddFriend from './pages/Album/CreateTrip/AddFriend';
+import SharePhoto from './pages/Album/SharePhoto';
 
 
 
@@ -79,6 +80,7 @@ const App = () => {
         <Route path='/trips/friends' element={<AddFriend/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail' element={<TripDetail/>}/>
+        <Route path='/trips/detail/share' element={<SharePhoto/>}/>
         <Route path='/trips/detail/vid' element={<VideoDetail/>}/>
         <Route path='/trips/detail/pic' element={<PhotoDetail/>}/>
         <Route path='/scrapbook/frame' element={<PickFrame/>}/>

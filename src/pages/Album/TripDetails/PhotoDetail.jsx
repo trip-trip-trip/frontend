@@ -34,7 +34,7 @@ const sharedList = [
 const PhotoDetail = () => {
   const [checkGrid, SetCheckGrid] = useState('grid');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0); // 현재 슬라이드 인덱스
-  const [showShared, setShowShared] = useState('false');
+  const [showShared, setShowShared] = useState(false);
   const handleToggleShared = (e) => {
     setShowShared(e.target.checked);
   };
