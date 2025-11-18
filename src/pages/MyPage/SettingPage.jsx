@@ -22,7 +22,7 @@ function urlBase64ToUint8Array(base64String) {
 export default function SettingPage() {
    const navigate = useNavigate();
   // 1. [수정] user가 null일 수 있으므로 안전하게 user만 가져옴
-   const { user } = useAuth(); 
+   const { user,token } = useAuth(); 
 
    const [isOn, setIsOn] = useState(false); // 2. [수정] 기본값 false로 변경
    const [alertCount, setAlertCount] = useState(3);
@@ -49,7 +49,7 @@ export default function SettingPage() {
   };
 
     const saveSettingsToBE = async (count, times) => {
-    if (!user) return;
+    if (!user||!token) return;
 
     const timezone = buildTimezoneRange(times);
     console.log("BE로 알림 설정 전송:", { timesPerDay: count, timezone });
@@ -57,7 +57,8 @@ export default function SettingPage() {
     try {
       const res = await fetch(`${API_BASE}/push/settings`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" 
+          ,"Authorization": `Bearer ${token}`},
         body: JSON.stringify({
           timesPerDay: count,
           timezone, // [start, end]
@@ -124,7 +125,9 @@ export default function SettingPage() {
         // 4) BE 서버로 구독 정보 전송
         const subRes = await fetch(`${API_BASE}/push/subscribe`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+           },
           body: JSON.stringify({
             userId: String(user.id), //  String으로 맞춰줌
             endpoint,

@@ -21,7 +21,7 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "/icons/icon-192x192.png",
+      icon: "public/icons/tripshot_logo.png",
       // 클릭 시 이동할 URL 정보를 여기에 추가합니다.
       data: {
         url: '/camera' 

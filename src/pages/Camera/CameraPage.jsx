@@ -3,6 +3,10 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { useNavigate, useParams } from 'react-router-dom';
 import './CameraPage.css';
+import {useAuth} from'../../contexts/AuthContext';
+
+
+
 
 // 1. 사용할 모든 '재료' 임포트
 import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레임
@@ -113,8 +117,12 @@ const CameraPage = () => {
   const [shotCount, setShotCount] = useState(0);
   const navigate = useNavigate();
   const [facingMode, setFacingMode] = useState('user');
-  const { tripId } = useParams();
-  const storageKey = `totalShotCount_${tripId}`;
+
+  const [videoMimeType, setVideoMimeType] = useState('video/webm');
+
+  //const { tripId } = useParams();
+  const { activeTripId } = useAuth();
+  const storageKey = `totalShotCount_${activeTripId}`;
 
   // 4. 스와이프 및 필터 인덱스 state
   const [currentFilterIndex, setCurrentFilterIndex] = useState(0);
@@ -147,12 +155,12 @@ const CameraPage = () => {
   };
 
   useEffect(() => {
-    if (tripId) {
+    if (activeTripId) {
       const savedCount = localStorage.getItem(storageKey);
       setShotCount(Number(savedCount) || 0);
-      console.log(`[총 촬영] ${tripId} 여행, 현재 ${savedCount || 0}회 촬영`);
+      console.log(`[총 촬영] ${activeTripId} 여행, 현재 ${savedCount || 0}회 촬영`);
     }
-  }, [tripId, storageKey]);
+  }, [activeTripId, storageKey]);
 
   const switchMode = (newMode) => setMode(newMode);
   const flipCamera = () => {
@@ -281,7 +289,10 @@ const CameraPage = () => {
       const videoTracks = originalStream.getVideoTracks();
       if (videoTracks.length === 0) { /* ... */ return; }
       const videoOnlyStream = new MediaStream(videoTracks);
-      const mimeType = MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm';
+      const mimeType = MediaRecorder.isTypeSupported('video/mov') ? 'video/mov' : 'video/webm';
+      
+      setVideoMimeType(mimeType);
+      console.log(`[Debug] 사용할 MIME 타입: ${mimeType}`);
       setIsRecording(true); setCountdown(3);
       const countdownInterval = setInterval(() => {
         setCountdown(prev => {
@@ -343,7 +354,7 @@ const CameraPage = () => {
       
         );
 
-      navigate(`/capture-complete/${tripId}`, {
+      navigate(`/capture-complete/${activeTripId}`, {
         state: { media: processedImageSrc, type: 'photo', mode: mode },
       });
     }
@@ -354,26 +365,29 @@ const CameraPage = () => {
     mode, 
     navigate, 
     handleDataAvailable, 
-    shotCount, 
     storageKey,
-    tripId,
-    currentFilterIndex // 10. [추가] 의존성 배열
+    shotCount,
+    currentFilterIndex ,
+    activeTripId,
+    setVideoMimeType
   ]);
 
   useEffect(() => {
     if (recordedChunks.length > 0 && !isRecording) {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const blob = new Blob(recordedChunks, { type: videoMimeType });
+      console.log(`[Debug] 생성된 Blob 타입: ${blob.type}`);
+
       const url = URL.createObjectURL(blob);
       setRecordedChunks([]);
-      navigate(`/capture-complete/${tripId}`, {
+      navigate(`/capture-complete/${activeTripId}`, {
         state: { media: url, type: 'video', blob: blob }, 
       });
     }
-  }, [recordedChunks, isRecording, navigate, tripId]);
+  }, [recordedChunks, isRecording, navigate, activeTripId,videoMimeType]);
 
   const videoConstraints = {
-    //width: { ideal: 720 },
-   // height: { ideal: 1280 },
+   width: { ideal: 720 },
+   height: { ideal: 1280 },
     facingMode: facingMode
   };
 
@@ -396,7 +410,7 @@ const CameraPage = () => {
       >
         {/* 13. [수정] 현재 필터의 CSS 필터 값을 웹캠에 인라인 스타일로 적용 */}
         <Webcam
-          audio={true} 
+          audio={false} 
           ref={webcamRef}
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}
