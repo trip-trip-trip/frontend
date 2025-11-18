@@ -1,6 +1,14 @@
 .select-pic{
-    padding: 5rem 0;
+    padding: 10rem 0;
     color: #17171B;
+    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
+    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+    position: relative;
+}
+
+.frame-preview{
+    width: 17rem;
+    align-self: center;
 }
 
 .photo-pick-container{
@@ -11,13 +19,24 @@
 }
 
 .select-pic-title h1{
-    font-size: 2rem;
-    font-weight: 500;
+    color: #525B65;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin:0;
 }
 
 .select-pic-title p{
-    font-size: 1.3rem;
+    color: #525B65;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 1.2rem 0 0.4rem 0;
+}
+
+.select-pic-title h3{
+    color: #525B65;
+    font-size: 1.4rem;
     font-weight: 300;
+    margin:0;
 }
 
 
@@ -49,20 +68,21 @@
 
 .next-button {
     width: 100%;
-    padding: 1.5rem;
-    margin: 2rem auto;
-    border: none;
-    border-radius: 1rem;
-    background-color: #e2e2e2; /* 비활성화 색상 */
-    color: #9f9f9f;
-    font-size: 1.8rem;
-    font-weight: bold;
+    padding: 1.2rem;
+    margin: 1.5rem auto;
+    border-radius: 3rem;
+    border: 1px solid #525B65;
+    background: #E0DDD2;
+    color: #525b6585;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
     cursor: not-allowed;
     transition: background-color 0.2s;
 }
 
 .next-button.active {
-    background-color: #519b63;
-    color: white;
+    background-color: #525B65;
+    color: #E0DDD2;
     cursor: pointer;
 }

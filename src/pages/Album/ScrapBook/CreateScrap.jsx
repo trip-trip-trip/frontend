@@ -1,11 +1,12 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../../../components/Header/Header';
 import Navbar from '../../../components/NavBar/NavBar';
 import './CreateScrap.css'; 
 import PhotoFrame from '../../../components/Album/ScrapBook/PhotoFrame';
 import { toPng } from 'html-to-image';
 import { useRef } from 'react';
+import save_btn from '/icons/save_btn.png'
 
 // === 프레임에 따른 사진 위치 정보 (실제 디자인에 맞게 조정 필요) ===
 const FRAME_POSITIONS = {
@@ -14,6 +15,24 @@ const FRAME_POSITIONS = {
         { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
         { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
         { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
+    ],
+    2: [ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
+      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
+      { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
+      { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
+    ],
+    3:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
+      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
+      { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
+      { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
+    ],
+    4:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
+      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
+      { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
+      { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
     ]
 };
 
@@ -26,6 +45,7 @@ const CreateScrap = () => {
     } = location.state || {};
 
     const scrapRef = useRef(null);
+    const navigate = useNavigate();
 
     // 선택된 프레임의 위치 정보 가져오기
     const initialFrameData = FRAME_POSITIONS[selectedFrameId] || [];
@@ -77,9 +97,8 @@ const CreateScrap = () => {
 
     return (
         <div className='create-scrap'>
-          <Header title={"스크랩북"}/>
+          <Header toBack={true}/>
           <div className="create-scrap-container">
-              <h1>완성된 스크랩북</h1>
               <div className="scrap-img-container" ref={scrapRef}>
                 <img src={selectedFrameUrl} alt="" className='frame-img'/>
                 {/* 4개의 사진 프레임 렌더링 */}
@@ -92,10 +111,24 @@ const CreateScrap = () => {
                       />
                 ))}
               </div>
+              <div className="save-scrap">
+                <div className="save-scrap-head">
+                  <h1>스크랩북을 완성했어요</h1>
+                  <button className='save-scrap-btn' onClick={handleSaveScrapbook}>
+                    <img src={save_btn} alt="" />
+                  </button>
+                </div>
+                <p><span>[앨범에 저장하기]</span>를 눌러서 여행 앨범에 스크랩북을 저장할 수 있어요.</p>
+                <button className='save-scrap-button album' onClick={handleSaveScrapbook}>
+                  앨범에 저장하기
+                </button>
+                <button className='save-scrap-button retry' onClick={handleSaveScrapbook}>
+                  다시 만들기
+                </button>
+              </div>
 
-              <button className='save-scrap-button' onClick={handleSaveScrapbook}>
-                스크랩북 저장하기
-              </button>
+
+              
           </div>
           <Navbar/>
         </div>

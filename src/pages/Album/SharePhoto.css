@@ -1,0 +1,93 @@
+.share-photo{
+    color: #17171B;
+    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
+    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+}
+
+.share-photo-cont{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 2rem 0 2rem;
+    font-family: Pretendard;
+    gap: 1.2rem;
+    color: #525B65;
+    height: 100%;
+}
+
+.share-photo-cont h1{
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.share-photo-cont h3{
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin: 0 0 0 0;
+}
+
+.share-all{
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.share-all h2{
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+
+.share-all input[type="checkbox"] {
+    -webkit-appearance: none; /* Safari, Chrome 용 */
+    -moz-appearance: none; /* Firefox 용 */
+    appearance: none; /* 표준 */
+    
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    border-radius: 0.4rem; 
+    background-color: #E0DDD2; /* 체크 해제 상태 색 */
+    cursor: pointer;
+    
+    /* display: inline-flex;
+    align-items: center;
+    justify-content: center; */
+
+    transition: ease-in-out 0.2s;
+}
+
+/* 체크됐을 때의 배경색 */
+.share-all input[type="checkbox"]:checked {
+    background-color: #525B65;
+    transition: ease-in-out 0.2s;
+}
+
+.share-media-btn{
+    margin-top: 1.6rem;
+    display: flex;
+    padding: 1.2rem 6.2rem;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 3rem;
+    border: 0.1rem solid #525B65;
+    background: #525B65;
+    color: #E0DDD2;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.share-selected-overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 23, 23, 0.752);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

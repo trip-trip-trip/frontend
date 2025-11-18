@@ -1,7 +1,6 @@
-/* :root{
+:root{
   --page-max: 430px;    
   --bg-cream: rgba(224, 221, 210);
-  --line: #eee;
 }
 
 .header{
@@ -173,3 +172,17 @@
     object-fit: contain;
 }
 
+.back-btn{
+  position: fixed;
+  background: none;
+  border: none;
+  top: 0.7rem;
+  left: 2rem;
+  z-index: 999;
+  cursor: pointer;
+}
+
+.back-btn img{
+  width: 1.1rem;
+  height: auto;
+}
