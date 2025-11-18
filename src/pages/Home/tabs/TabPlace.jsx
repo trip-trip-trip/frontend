@@ -4,7 +4,7 @@ import './TabPlace.css';
 import homePlace from '../../../assets/home_placeLogo.png';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 
-const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const MAPS_KEY = 'AIzaSyBxUpz_y5O2nOTivngRz6fVvYHtG91i75M';
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 const FALLBACK_THUMB = `${window.location.origin}/icons/tripshot.png`;
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.9780 }; //서울 중심

@@ -225,4 +225,3 @@ if (activeTripId) {
 };
 
 export default TabAll;
-
