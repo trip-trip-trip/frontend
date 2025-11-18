@@ -13,7 +13,7 @@ const Home = () => {
   const { user, login, setUser, isLoading, activeTripId } = useAuth();
   const [params] = useSearchParams();
 
-  //소셜 로그인 redirect 처리 및 Context 업데이트 로직 (활성화)
+  // ⭐ 소셜 로그인 redirect 처리 및 Context 업데이트 로직 (활성화)
   useEffect(() => {
     const token = params.get("token");
     const userStr = params.get("user");
@@ -21,19 +21,19 @@ const Home = () => {
     // token과 userStr이 있고, Context의 user가 null일 때 (새 로그인) 또는 URL에 정보가 있을 때 처리
     if (token && userStr) {
         
-        // URL에서 파라미터 제거 (URL 클리닝)
+        // 1. URL에서 파라미터 제거 (URL 클리닝)
         const url = new URL(window.location);
         url.searchParams.delete('token');
         url.searchParams.delete('user');
         url.searchParams.delete('level');
         window.history.replaceState({}, '', url);
         
-        //  Context에 유저 정보가 없거나, URL에 새 정보가 있을 경우 업데이트
+        // 2. Context에 유저 정보가 없거나, URL에 새 정보가 있을 경우 업데이트
         if (!user) {
             try {
                 const decodedUser = JSON.parse(decodeURIComponent(userStr));
                 
-                // AuthContext의 login 함수를 사용하여 토큰과 사용자 정보를 Context에 저장
+                // ⭐ AuthContext의 login 함수를 사용하여 토큰과 사용자 정보를 Context에 저장
                 login(token, decodedUser);
                 
             } catch (err) {
@@ -71,7 +71,7 @@ const Home = () => {
     window.history.replaceState({}, '', url);
   }, [tab]);
 
-  // Context의 isLoading 상태에 따라 로딩 화면 표시
+  // ❗ Context의 isLoading 상태에 따라 로딩 화면 표시
   if (isLoading) return <div>불러오는 중...</div>;
 
   return (

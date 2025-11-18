@@ -75,6 +75,7 @@ const Navbar = () => {
       <div className="nav-link" onClick={handlePostClick}>
         <img src={post} alt="올리기" className='icon'
         />
+        <p> 게시 </p>
       </div>
 
       {/* 4. 앨범 (/trips) */}
