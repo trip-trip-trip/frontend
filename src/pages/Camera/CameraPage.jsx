@@ -161,6 +161,13 @@ const CameraPage = () => {
     }
   }, [activeTripId, storageKey]);
 
+  const switchMode = (newMode) => setMode(newMode);
+  const flipCamera = () => {
+    setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
+  };
+  const handleDataAvailable = useCallback(({ data }) => {
+    if (data.size > 0) setRecordedChunks((prev) => prev.concat(data));
+  }, []);
 
   // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
   const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStamp, cssFilter) => {
@@ -272,16 +279,14 @@ const CameraPage = () => {
   
   // 7. [수정] 'photo' 모드 삭제, 'video'와 'film'만 남김
   const handleStartCaptureClick = useCallback(async () => {
-
-    if (shotCount >= MAX_TOTAL_SHOTS) return;
-
+    if (shotCount >= MAX_TOTAL_SHOTS) { /* ... */ return; }
+    console.log(`[Debug] 촬영 버튼 클릭. 현재 모드: ${mode}`);
+    
     if (mode === 'video') {
-      if (!webcamRef.current || !webcamRef.current.stream) return;
-
+      if (!webcamRef.current || !webcamRef.current.stream) { /* ... */ return; }
       const originalStream = webcamRef.current.stream;
       const videoTracks = originalStream.getVideoTracks();
-      if (videoTracks.length === 0) return;
-
+      if (videoTracks.length === 0) { /* ... */ return; }
       const videoOnlyStream = new MediaStream(videoTracks);
       const mimeType = MediaRecorder.isTypeSupported('video/mov') ? 'video/mov' : 'video/webm';
       
@@ -298,40 +303,46 @@ const CameraPage = () => {
         });
       }, 1000);
       try {
-        mediaRecorderRef.current = new MediaRecorder(videoOnlyStream, {
-          mimeType: MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm'
-        });
-
-        mediaRecorderRef.current.ondataavailable = handleDataAvailable;
+        mediaRecorderRef.current = new MediaRecorder(videoOnlyStream, { mimeType });
+        mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable);
+        mediaRecorderRef.current.onerror = (event) => {
+          console.error('[Debug] MediaRecorder 에러:', event.error);
+          alert(`녹화 중 에러 발생: ${event.error.name}`);
+          setIsRecording(false); setCountdown(0);
+        };
+        mediaRecorderRef.current.onstop = () => {
+          console.log('[Debug] 녹화 중지됨.');
+          setIsRecording(false); setCountdown(0);
+        };
         mediaRecorderRef.current.start();
-
         const newCount = shotCount + 1;
         setShotCount(newCount);
-        localStorage.setItem(storageKey, newCount);
-
+        localStorage.setItem(storageKey, newCount.toString());
+        console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (영상)`);
         setTimeout(() => {
-          if (mediaRecorderRef.current.state === 'recording') {
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
           }
         }, 3000);
       } catch (e) {
-        console.error('MediaRecorder error:', e);
-        setIsRecording(false);
-        setCountdown(0);
+        console.error('[Debug] MediaRecorder 초기화 실패:', e);
+        alert(`영상 녹화를 시작할 수 없습니다. (에러: ${e.message})`);
+        setIsRecording(false); setCountdown(0);
       }
-    }
-
-    else if (mode === 'film') {
+    } else if (mode === 'film') { 
       const imageSrc = webcamRef.current.getScreenshot();
       if (!imageSrc) {
-        alert("카메라 준비 중입니다.");
-        return;
+        alert('카메라가 준비되지 않았습니다.');
+        return; 
       }
 
       const newCount = shotCount + 1;
       setShotCount(newCount);
-      localStorage.setItem(storageKey, newCount);
-
+      localStorage.setItem(storageKey, newCount.toString());
+      console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (${mode})`);
+      
+      console.log('[Debug] 필름 모드 사진 촬영, 효과 적용 예정.');
+      // 8. [수정] 현재 선택된 필터 팩 전체를 전달
       const selectedFilter = FILTERS[currentFilterIndex];
         const processedImageSrc = await applyFilmFrame(
         imageSrc, 
@@ -346,7 +357,7 @@ const CameraPage = () => {
         state: { media: processedImageSrc, type: 'photo', mode: mode },
       });
     }
-
+    // 9. [삭제] 'else' (photo 모드) 블록 삭제
   }, [
     webcamRef, 
     mediaRecorderRef, 
@@ -360,16 +371,12 @@ const CameraPage = () => {
     setVideoMimeType
   ]);
 
-  // -------------------------------
-  // 📌 영상 파일 생성 & 이동
-  // -------------------------------
   useEffect(() => {
     if (recordedChunks.length > 0 && !isRecording) {
       const blob = new Blob(recordedChunks, { type: videoMimeType });
       console.log(`[Debug] 생성된 Blob 타입: ${blob.type}`);
 
       const url = URL.createObjectURL(blob);
-
       setRecordedChunks([]);
       navigate(`/capture-complete/${activeTripId}`, {
         state: { media: url, type: 'video', blob: blob }, 
@@ -382,6 +389,7 @@ const CameraPage = () => {
    height: { ideal: 1280 },
     facingMode: facingMode
   };
+
   return (
     <div className="camera-page-wrapper">
       <header className="camera-header">
