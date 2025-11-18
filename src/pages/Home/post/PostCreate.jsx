@@ -5,22 +5,23 @@ import './Post.css';
 const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
-// 데모 데이터 
+// --- 데모 데이터 (API 실패 시 사용) ---
 const MOCK_TRIP_LIST = [
   { id: 10, title: "2025 도쿄여행 🗼" },
   { id: 20, title: "부산맛집탐방 🍜" },
   { id: 21, title: "친구들과 졸업여행! 🎓" }
 ];
+
 const MOCK_MEDIA_DATA = {
   10: {
     contents: {
       photos: [
-        { media: { mediaAssetId: 101, contentType: 'PHOTO', url: 'https://placehold.co/400x400/e9c46a/264653?text=Tokyo1' } },
-        { media: { mediaAssetId: 102, contentType: 'PHOTO', url: 'https://placehold.co/400x400/f4a261/264653?text=Tokyo2' } },
-        { media: { mediaAssetId: 103, contentType: 'PHOTO', url: 'https://placehold.co/400x400/e76f51/264653?text=Tokyo3' } }
+        { media: { mediaAssetId: 101, contentType: 'MEDIA', url: 'https://placehold.co/400x400/e9c46a/264653?text=Tokyo1' } },
+        { media: { mediaAssetId: 102, contentType: 'MEDIA', url: 'https://placehold.co/400x400/f4a261/264653?text=Tokyo2' } },
+        { media: { mediaAssetId: 103, contentType: 'MEDIA', url: 'https://placehold.co/400x400/e76f51/264653?text=Tokyo3' } }
       ],
       scrapbooks: [
-        { media: { mediaAssetId: 104, contentType: 'SCRAPBOOK', url: 'https://placehold.co/400x400/2a9d8f/ffffff?text=Scrapbook' } }
+        { media: { mediaAssetId: 104, contentType: 'MEDIA', url: 'https://placehold.co/400x400/2a9d8f/ffffff?text=Scrapbook' } }
       ],
       reelItems: []
     }
@@ -28,20 +29,20 @@ const MOCK_MEDIA_DATA = {
   20: {
     contents: {
       photos: [
-        { media: { mediaAssetId: 201, contentType: 'PHOTO', url: 'https://placehold.co/400x400/ade8f4/000000?text=Busan1' } },
-        { media: { mediaAssetId: 202, contentType: 'PHOTO', url: 'https://placehold.co/400x400/90e0ef/000000?text=Busan2' } }
+        { media: { mediaAssetId: 201, contentType: 'MEDIA', url: 'https://placehold.co/400x400/ade8f4/000000?text=Busan1' } },
+        { media: { mediaAssetId: 202, contentType: 'MEDIA', url: 'https://placehold.co/400x400/90e0ef/000000?text=Busan2' } }
       ],
       scrapbooks: [],
       reelItems: [
-        { media: { mediaAssetId: 203, contentType: 'VIDEO', url: 'https://placehold.co/400x400/0077b6/ffffff?text=Reel1' } },
-        { media: { mediaAssetId: 204, contentType: 'VIDEO', url: 'https://placehold.co/400x400/00b4d8/ffffff?text=Reel2' } }
+        { media: { mediaAssetId: 203, contentType: 'MEDIA', url: 'https://placehold.co/400x400/0077b6/ffffff?text=Reel1' } },
+        { media: { mediaAssetId: 204, contentType: 'MEDIA', url: 'https://placehold.co/400x400/00b4d8/ffffff?text=Reel2' } }
       ]
     }
   },
   21: {
     contents: {
       photos: [
-        { media: { mediaAssetId: 301, contentType: 'PHOTO', url: 'https://placehold.co/400x400/ffd6ff/000000?text=Graduation' } }
+        { media: { mediaAssetId: 301, contentType: 'MEDIA', url: 'https://placehold.co/400x400/ffd6ff/000000?text=Graduation' } }
       ],
       scrapbooks: [],
       reelItems: []
@@ -51,6 +52,7 @@ const MOCK_MEDIA_DATA = {
 
 export default function PostCreate() {
   const nav = useNavigate();
+  
   const [title, setTitle] = useState('');
   const [locationText, setLocationText] = useState('');
   const [content, setContent] = useState('');
@@ -59,16 +61,15 @@ export default function PostCreate() {
   
   const [myTrips, setMyTrips] = useState([]);
   const [selectedTripId, setSelectedTripId] = useState(null);
-
+  
   const [tripContents, setTripContents] = useState(null);
   const [selectedMedia, setSelectedMedia] = useState([]);
-
+  
   // 실제 API 로직을 위한 여행 목록 로딩 상태
   const [isLoadingTrips, setIsLoadingTrips] = useState(false);
 
-  // 여행 목록 불러오기
+  //  여행 목록 불러오기
   useEffect(() => {
-    
     const fetchMyTrips = async () => {
       setIsLoadingTrips(true);
       const token = localStorage.getItem('jwtToken');
@@ -87,15 +88,15 @@ export default function PostCreate() {
           throw new Error(data.message || '여행 목록 로드 실패');
         }
       } catch (e) {
-        console.error('여행 목록 로드 실패:', e);
-        alert(e.message);
+        console.error('여행 목록 로드 실패, 데모 데이터를 사용합니다:', e);
+        // API 실패 시에만 데모 데이터 사용
+        setMyTrips(MOCK_TRIP_LIST);
       } finally {
         setIsLoadingTrips(false);
       }
     };
+
     fetchMyTrips();
-    
-    setMyTrips(MOCK_TRIP_LIST); //여행 없음 데모로 
   }, []);
 
   // 선택된 여행의 미디어 불러오기
@@ -106,7 +107,6 @@ export default function PostCreate() {
       return;
     }
 
-    
     const fetchTripMedia = async () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
@@ -115,33 +115,27 @@ export default function PostCreate() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
+        
         if (data.isSuccess) {
           setTripContents(data.result.contents);
         } else {
           throw new Error(data.message || '미디어 로드 실패');
         }
       } catch (e) {
-        console.error('Trip 미디어 로드 실패:', e);
-        alert(e.message);
+        console.error('Trip 미디어 로드 실패, 데모 데이터를 확인합니다:', e);
+        // API 실패 시에만 데모 데이터 사용
+        const mockData = MOCK_MEDIA_DATA[selectedTripId];
+        if (mockData) {
+            setTripContents(mockData.contents);
+        } else {
+            setTripContents(null);
+        }
       } finally {
         setLoading(false);
       }
     };
-    fetchTripMedia();
-    
 
-    setLoading(true);
-    const timer = setTimeout(() => {
-      const data = MOCK_MEDIA_DATA[selectedTripId];
-      if (data) {
-        setTripContents(data.contents);
-      } else {
-        setTripContents(null);
-      }
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-    
+    fetchTripMedia();
   }, [selectedTripId]);
 
   const handleTripChange = (e) => {
@@ -152,17 +146,17 @@ export default function PostCreate() {
   const allMedia = useMemo(() => {
     if (!tripContents) return [];
     
-    const photos = tripContents.photos.map(p => p.media);
-    const scrapbooks = tripContents.scrapbooks.map(s => s.media);
-    const reelItems = tripContents.reelItems.map(r => r.media);
-
+    const photos = tripContents.photos ? tripContents.photos.map(p => p.media) : [];
+    const scrapbooks = tripContents.scrapbooks ? tripContents.scrapbooks.map(s => s.media) : [];
+    const reelItems = tripContents.reelItems ? tripContents.reelItems.map(r => r.media) : [];
+    
     const mediaMap = new Map();
     [...photos, ...scrapbooks, ...reelItems].forEach(media => {
       if (media && media.mediaAssetId) {
         mediaMap.set(media.mediaAssetId, media);
       }
     });
-
+    
     return Array.from(mediaMap.values());
   }, [tripContents]);
 
@@ -178,7 +172,7 @@ export default function PostCreate() {
   };
   
   const canShare = useMemo(() => {
-      return selectedMedia.length > 0 && !!selectedTripId && !loading;
+    return selectedMedia.length > 0 && !!selectedTripId && !loading;
   }, [selectedMedia, selectedTripId, loading]);
 
   async function geocodeAddress(address) {
@@ -214,13 +208,13 @@ export default function PostCreate() {
         lat = r.lat;
         lng = r.lng;
       }
-
+      
       const visibilityMap = {
         friends: 'friends',
         private: 'private',
         public: 'public',
       };
-
+      
       const payload = {
         tripId: selectedTripId,
         visibility: visibilityMap[privacy] || 'friends',
@@ -233,9 +227,9 @@ export default function PostCreate() {
           object_type: media.contentType,
         })),
       };
-
+      
       console.log("--- 실제 API 호출: 공유 페이로드 ---", payload);
-
+      
       // 실제 POST /posts API 호출
       const res = await fetch(`${API_BASE}/posts`, {
         method: 'POST',
@@ -245,14 +239,14 @@ export default function PostCreate() {
         },
         body: JSON.stringify(payload),
       });
-
+      
       const data = await res.json();
-
+      
       if (!res.ok || !data.isSuccess) {
         alert(data.message || '게시물 업로드 실패');
         return;
       }
-
+      
       alert('게시물 업로드 성공!');
       nav('/home', { replace: true });
 
@@ -260,7 +254,7 @@ export default function PostCreate() {
       console.error('업로드 오류:', e);
       alert('업로드 중 오류 발생');
     }
-
+    
     setLoading(false);
   };
 
@@ -274,14 +268,14 @@ export default function PostCreate() {
             {loading ? '업로드...' : '공유'}
           </button>
         </header>
-
+        
         <main className="compose-body">
           <div className="form-row">
             <select 
-              className="trip-select"
-              value={selectedTripId || ""} 
-              onChange={handleTripChange}
-              disabled={isLoadingTrips} //  실제 API 로드 시 드롭다운 비활성화
+                className="trip-select"
+                value={selectedTripId || ""}
+                onChange={handleTripChange}
+                disabled={isLoadingTrips}
             >
               <option value="">
                 {isLoadingTrips ? "여행 로딩 중..." : "클릭하여 여행 선택"}
@@ -293,22 +287,22 @@ export default function PostCreate() {
               ))}
             </select>
           </div>
-
+          
           <div className="picker-row">
             {loading && <div>미디어 불러오는 중...</div>}
-             
+            
             {selectedTripId && !loading && (
               <div className="media-picker-grid">
                 {allMedia.length === 0 && (
                   <div>이 여행에는 미디어가 없습니다.</div>
                 )}
                 {allMedia.map((media) => {
-                  const imageUrl = media.url.replace(/<|>/g, '');
+                  const imageUrl = media.url ? media.url.replace(/<|>/g, '') : '';
                   const isSelected = !!selectedMedia.find(m => m.mediaAssetId === media.mediaAssetId);
-
+                  
                   return (
-                    <div
-                      key={media.mediaAssetId}
+                    <div 
+                      key={media.mediaAssetId} 
                       className={`media-thumb ${isSelected ? 'selected' : ''}`}
                       onClick={() => toggleMediaSelection(media)}
                     >
@@ -319,22 +313,22 @@ export default function PostCreate() {
               </div>
             )}
           </div>
-
+          
           <div className="form-row">
             <label>제목</label>
             <input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
-
+          
           <div className="form-row">
             <label>위치</label>
             <input value={locationText} onChange={(e) => setLocationText(e.target.value)} />
           </div>
-
+          
           <div className="form-row">
             <label>내용</label>
             <textarea rows={4} value={content} onChange={(e) => setContent(e.target.value)} />
           </div>
-
+          
           <div className="form-row">
             <label>공개범위</label>
             <select value={privacy} onChange={(e) => setPrivacy(e.target.value)}>

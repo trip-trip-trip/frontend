@@ -103,7 +103,7 @@ export default function ProfilePage() {
             {safeUser.albums.map((album, i) => (
                <div key={i} className="album-item" style={{ backgroundColor: album.color }} />
             ))}
-            <div className="album-item add" onClick={() => navigate("/posting")}>+</div>
+            <div className="album-item add" onClick={() => navigate("/post/create")}>+</div>
          </div>
 
          <NavBar current="mypage" />
