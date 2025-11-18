@@ -4,31 +4,48 @@ import { useAuth } from '../../contexts/AuthContext';
 import defaultProfile from "../../assets/default-profile.png";
 import "./ProfileEditPage.css"; 
 
+// 1. API_BASE 정의
+const API_BASE = import.meta.env.PROD 
+   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+   : '/api';
+
 export default function ProfileEditPage() {
-  const navigate = useNavigate();
-  const { user, setUser } = useAuth();
+   const navigate = useNavigate();
+  // 2. token과 'fetchUserProfile' (새로고침용) 함수 가져오기
+   const { user, token, fetchUserProfile } = useAuth();
 
-const [username, setUsername] = useState(user.username);
-const [bio, setBio] = useState(user.bio || ""); // 카카오에 bio가 없으므로 빈 문자열로 초기화
-const [profileImage, setProfileImage] = useState(user.profileImage || "");
-const [privacy, setPrivacy] = useState(user.privacy || "private"); // (user에 privacy가 없다면 기본값 private)
-const fileInputRef = useRef(null);
-const cameraInputRef = useRef(null);
-const [menuOpen, setMenuOpen] = useState(false);
-  if (!user) {
-    return <div>로딩 중...</div>;
-  }
+  // 3. state 초기화 (user가 null일 수 있으므로)
+  const [username, setUsername] = useState(user?.username || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [profileImage, setProfileImage] = useState(user?.avatarUrl || defaultProfile); // 👈 로컬 미리보기용
+  const [privacy, setPrivacy] = useState(user?.privacy || "private"); 
   
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setProfileImage(reader.result); // state 업데이트
-    reader.readAsDataURL(file);
-    setMenuOpen(false);
-  };
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleCameraClick = () => {
+  // 4. user 정보가 AuthContext에서 로드되면 state에 반영
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username || "");
+      setBio(user.bio || "");
+      setProfileImage(user.avatarUrl || defaultProfile);
+      // setPrivacy(user.privacy || "private"); // 👈 API 명세서에 privacy 없음
+    }
+  }, [user]);
+
+  // 5. 이미지 변경 (로컬 미리보기 - 수정 없음)
+   const handleImageChange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onloadend = () => setProfileImage(reader.result); // 로컬 state (미리보기) 업데이트
+      reader.readAsDataURL(file);
+      setMenuOpen(false);
+   };
+
+    const handleCameraClick = () => {
     cameraInputRef.current.click();
     setMenuOpen(false);
   };
@@ -38,38 +55,74 @@ const [menuOpen, setMenuOpen] = useState(false);
     setMenuOpen(false);
   };
 
-  // 3. "수정완료" 버튼 클릭 시 (지금은 콘솔에만 출력)
- const handleSave = () => {
-    // 6. setUser 함수 호출 (이게 핵심!)
-    setUser({
-      ...user, // 앨범, 친구 수 등 기존 Context 정보는 유지
-      username: username, // 로컬 state의 값으로 덮어쓰기
+   // 6. [핵심] "수정완료" 버튼 클릭 (API 연동)
+   const handleSave = async () => {
+    if (!token) {
+      alert("로그인 정보가 없습니다.");
+      return;
+    }
+    setIsLoading(true);
+
+    // 7. PATCH /users/me API로 보낼 데이터
+    const patchData = {
+      username: username,
       bio: bio,
-      profileImage: profileImage,
-      privacy: privacy,
-    });
-    console.log("저장 프로필");
-    // TODO: 여기에 BE로 전송하는 API 로직 추가
-    
-    // 저장이 완료되면 프로필 페이지로 복귀
-    navigate('/mypage/profile'); 
-  };
+    };
 
-  return (
-    <div className="profile-edit-page">
-      {/* 상단바 */}
-      <header className="edit-header">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          &lt;
-        </button>
-        <h2 className="header-title">프로필 수정</h2>
-        <button className="save-button" onClick={handleSave}>
-          수정완료
-        </button>
-      </header>
+    //  TODO: 이미지 업로드 로직
+    // 1. "새로운 프로필 이미지" API (예: POST /media/upload/profile) 호출
+    // 2. 응답으로 URL(newUrl)을 받음
+    // 3. patchData.avatarUrl = newUrl;
+    //
 
-      {/* 메인 콘텐츠 */}
-      <main className="edit-content">
+      try {
+      const res = await fetch(`${API_BASE}/users/me`, {
+        method: "PATCH",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(patchData)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "서버 오류로 수정에 실패했습니다.");
+      }
+
+      // 8. [중요] 수정 성공 시, AuthContext의 user 정보를
+      //    DB에서 다시 불러와 최신화합니다.
+      //await fetchUserProfile(token);
+
+      alert("프로필이 성공적으로 수정되었습니다.");
+      navigate('/mypage/profile'); // 프로필 페이지로 복귀
+
+    } catch (err) {
+      alert(`저장 실패: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+
+   };
+
+   return (
+      <div className="profile-edit-page">
+         <header className="edit-header">
+            <button className="back-button" onClick={() => navigate(-1)}>
+               &lt;
+            </button>
+            <h2 className="header-title">프로필 수정</h2>
+            <button 
+          className="save-button" 
+          onClick={handleSave} 
+          disabled={isLoading} // 👈 로딩 시 비활성화
+        >
+               {isLoading ? "저장 중..." : "수정완료"}
+            </button>
+         </header>
+
+      {/* ... (나머지 JSX는 기존 코드와 동일) ... */}
+       <main className="edit-content">
         {/* 1. 프로필 이미지 섹션 */}
         <section className="edit-image-section">
           <img
@@ -157,3 +210,5 @@ const [menuOpen, setMenuOpen] = useState(false);
     </div>
   );
 }
+
+ 
