@@ -23,7 +23,8 @@ const mapApiPost = (p) => ({
   author: p.author?.username ?? 'username', 
   author_avatar: p.author?.avatar_url ?? '/assets/default-avatar.png',
   caption: p.caption ?? '',
-  
+    
+  // ⭐ API 응답의 media 배열에서 URL 추출
   images: p.media ? p.media.map(m => m.thumbnail_url || m.url) : [], 
   
   // 썸네일
@@ -37,43 +38,41 @@ const mapApiPost = (p) => ({
   comment_count: p.comment_count ?? 0,
   is_liked: !!p.is_liked,
   is_mine: p.author?.id === 'current_user_id', 
-  lat: p.lat ?? null,
-  lng: p.lng ?? null,
 });
 
 const createInitialDummyPosts = () => {
     const now = Date.now();
     writePosts([
-      { id: String(now - 1), userName: 'jiwoo', image: '/trip-img/trip1.jpeg', title: '서울 여행', content: '서울 한 컷', lat: 37.579617, lng: 126.977041, privacy: 'friends', likes: 0, comments: 0, createdAt: now - 1, is_liked: false, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=D1' },
-      { id: String(now - 2), userName: 'jimin', image: '/trip-img/trip2.jpeg', title: '제주', content: '한라산', lat: 33.4996, lng: 126.5312, privacy: 'friends', likes: 10, comments: 0, createdAt: now - 2, is_liked: true, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=D2' },
+      { id: String(now - 1), userName: 'demo', image: '/trip-img/trip1.jpeg', title: '경복궁', content: '서울 한 컷', lat: 37.579617, lng: 126.977041, privacy: 'friends', likes: 0, comments: 0, createdAt: now - 1, is_liked: false, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=D1' },
+      { id: String(now - 2), userName: 'demo', image: '/trip-img/trip2.jpeg', title: '제주', content: '한라산', lat: 33.4996, lng: 126.5312, privacy: 'friends', likes: 10, comments: 3, createdAt: now - 2, is_liked: true, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=D2' },
       { id: String(now - 3), userName: 'me', image: '/trip-img/trip3.jpeg', title: '비공개', content: '내가 올린 게시물', lat: 37.5665, lng: 126.9780, privacy: 'private', likes: 0, comments: 0, createdAt: now - 3, is_liked: false, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=ME' }
     ]);
 };
 
-const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
+const TabAll = ({ activeTrip = null }) => {
   const navigate = useNavigate();
   const { activeTripId, token, user } = useAuth();
-  const [posts, setPosts] = useState([]);
+
   const currentUserName = user?.username || user?.tag || 'me';
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
-   
-  useEffect(() => {
-    if (onPostsLoaded) {
-      onPostsLoaded(posts);
-    }
-  }, [posts, onPostsLoaded]);
+  const [posts, setPosts] = useState([]);
+
   
   const canShoot = useMemo(() => !!activeTrip, [activeTrip]);
 
+
+  // ⭐ 로컬 데이터 매핑 함수 (다중 이미지 지원)
 const mapLocalPost = (p) => ({
   id: p.id,
   author: p.userName === 'me' ? currentUserName : p.userName,
   author_avatar: p.author_avatar ?? 'https://placehold.co/48x48/CCCCCC/FFF?text=ME',
   caption: p.content ?? '', 
     
+  // ⭐ PostItem의 images prop으로 배열 전달 (PostCreate에서 저장한 images 사용)
   images: p.images || (p.image ? [p.image] : []), 
   
+  // ⭐ 썸네일 (PostItem의 image prop): images 배열의 첫 번째 항목 사용 (피드 썸네일)
   image: (p.images && p.images[0]) || p.image || null, 
   
   location: p.location || (p.lat && p.lng ? '위치 정보 있음' : '위치 정보 없음'),                
@@ -84,8 +83,6 @@ const mapLocalPost = (p) => ({
   comment_count: p.comments ?? 0,
   is_liked: !!p.is_liked,
   is_mine: p.userName === 'me', 
-  lat: p.lat ?? null,
-  lng: p.lng ?? null,
 });
 
 
@@ -103,12 +100,6 @@ const mapLocalPost = (p) => ({
       
       if (localPosts.length > 0) {
           setPosts(localPosts);
-      }
-
-      if (!API_BASE) {
-          console.warn('API_BASE가 설정되지 않아 API 호출을 건너뛰고 로컬 데이터만 사용합니다.');
-          setLoading(false);
-          return;
       }
       
       try {
@@ -152,7 +143,7 @@ const mapLocalPost = (p) => ({
             id: 'demo-1',
             author: '여행에미친사람', 
             author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=A',
-            caption: '도쿄에 다녀왔다!! 너무너무 재밌었다 또 가고 싶네',
+            caption: '도쿄에 다녀왔다!! 너무너무 재밌었다 또 가고 싶다.',
             image: randomImage,
             images: [randomImage],
             location: '도쿄',
@@ -161,8 +152,6 @@ const mapLocalPost = (p) => ({
             comment_count: 2, 
             is_liked: false,
             is_mine: true, 
-            lat: 35.6895, //tokyo location
-            lng: 139.6917,
           }]);
         }
         setErr(error.message || '게시물 로드 실패');
@@ -171,7 +160,7 @@ const mapLocalPost = (p) => ({
       }
     })();
     return () => ac.abort();
-  }, []);
+  }, [user, token]);
 
   const goShoot = () => {
     if (!canShoot) 
@@ -185,7 +174,8 @@ if (activeTripId) {
 
   return (
     <section className="taball">
-      {/* {activeTrip && (
+      {/*진행 중 여행 카드->activeTrip 있을 때만 */}
+      {activeTrip && (
         <div className="live-card">
           <div className="live-head">
             <div>
@@ -206,7 +196,7 @@ if (activeTripId) {
             지금 촬영하러 가기
           </button>
         </div>
-      )} */}
+      )}
 
       <div className="feed-list">
         {loading && <div className="feed-skeleton">불러오는 중…</div>}
