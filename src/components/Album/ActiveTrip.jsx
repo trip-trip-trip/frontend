@@ -10,7 +10,7 @@ import members_icon from '/icons/members_icon.png'
 import camera_icon from '/icons/camera_icon.png'
 import write_icon from '/icons/write_icon.png'
 
-const ActiveTrip = ({tripName, startDate, endDate, members, img, filmCount, vidCount}) => {
+const ActiveTrip = ({tripName, startDate, endDate, members, filmCount, vidCount}) => {
     const navigate = useNavigate();
   return (
     <div className='active-trip-container'>
@@ -71,7 +71,7 @@ const ActiveTrip = ({tripName, startDate, endDate, members, img, filmCount, vidC
               <div className="goto-camera-cont">
                   <img src={camera_icon} alt="" />
                   <h6>촬영하기</h6>
-                  <div className="left-pic-num">{24 - count}장 남음</div>
+                  <div className="left-pic-num">{24 - filmCount}장 남음</div>
             </div>
             </div>
 
