@@ -7,8 +7,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 // 프레임 목록 더미
 const FrameList = [
   { id: 1, url: '/frame1.PNG', picNum: 4 },
-  { id: 2, url: '/frame1.PNG', picNum: 4 },
-  { id: 3, url: '/frame1.PNG', picNum: 4 },
+  { id: 2, url: '/frame1.PNG', picNum: 3 },
+  { id: 3, url: '/frame1.PNG', picNum: 2 },
   { id: 4, url: '/frame1.PNG', picNum: 4 },
 ];
 const PickFrame = () => {

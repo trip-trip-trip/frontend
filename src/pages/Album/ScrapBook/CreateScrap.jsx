@@ -20,16 +20,13 @@ const FRAME_POSITIONS = {
         { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
     ],
     2: [ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
-      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
-      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
-      { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
-      { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
+      { id: 1, initialUrlIndex: 0, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
+      { id: 3, initialUrlIndex: 2, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
     ],
     3:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
       { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
       { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
-      { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
-      { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
     ],
     4:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
       { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
