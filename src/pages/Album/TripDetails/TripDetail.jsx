@@ -77,14 +77,14 @@ const TripDetail = () => {
 
       if (fetchedTripDetail && fetchedTripDetail.trip){
         setTripInfo({
-          tripId: fetchedTripDetail.id,
-          title: fetchedTripDetail.title,
-          startDate: fetchedTripDetail.startDate, 
-          endDate: fetchedTripDetail.endDate,  
-          members: (fetchedTripDetail.inviteesNameList || []).map((name, index) => ({
+          tripId: fetchedTripDetail.trip.id,
+          title: fetchedTripDetail.trip.title,
+          startDate: fetchedTripDetail.trip.startDate, 
+          endDate: fetchedTripDetail.trip.endDate,  
+          members: (fetchedTripDetail.trip.inviteesNameList || []).map((name, index) => ({
               name: name,
-              profile: fetchedTripDetail.inviteesProfileImgList[index] || '',
-              tag: fetchedTripDetail.inviteesTagList[index] || ''
+              profile: fetchedTripDetail.trip.inviteesProfileImgList[index] || '',
+              tag: fetchedTripDetail.trip.inviteesTagList[index] || ''
           })),
         })
       }
@@ -145,7 +145,7 @@ const TripDetail = () => {
       <div className='trip-detail-container'>
         <h1>{tripInfo.title}</h1> 
         <div className="date-and-edit">
-          <h3>{tripInfo.startDate.split('-').join('.')} - {tripInfo.endDate.split('-').join('.')}</h3>
+          <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
           <button className='edit-btn'><img src={edit_btn} alt="" /></button>
         </div>
 
