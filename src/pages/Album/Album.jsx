@@ -259,7 +259,7 @@ return(
                 key = {index}
                 className="completed-trip-item">
                 <EndedTripItem
-                  id = {trip.id}
+                  tripId = {trip.id}
                   title={trip.title}
                   startDate={trip.startDate}
                   endDate={trip.endDate}
