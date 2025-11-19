@@ -11,11 +11,11 @@ const sharedList = [
     { name: '이친구', profile: '/profile-img.png' },
 ];
 
-const picList = [
-    '/trip-img/trip1.jpeg', '/trip-img/trip3.jpeg', '/trip-img/trip4.jpeg', '/trip-img/trip5.jpeg', 
-    '/trip-img/trip6.jpeg', '/trip-img/trip7.jpeg', '/trip-img/trip8.jpeg', '/trip-img/trip9.jpeg', 
-    '/trip-img/trip10.jpeg', '/trip-img/trip11.jpeg'
-];
+// const picList = [
+//     '/trip-img/trip1.jpeg', '/trip-img/trip3.jpeg', '/trip-img/trip4.jpeg', '/trip-img/trip5.jpeg', 
+//     '/trip-img/trip6.jpeg', '/trip-img/trip7.jpeg', '/trip-img/trip8.jpeg', '/trip-img/trip9.jpeg', 
+//     '/trip-img/trip10.jpeg', '/trip-img/trip11.jpeg'
+// ];
 
 const SelectPic = () => {
     const [selectedPics, setSelectedPics] = useState([]);
@@ -25,6 +25,7 @@ const SelectPic = () => {
     const selectedPicNum = location.state?.selectedPicNum;
     const selectedFrameUrl = location.state?.selectedFrameUrl;
     const selectedFrameId = location.state?.selectedFrameId;
+    const picList = location.state?.picList;
 
     if (!selectedPicNum || !selectedFrameUrl || !selectedFrameId) {
       console.log(selectedPicNum, selectedFrameUrl, selectedFrameId)
@@ -84,15 +85,15 @@ const SelectPic = () => {
               </div>
 
               <div className='photo-grid'>
-                {picList.map((picUrl, index) => {
-                  const isSelected = selectedPics.includes(picUrl);
+                {picList.map((pics, index) => {
+                  const isSelected = selectedPics.includes(pics);
                   return (
                     <div 
                         key={index} 
                         className={`photo-item ${isSelected ? 'selected' : ''}`}
-                        onClick={() => handleSelectPic(picUrl)}
+                        onClick={() => handleSelectPic(pics)}
                     >
-                      <img src={picUrl} alt={`여행 사진 ${index + 1}`} />
+                      <img src={pics.url} alt={`여행 사진 ${index + 1}`} />
                       {
                         // 선택했을 때
                         isSelected && (
