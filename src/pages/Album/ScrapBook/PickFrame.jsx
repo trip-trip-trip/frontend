@@ -2,8 +2,7 @@ import React from 'react'
 import Header from '../../../components/Header/Header';
 import Navbar from '../../../components/NavBar/NavBar';
 import './PickFrame.css'
-import { useNavigate } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // 프레임 목록 더미
 const FrameList = [
@@ -15,14 +14,18 @@ const FrameList = [
 const PickFrame = () => {
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const picList = location.state?.picList;
+
   // 프레임 선택 핸들러
-  const handleFrameSelect = (frameId, picNum, frameUrl) => {
+  const handleFrameSelect = (frameId, picNum, frameUrl, picList) => {
     // 사진 선택 페이지로 이동하면서 선택된 프레임 정보를 state로 전달
     navigate('/scrapbook/create', {
         state: {
             selectedPicNum: picNum,  
             selectedFrameUrl: frameUrl,
-            selectedFrameId: frameId
+            selectedFrameId: frameId,
+            picList: picList
         }
     });
   };

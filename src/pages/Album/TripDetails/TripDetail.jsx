@@ -193,7 +193,7 @@ const TripDetail = () => {
             </div>
           </div>
 
-          <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame')}>
+          <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { picList : photoData } } )}>
             <h1>스크랩북 만들기</h1>
           </button>
 
