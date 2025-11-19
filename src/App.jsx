@@ -80,9 +80,9 @@ const App = () => {
         <Route path='/trips/friends' element={<AddFriend/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail/:tripId' element={<TripDetail/>}/>
-        <Route path='/trips/detail/share' element={<SharePhoto/>}/>
-        <Route path='/trips/detail/vid' element={<VideoDetail/>}/>
-        <Route path='/trips/detail/pic' element={<PhotoDetail/>}/>
+        <Route path='/trips/detail/:tripId/share' element={<SharePhoto/>}/>
+        <Route path='/trips/detail/:tripId/vid' element={<VideoDetail/>}/>
+        <Route path='/trips/detail/:tripId/pic' element={<PhotoDetail/>}/>
         <Route path='/scrapbook/frame' element={<PickFrame/>}/>
         <Route path='/scrapbook/create' element={<SelectPic/>}/>
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
