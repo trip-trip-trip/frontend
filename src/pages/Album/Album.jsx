@@ -112,8 +112,8 @@ const Album = () => {
           const tripData = {
             id: trip.id,
             title: trip.title,
-            startDate: trip.startDate.split('T')[0], // 시간 정보 제거
-            endDate: trip.endDate.split('T')[0],   // 시간 정보 제거
+            startDate: trip.startDate,
+            endDate: trip.endDate,
             members: (trip.inviteesNameList || []).map((name, index) => ({
                 name: name,
                 profile: trip.inviteesProfileImgList[index] || '',
@@ -139,7 +139,7 @@ const Album = () => {
         setCompletedTrips(completedList);
 
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        console.error("Error fetching trips:", error);
       }finally{
         setIsLoading(false);
       }
@@ -148,7 +148,19 @@ const Album = () => {
   }, [token, activeTripId]);
 
 
-   
+  if (isLoading) {
+    return (
+      <div className='album'>
+        <Header/>
+          <div className="album-container">
+            <h1>여행 정보를 불러오는 중...</h1>
+          </div>
+        <Navbar/>
+      </div>
+    );
+  }
+
+
   // 친구 초대 요청에서 <거절> 클릭 시 동작
   const handleRejectRequest = () => {
     setHasInviteRequest(false);
