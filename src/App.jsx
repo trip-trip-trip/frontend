@@ -79,7 +79,7 @@ const App = () => {
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/friends' element={<AddFriend/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
-        <Route path='/trips/detail' element={<TripDetail/>}/>
+        <Route path='/trips/detail/:tripId' element={<TripDetail/>}/>
         <Route path='/trips/detail/share' element={<SharePhoto/>}/>
         <Route path='/trips/detail/vid' element={<VideoDetail/>}/>
         <Route path='/trips/detail/pic' element={<PhotoDetail/>}/>
