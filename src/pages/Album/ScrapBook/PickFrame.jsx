@@ -18,7 +18,7 @@ const PickFrame = () => {
   const picList = location.state?.picList;
 
   // 프레임 선택 핸들러
-  const handleFrameSelect = (frameId, picNum, frameUrl, picList) => {
+  const handleFrameSelect = (frameId, picNum, frameUrl) => {
     // 사진 선택 페이지로 이동하면서 선택된 프레임 정보를 state로 전달
     navigate('/scrapbook/create', {
         state: {
