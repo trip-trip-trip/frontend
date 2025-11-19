@@ -79,8 +79,8 @@ const TripDetail = () => {
         setTripInfo({
           tripId: fetchedTripDetail.id,
           title: fetchedTripDetail.title,
-          startDate: fetchedTripDetail.startDate.split('T')[0], // 시간 정보 제거
-          endDate: fetchedTripDetail.endDate.split('T')[0],   // 시간 정보 제거
+          startDate: fetchedTripDetail.startDate, 
+          endDate: fetchedTripDetail.endDate,  
           members: (fetchedTripDetail.inviteesNameList || []).map((name, index) => ({
               name: name,
               profile: fetchedTripDetail.inviteesProfileImgList[index] || '',
@@ -215,7 +215,7 @@ const TripDetail = () => {
                     </div>
                 )}
                 {/* 릴 아이템들 */}
-                {vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
+                {vidData.videoItems && vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
                     <div className='video-card' key={index}>
                         <video src={video.url} controls></video>
                     </div>
