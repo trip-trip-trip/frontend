@@ -7,6 +7,9 @@ import PhotoFrame from '../../../components/Album/ScrapBook/PhotoFrame';
 import { toPng } from 'html-to-image';
 import { useRef } from 'react';
 import save_btn from '/icons/save_btn.png'
+import { toBlob } from 'html-to-image';
+import { useAuth } from '../../../contexts/AuthContext';
+
 
 // === 프레임에 따른 사진 위치 정보 (실제 디자인에 맞게 조정 필요) ===
 const FRAME_POSITIONS = {
@@ -37,6 +40,9 @@ const FRAME_POSITIONS = {
 };
 
 const CreateScrap = () => {
+    const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
     const location = useLocation();
     const { 
         selectedPics = [], 
@@ -45,6 +51,7 @@ const CreateScrap = () => {
     } = location.state || {};
 
     const scrapRef = useRef(null);
+    const {token} = useAuth();
     const navigate = useNavigate();
 
     // 선택된 프레임의 위치 정보 가져오기
@@ -58,9 +65,8 @@ const CreateScrap = () => {
         }))
     );
 
-
     //이미지 저장함수
-    const handleSaveScrapbook = async () => {
+    const handleDownloadScrapbook = async () => {
       if (!scrapRef.current) {
         alert("스크랩북 제작 중 오류가 발생했습니다. 다시 시도해주세요.");
         return;
@@ -71,7 +77,6 @@ const CreateScrap = () => {
           cacheBust: true,
           pixelRatio: 3,
         });
-  
         const link = document.createElement('a');
         link.href = dataUrl;
         link.download = `scrapbook_${new Date().toISOString()}.png`;
@@ -85,14 +90,76 @@ const CreateScrap = () => {
         alert('이미지 저장에 실패했습니다.');
       }
     };
+
+    // 💾 앨범에 저장하기 (API 연동) 함수
+    const handleSaveToAlbum = async () => {
+
+      if (!scrapRef.current) {
+          alert("스크랩북 제작 중 오류가 발생했습니다. 다시 시도해주세요.");
+          return;
+      }
+
+      try {
+          const fileBlob = await toBlob(scrapRef.current, {
+              cacheBust: true,
+              pixelRatio: 3,
+              backgroundColor: 'white'
+          });
+
+          if (!fileBlob) {
+              alert('이미지 파일 변환에 실패했습니다.');
+              return;
+          }
+
+          const fd = new FormData();
+          // 파일명은 'scrapbook.png', MIME 타입은 'image/png'로 가정합니다.
+          fd.append("file", fileBlob, `scrapbook_${Date.now()}.png`); 
+
+          // 'meta' 필드는 JSON을 Blob으로 변환하여 추가합니다.
+          const metaData = {
+              "media": {
+                  "tripId": selectedPics[0].tripId,
+                  "mediaKind": "PHOTO", // 스크랩북이므로 PHOTO
+                  "captureType": "SCRAPBOOK", // 스크랩북 고유 타입
+                  "comment": '' 
+              },
+              "tripId": selectedPics[0].tripId,
+              "title": 'New Scrapbook'
+          };
+          const metaBlob = new Blob([JSON.stringify(metaData)], { type: "application/json" });
+          fd.append("meta", metaBlob);
+
+          // 3. API 요청
+          const res = await fetch("/media/upload/scrapbook", {
+              method: "POST",
+              headers: { 
+                  Authorization: `Bearer ${token}`,
+              },
+              body: fd
+          });
+
+          const result = await res.json();
+
+          if (result.isSuccess) {
+              alert('스크랩북이 앨범에 성공적으로 저장되었습니다!');
+              // navigate('/album'); 
+          } else {
+              console.error('API 응답 오류:', result);
+              alert(`스크랩북 저장에 실패했습니다: ${result.message || '서버 오류'}`);
+          }
+      } catch (error) {
+          console.error('스크랩북 앨범 저장 중 오류 발생:', error);
+          alert('스크랩북을 앨범에 저장하는 중 네트워크 오류가 발생했습니다.');
+      }
+  };
   
     //사진 개수 미달시 뒤로가기
     if (!selectedFrameId || selectedPics.length !== 4) {
-        return (
-            <div className="error-message">
-                필수 데이터가 부족합니다. <a href="/">처음으로</a>
-            </div>
-        );
+      return (
+        <div className="error-message">
+          필수 데이터가 부족합니다. <a href="/">처음으로</a>å
+        </div>
+      );
     }
 
     return (
@@ -114,21 +181,18 @@ const CreateScrap = () => {
               <div className="save-scrap">
                 <div className="save-scrap-head">
                   <h1>스크랩북을 완성했어요</h1>
-                  <button className='save-scrap-btn' onClick={handleSaveScrapbook}>
+                  <button className='save-scrap-btn' onClick={handleDownloadScrapbook}>
                     <img src={save_btn} alt="" />
                   </button>
                 </div>
                 <p><span>[앨범에 저장하기]</span>를 눌러서 여행 앨범에 스크랩북을 저장할 수 있어요.</p>
-                <button className='save-scrap-button album' onClick={handleSaveScrapbook}>
+                <button className='save-scrap-button album' onClick={handleSaveToAlbum}>
                   앨범에 저장하기
                 </button>
-                <button className='save-scrap-button retry' onClick={handleSaveScrapbook}>
+                <button className='save-scrap-button retry' onClick={()=>navigate(-2)}>
                   다시 만들기
                 </button>
               </div>
-
-
-              
           </div>
           <Navbar/>
         </div>

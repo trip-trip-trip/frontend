@@ -5,11 +5,11 @@ import Header from '../../../components/Header/Header';
 import Navbar from '../../../components/NavBar/NavBar';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const sharedList = [
-    { name: '김멋사', profile: '/profile-img.png' },
-    { name: '김친구', profile: '/profile-img.png' },
-    { name: '이친구', profile: '/profile-img.png' },
-];
+// const sharedList = [
+//     { name: '김멋사', profile: '/profile-img.png' },
+//     { name: '김친구', profile: '/profile-img.png' },
+//     { name: '이친구', profile: '/profile-img.png' },
+// ];
 
 // const picList = [
 //     '/trip-img/trip1.jpeg', '/trip-img/trip3.jpeg', '/trip-img/trip4.jpeg', '/trip-img/trip5.jpeg', 
@@ -25,7 +25,7 @@ const SelectPic = () => {
     const selectedPicNum = location.state?.selectedPicNum;
     const selectedFrameUrl = location.state?.selectedFrameUrl;
     const selectedFrameId = location.state?.selectedFrameId;
-    const picList = location.state?.picList;
+    const picList = location.state?.picList || [];
 
     if (!selectedPicNum || !selectedFrameUrl || !selectedFrameId) {
       console.log(selectedPicNum, selectedFrameUrl, selectedFrameId)
