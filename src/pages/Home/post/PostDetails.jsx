@@ -17,8 +17,8 @@ const PostDetail = () => {
   const [newComment, setNewComment] = useState("");
 
   const isMine = useMemo(() => {
-    // post.authorId는 아래 normalize 과정에서 따로 저장할 예정
-    return post?.authorId === user?.id; 
+    if (!post || !user) return false;
+    return Number(post.authorId) === Number(user.id);
   }, [post, user]);
 
   // 댓글 목록을 불러오는 함수
@@ -54,7 +54,8 @@ const PostDetail = () => {
         if (!postRes.ok) throw new Error('게시물을 찾을 수 없습니다.');
         
         const postData = await postRes.json();
-        console.log('상세 조회 원본 데이터:', postData());
+        console.log('상세 조회 원본 데이터:', postData);
+
         if (postData.isSuccess) {
           const p = postData.result;
 
@@ -73,9 +74,12 @@ const PostDetail = () => {
             // 3) 기타 필드 매핑
             caption: p.caption || '',
             location: p.location || '', // API에 location이 없다면 빈 값 처리
-            date: new Date(p.created_at).toLocaleDateString('ko-KR', {
-              year: 'numeric', month: '2-digit', day: '2-digit'
-            }).replace(/\./g, '.').trim(),
+
+            date: p.created_at 
+              ? new Date(p.created_at).toLocaleDateString('ko-KR', {
+                  year: 'numeric', month: '2-digit', day: '2-digit'
+                }).replace(/\./g, '.').trim()
+              : '날짜 미상',
             
             like_count: p.like_count ?? 0,
             comment_count: p.comment_count ?? 0,
