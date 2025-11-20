@@ -19,7 +19,7 @@ const PostDetail = () => {
   const isMine = useMemo(() => {
     if (!post || !user) return false;
     return Number(post.authorId) === Number(user.id);
-  }, [post, user]);
+  }, [post, user]);  
 
   // 댓글 목록을 불러오는 함수
   const fetchComments = useCallback(async () => {
@@ -136,7 +136,6 @@ const PostDetail = () => {
     }
   };
   
-
   //댓글 삭제
   const handleCommentDelete = async(commentId) =>{
     if (!confirm("댓글을 삭제하시겠습니까?")) return;
@@ -176,13 +175,12 @@ const PostDetail = () => {
        </div>
     </div>
   );
-
+  
 return (
   <div className="post-detail-page">
     <Header toBack={true}/>  
 
     <PostItem post={post} isMine={isMine} isDetail={true} />
-
       <div className="detail-comments-area">
         <div className="comments-list-detail">
           {Array.isArray(comments) && comments.map(c => {

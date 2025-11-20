@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './NavBar.css' ;
 
@@ -9,19 +9,49 @@ import mypage_off from '../../assets/my_off.png';
 
 import home_on from '../../assets/home_on.png'; 
 import camera_on from '../../assets/camera_on.png';
-import post from '../../assets/upload.png'; 
+import postIcon from '../../assets/upload.png'; 
 import album_on from '../../assets/album_on.png';
 import mypage_on from '../../assets/my_on.png';
 
 
 import { useAuth } from '../../contexts/AuthContext'; 
-
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 const Navbar = () => {
   const locationNow = useLocation();
   const navigate = useNavigate(); 
-  const { activeTripId } = useAuth(); 
+  const { activeTripId, token } = useAuth(); 
   
   const path = locationNow.pathname;
+
+  const [showMenu, setShowMenu] = useState(false);
+  // 현재 여행 중인지 여부
+  const [isTripActive, setIsTripActive] = useState(false);
+
+  // 메뉴 외부 클릭 시 닫기 위한 로직 =
+  useEffect(() => {
+    const closeMenu = () => setShowMenu(false);
+    if (showMenu) {
+      window.addEventListener('click', closeMenu);
+    }
+    return () => window.removeEventListener('click', closeMenu);
+  }, [showMenu]);
+
+  // 여행 상태 확인 API 호출 함수
+  const checkActiveTrip = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/trips/isActiveTrips`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.isSuccess) {
+        // isOngoing이 true면 여행 중 -> 여행 만들기 비활성화
+        setIsTripActive(data.result.isOngoing);
+      }
+    } catch (e) {
+      console.error("여행 상태 확인 실패:", e);
+    }
+  };
 
   const handleCameraClick = () => {
     if (activeTripId) {
@@ -31,10 +61,21 @@ const Navbar = () => {
     }
   };
   
-  // 게시물 올리기 (Upload) 핸들러
-  const handlePostClick = () => {
-    navigate('/trips/create'); 
-  }
+  const handlePostClick = (e) => {
+    e.stopPropagation(); // 버블링 방지 (window click 이벤트가 바로 닫아버리는 것 방지)
+    
+    if (!showMenu) {
+      // 메뉴를 열 때 최신 상태 확인
+      checkActiveTrip();
+    }
+    setShowMenu(!showMenu);
+  };
+
+  // 메뉴 아이템 클릭 핸들러
+  const handleMenuItemClick = (targetPath) => {
+    navigate(targetPath);
+    setShowMenu(false);
+  };
 
 
   if (
@@ -49,6 +90,39 @@ const Navbar = () => {
   }
 
   return (
+<>
+    {/* 팝업 메뉴 (Navbar 위에 표시) */}
+      {showMenu && (
+        <>
+            {/* 배경을 누르면 닫히게 하는 투명 레이어 */}
+            <div className="menu-overlay" onClick={() => setShowMenu(false)} />
+            
+            <div className="upload-popup" onClick={(e) => e.stopPropagation()}>
+            <button 
+                className={`popup-item ${isTripActive ? 'disabled' : ''}`}
+                onClick={() => !isTripActive && handleMenuItemClick('/trips/create')}
+                disabled={isTripActive}
+            >
+                여행 만들기
+            </button>
+            <div className="divider"></div>
+            <button 
+                className="popup-item"
+                onClick={() => handleMenuItemClick('/scrapbook/create')}
+            >
+                스크랩북 만들기
+            </button>
+            <div className="divider"></div>
+            <button 
+                className="popup-item"
+                onClick={() => handleMenuItemClick('/post/create')}
+            >
+                게시물 올리기
+            </button>
+            </div>
+        </>
+      )}
+
     <nav className="navbar">
       
       {/* 1. 홈 (/) */}
@@ -73,7 +147,7 @@ const Navbar = () => {
 
       {/* 3. 올리기 (게시물) */}
       <div className="nav-link" onClick={handlePostClick}>
-        <img src={post} alt="올리기" className='icon'
+        <img src={postIcon} alt="올리기" className='icon'
         />
         <p> 게시 </p>
       </div>
@@ -98,6 +172,7 @@ const Navbar = () => {
         <p className={path.startsWith('/mypage') ? 'active' : ''}>프로필</p>
       </div>
     </nav>
+    </>
   );
 };
 
