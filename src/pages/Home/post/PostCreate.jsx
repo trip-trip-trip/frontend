@@ -67,6 +67,7 @@ export default function PostCreate() {
   const [selectedTripId, setSelectedTripId] = useState(null);
   const [tripContents, setTripContents] = useState(null);
   const [selectedMedia, setSelectedMedia] = useState([]);
+  const [selectedCoords, setSelectedCoords] = useState({ lat: null, lng: null });
   
   // 실제 API 로직을 위한 여행 목록 로딩 상태
   const [isLoadingTrips, setIsLoadingTrips] = useState(false);
@@ -119,28 +120,32 @@ export default function PostCreate() {
 
   }, []);
    
-  //위치 텍스트 자동 채우기
+  // 위치 텍스트 자동 채우기
   const handleTripChange = (e) => {
     const newTripId = Number(e.target.value);
     setSelectedTripId(newTripId || null);
 
     if (newTripId) {
-      // 1) 선택한 여행 찾기
+      // 선택한 여행 찾기
       const selectedTrip = myTrips.find(t => t.id === newTripId);
       
-      // 2) 여행의 placeId로 실제 지명(예: 제주도) 찾기
       if (selectedTrip && selectedTrip.placeId) {
-        const matchedPlace = placeList.find(p => p.placeId === selectedTrip.placeId);
+        // API 응답에 맞춰 p.placeId가 아니라 p.id로 찾아야 함
+        const matchedPlace = placeList.find(p => p.id === selectedTrip.placeId);
         
-        // 3) 찾았으면 위치 입력창에 자동 입력
+        // 찾았으면 위치 입력창에 자동 입력
         if (matchedPlace) {
-          // API 응답 필드명에 따라 matchedPlace.placeName 또는 matchedPlace.name 등 확인 필요
-          setLocationText(matchedPlace.placeName || matchedPlace.name || '');
+          setLocationText(matchedPlace.name || ''); 
+         //좌표도 미리 state에 저장해두기! (구글 API 안 써도 됨)
+          setSelectedCoords({
+              lat: matchedPlace.lat,
+              lng: matchedPlace.lng
+          });
         }
       }
     } else {
-      // 선택 해제 시 초기화 (원하면 유지해도 됨)
       setLocationText('');
+      setSelectedCoords({ lat: null, lng: null }); // 선택 해제 시 좌표 초기화
     }
   };
 
@@ -243,13 +248,27 @@ export default function PostCreate() {
 
     try {
       // 실제 Geocoding 호출
-      let lat = null;
-      let lng = null;
-      if (locationText) {
-        const r = await geocodeAddress(locationText);
-        lat = r.lat;
-        lng = r.lng;
+      // 1순위: 여행 선택해서 이미 확보된 좌표 사용 (가장 정확 & 빠름)
+      // 2순위: 사용자가 위치를 손으로 수정했을 경우 등을 대비해, 좌표가 없으면 그때만 구글링(Geocoding)
+      
+      let finalLat = selectedCoords.lat;
+      let finalLng = selectedCoords.lng;
+
+      // 만약 여행 선택 안 하고 손으로 위치만 적었거나, 좌표가 없는 경우에만 구글 API 호출
+      if ((!finalLat || !finalLng) && locationText) {
+         console.log("좌표가 없어서 구글 API를 호출합니다...");
+         const r = await geocodeAddress(locationText);
+         finalLat = r.lat;
+         finalLng = r.lng;
       }
+
+      // let lat = null;
+      // let lng = null;
+      // if (locationText) {
+      //   const r = await geocodeAddress(locationText);
+      //   lat = r.lat;
+      //   lng = r.lng;
+      // }
       
       const visibilityMap = {
         friends: 'friends',
@@ -262,8 +281,8 @@ export default function PostCreate() {
         visibility: visibilityMap[privacy] || 'friends',
         caption: content || title,
         location_text: locationText,
-        lat,
-        lng,
+        lat: finalLat,
+        lng: finalLng,
         media: selectedMedia.map((media) => {
             // 서버가 'PHOTO'를 모르므로 'MEDIA'로 변환해서 보내야 함
             let serverType = media.contentType;

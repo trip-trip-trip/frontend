@@ -17,30 +17,6 @@ const readLocalPosts = () => {
 const writePosts = (arr) => localStorage.setItem(LS_KEY, JSON.stringify(arr));
 
 
-// API 데이터 매핑 함수
-const mapApiPost = (p) => ({
-  id: p.id,
-  author: p.author?.username ?? 'username', 
-  author_avatar: p.author?.avatar_url ?? '/assets/default-avatar.png',
-  caption: p.caption ?? '',
-  
-  images: p.media ? p.media.map(m => m.thumbnail_url || m.url) : [], 
-  
-  // 썸네일
-  image: p.media?.[0]?.thumbnail_url || p.media?.[0]?.url || null, 
-  
-  location: p.location ?? '위치 정보 없음',                 
-  date: new Date(p.created_at).toLocaleDateString('ko-KR', { 
-    year: 'numeric', month: '2-digit', day: '2-digit' 
-  }).replace(/\./g, '.').trim(), 
-  like_count: p.like_count ?? 0,
-  comment_count: p.comment_count ?? 0,
-  is_liked: !!p.is_liked,
-  is_mine: p.author?.id === 'current_user_id', 
-  lat: p.lat ?? null,
-  lng: p.lng ?? null,
-});
-
 const createInitialDummyPosts = () => {
     const now = Date.now();
     writePosts([
@@ -49,12 +25,13 @@ const createInitialDummyPosts = () => {
       { id: String(now - 3), userName: 'me', image: '/trip-img/trip3.jpeg', title: '비공개', content: '내가 올린 게시물', lat: 37.5665, lng: 126.9780, privacy: 'private', likes: 0, comments: 0, createdAt: now - 3, is_liked: false, author_avatar: 'https://placehold.co/48x48/CCCCCC/FFF?text=ME' }
     ]);
 };
-
+////
 const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
   const navigate = useNavigate();
-  const { activeTripId, token, user } = useAuth();
+  const { activeTripId, token, user } = useAuth(); // user 정보 가져옴
   const [posts, setPosts] = useState([]);
   const currentUserName = user?.username || user?.tag || 'me';
+  const currentUserId = user?.id; // ★ 현재 로그인한 사용자 ID
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
    
@@ -65,6 +42,31 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
   }, [posts, onPostsLoaded]);
   
   const canShoot = useMemo(() => !!activeTrip, [activeTrip]);
+
+const mapApiPost = (p) => ({
+  id: p.id,
+  author: p.author?.username ?? '알 수 없음', 
+  author_avatar: p.author?.avatar_url ?? '/assets/default-avatar.png',
+  caption: p.caption ?? '',
+  
+  images: p.media ? p.media.map(m => m.thumbnail_url || m.url) : [], 
+  
+  // 썸네일
+  image: p.media?.[0]?.thumbnail_url || p.media?.[0]?.url || null, 
+  location: p.location ?? '', 
+  // 날짜 처리 안전장치 추가
+  date: p.created_at ? new Date(p.created_at).toLocaleDateString('ko-KR', { 
+  year: 'numeric', month: '2-digit', day: '2-digit' 
+  }).replace(/\./g, '.').trim() : '날짜 없음', 
+  like_count: p.like_count ?? 0,
+  comment_count: p.comment_count ?? 0,
+  is_liked: !!p.is_liked,
+  // 실제 로그인한 유저 ID와 작성자 ID 비교
+  is_mine: p.author?.id === currentUserId, 
+  lat: p.lat ?? null,
+  lng: p.lng ?? null,
+});
+
 
 const mapLocalPost = (p) => ({
   id: p.id,
@@ -115,7 +117,7 @@ const mapLocalPost = (p) => ({
         setLoading(true);
         setErr('');
         
-        const url = `${API_BASE}/posts?feed_type=all&limit=20`;
+        const url = `${API_BASE}/posts?feed_type=all&limit=200`;
         const res = await fetch(url, { 
           signal: ac.signal, credentials: 'include',
            headers: {
@@ -171,7 +173,7 @@ const mapLocalPost = (p) => ({
       }
     })();
     return () => ac.abort();
-  }, []);
+  }, [token, user]);
 
   const goShoot = () => {
     if (!canShoot) 
