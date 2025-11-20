@@ -29,7 +29,9 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
   const navigate = useNavigate();
   const { token } = useAuth(); // API 호출 시 필요한 토큰
 
-  const images = postImages || (post.image ? [post.image] : []);
+  const images = Array.isArray(postImages) 
+    ? postImages 
+    : (post.image ? [post.image] : []);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(is_liked || false);

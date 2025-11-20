@@ -31,6 +31,7 @@ const PostDetail = () => {
       if (!res.ok) throw new Error('댓글 로드 실패');
       const data = await res.json();
       if (data.isSuccess) {
+        const resultList = Array.isArray(data.result) ? data.result : [];
         setComments(data.result || []); 
       }
     } catch (err) {
@@ -184,7 +185,7 @@ return (
 
       <div className="detail-comments-area">
         <div className="comments-list-detail">
-          {comments.map(c => {
+          {Array.isArray(comments) && comments.map(c => {
             const isCommentMine = c.user?.id === user?.id;
             return (
             <div key={c.id} className="comment-item detail-item">
