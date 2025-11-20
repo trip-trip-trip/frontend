@@ -32,6 +32,8 @@ import PostCreate from './pages/Home/post/PostCreate';
 import SetUsername from './pages/SignUp/SetUsername';
 import AddFriend from './pages/Album/CreateTrip/AddFriend';
 import SharePhoto from './pages/Album/SharePhoto';
+import PostEdit from './pages/Home/post/PostEdit';
+
 
 
 
@@ -97,6 +99,7 @@ const App = () => {
         <Route path="/post" element={< PostItem/>} />
         <Route path="/post/:id" element={< PostDetails/>} />
         <Route path="/post/create" element={< PostCreate/>} />
+        <Route path="/post/edit/:id" element={< PostEdit/>} />
 
 
         {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
