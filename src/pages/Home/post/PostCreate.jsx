@@ -54,11 +54,10 @@ const MOCK_MEDIA_DATA = {
 
 export default function PostCreate() {
   const nav = useNavigate();
-  
-  const [title, setTitle] = useState('');
+
   const [locationText, setLocationText] = useState('');
   const [content, setContent] = useState('');
-  const [privacy, setPrivacy] = useState('friends');
+  const [privacy, setPrivacy] = useState('FRIENDS');
   const [loading, setLoading] = useState(false); // 미디어 로딩 + 공유 버튼 로딩
 
   const [myTrips, setMyTrips] = useState([]); //내 여행 목록
@@ -269,37 +268,33 @@ export default function PostCreate() {
       //   lng = r.lng;
       // }
       
-      const visibilityMap = {
-        friends: 'friends',
-        private: 'private',
-        public: 'public',
-      };
+      // const visibilityMap = {
+      //   friends: 'friends',
+      //   private: 'private',
+      // };
       
       const payload = {
         tripId: selectedTripId,
-        visibility: visibilityMap[privacy] || 'friends',
-        caption: content || title,
+        visibility: privacy, // 대문자 값 그대로 사용
+        caption: content,    // title 제거하고 content만 사용
         location_text: locationText,
         lat: finalLat,
         lng: finalLng,
         media: selectedMedia.map((media) => {
-            // 서버가 'PHOTO'를 모르므로 'MEDIA'로 변환해서 보내야 함
             let serverType = media.contentType;
-            
             if (serverType === 'PHOTO') {
                 serverType = 'MEDIA';
             } else if (serverType === 'VIDEO') {
-                serverType = 'MEDIA'; // 비디오라면
+                serverType = 'MEDIA';
             }
-
             return {
                 media_id: media.mediaAssetId,
-                object_type: serverType, // 변환된 타입을 전송
+                object_type: serverType,
             };
         })
       };
       
-      console.log("--- 실제 API 호출: 공유 페이로드 ---", payload);
+      console.log("--- 업로드 페이로드 ---", payload);
       
       // 실제 POST /posts API 호출
       const res = await fetch(`${API_BASE}/posts`, {
@@ -334,9 +329,6 @@ export default function PostCreate() {
       <div className="compose">
         <header className="compose-header">
           <Header title="새 게시물" toBack={true} />
-          {/* <button className="share" disabled={!canShare} onClick={share}>
-            {loading ? '업로드...' : '공유'}
-          </button> */}
         </header>
         
         <main className="compose-body">
@@ -384,11 +376,7 @@ export default function PostCreate() {
             )}
           </div>
           
-          <div className="form-row">
-            <label>제목</label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} />
-          </div>
-          
+        
           <div className="form-row">
             <label>위치</label>
             <input value={locationText} onChange={(e) => setLocationText(e.target.value)} />
@@ -402,8 +390,8 @@ export default function PostCreate() {
           <div className="form-row">
             <label>공개범위</label>
             <select value={privacy} onChange={(e) => setPrivacy(e.target.value)}>
-              <option value="friends">친구만</option>
-              <option value="private">비공개</option>
+              <option value="FRIENDS">친구만</option>
+              <option value="PRIVATE">비공개</option>
             </select>
             
             <button className='create-post-btn' onClick={share}>게시물 작성하기!</button>

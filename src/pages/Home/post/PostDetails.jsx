@@ -118,7 +118,7 @@ const PostDetail = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
           },
-        body: JSON.stringify({ content: newComment })
+        body: JSON.stringify({ comment: newComment })
       });
 
       const data = await res.json();

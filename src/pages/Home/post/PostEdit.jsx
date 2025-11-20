@@ -145,7 +145,6 @@ const PostEdit = () => {
               onChange={(e) => setVisibility(e.target.value)}
           >
              <option value="FRIENDS">친구 공개</option>
-             <option value="PUBLIC">전체 공개</option>
              <option value="PRIVATE">비공개</option>
           </select>
         </div>
