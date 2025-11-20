@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Post.css';
+import Header from '../../../components/Header/Header';
 
-const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+// const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const MAPS_KEY = 'AIzaSyBxUpz_y5O2nOTivngRz6fVvYHtG91i75M'
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 // --- 데모 데이터 (API 실패 시 사용) ---
@@ -58,21 +60,37 @@ export default function PostCreate() {
   const [content, setContent] = useState('');
   const [privacy, setPrivacy] = useState('friends');
   const [loading, setLoading] = useState(false); // 미디어 로딩 + 공유 버튼 로딩
+
+  const [myTrips, setMyTrips] = useState([]); //내 여행 목록
+  const [placeList, setPlaceList] = useState([]);
   
-  const [myTrips, setMyTrips] = useState([]);
   const [selectedTripId, setSelectedTripId] = useState(null);
-  
   const [tripContents, setTripContents] = useState(null);
   const [selectedMedia, setSelectedMedia] = useState([]);
   
   // 실제 API 로직을 위한 여행 목록 로딩 상태
   const [isLoadingTrips, setIsLoadingTrips] = useState(false);
 
-  //  여행 목록 불러오기
+  //  여행 목록 불러오기 + 여행지 장소
   useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    const fetchPlaces = async()=>{
+      try{
+        const res = await fetch(`${API_BASE}/trips/places`,{
+          headers: { Authorization: `Bearer ${token}`},
+
+        });
+        const data = await res.json();
+        if(data.isSuccess){
+          setPlaceList(data.result.contents || data.result || []);
+        }
+      }catch(e){
+        console.error("여행지 목록 로드 실패: ", e);
+      }
+    };
     const fetchMyTrips = async () => {
       setIsLoadingTrips(true);
-      const token = localStorage.getItem('jwtToken');
+      // const token = localStorage.getItem('jwtToken');
       try {
         const res = await fetch(`${API_BASE}/trips`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +99,8 @@ export default function PostCreate() {
         if (data.isSuccess) {
           const extractedTrips = data.result.map(tripPackage => ({
             id: tripPackage.trip.id,
-            title: tripPackage.trip.title
+            title: tripPackage.trip.title,
+            placeId: tripPackage.trip.placeId
           }));
           setMyTrips(extractedTrips || []);
         } else {
@@ -95,9 +114,35 @@ export default function PostCreate() {
         setIsLoadingTrips(false);
       }
     };
-
+    fetchPlaces();
     fetchMyTrips();
+
   }, []);
+   
+  //위치 텍스트 자동 채우기
+  const handleTripChange = (e) => {
+    const newTripId = Number(e.target.value);
+    setSelectedTripId(newTripId || null);
+
+    if (newTripId) {
+      // 1) 선택한 여행 찾기
+      const selectedTrip = myTrips.find(t => t.id === newTripId);
+      
+      // 2) 여행의 placeId로 실제 지명(예: 제주도) 찾기
+      if (selectedTrip && selectedTrip.placeId) {
+        const matchedPlace = placeList.find(p => p.placeId === selectedTrip.placeId);
+        
+        // 3) 찾았으면 위치 입력창에 자동 입력
+        if (matchedPlace) {
+          // API 응답 필드명에 따라 matchedPlace.placeName 또는 matchedPlace.name 등 확인 필요
+          setLocationText(matchedPlace.placeName || matchedPlace.name || '');
+        }
+      }
+    } else {
+      // 선택 해제 시 초기화 (원하면 유지해도 됨)
+      setLocationText('');
+    }
+  };
 
   // 선택된 여행의 미디어 불러오기
   useEffect(() => {
@@ -138,10 +183,6 @@ export default function PostCreate() {
     fetchTripMedia();
   }, [selectedTripId]);
 
-  const handleTripChange = (e) => {
-    const newTripId = e.target.value;
-    setSelectedTripId(newTripId ? Number(newTripId) : null);
-  };
 
   const allMedia = useMemo(() => {
     if (!tripContents) return [];
@@ -170,6 +211,7 @@ export default function PostCreate() {
       }
     });
   };
+  
   
   const canShare = useMemo(() => {
     return selectedMedia.length > 0 && !!selectedTripId && !loading;
@@ -273,11 +315,10 @@ export default function PostCreate() {
     <>
       <div className="compose">
         <header className="compose-header">
-          <button onClick={() => nav(-1)}>←</button>
-          <div>새 게시물</div>
-          <button className="share" disabled={!canShare} onClick={share}>
+          <Header title="새 게시물" toBack={true} />
+          {/* <button className="share" disabled={!canShare} onClick={share}>
             {loading ? '업로드...' : '공유'}
-          </button>
+          </button> */}
         </header>
         
         <main className="compose-body">
@@ -346,6 +387,9 @@ export default function PostCreate() {
               <option value="friends">친구만</option>
               <option value="private">비공개</option>
             </select>
+            
+            <button className='create-post-btn' onClick={share}>게시물 작성하기!</button>
+          
           </div>
         </main>
       </div>

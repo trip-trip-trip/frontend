@@ -432,3 +432,121 @@
     border-radius: 4px;
     box-sizing: border-box;
 }
+
+/* 1. 작성/수정 페이지 전체 레이아웃 */
+.compose {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #fff;
+    position: relative;
+}
+
+/* 2. 작성/수정 페이지 헤더 (Sticky) */
+.compose-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    padding: 0 16px;
+    border-bottom: 1px solid #dbdbdb;
+    background-color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.compose-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    color: #333;
+}
+
+/* 3. 작성/수정 본문 스크롤 영역 */
+.compose-body {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+/* 4. 파란색 텍스트 버튼 (공유/완료/수정) */
+.text-btn-blue, .share {
+    color: #0095f6 !important;
+    font-weight: 600;
+    font-size: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.text-btn-blue:disabled, .share:disabled {
+    color: #bce3fd !important;
+    cursor: default;
+}
+
+/* 5. 읽기 전용 입력창 (수정 페이지 위치 등) */
+.input-readonly {
+    background-color: #f9f9f9 !important;
+    color: #999;
+    cursor: default;
+}
+
+/* 6. 게시물 삭제 버튼 (수정 페이지 하단) */
+.delete-section {
+    margin-top: 30px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.delete-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #fff0f0;
+    color: #d32f2f;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+.delete-btn:hover {
+    background-color: #ffe0e0;
+}
+
+/* 7. 댓글 삭제 버튼 (상세 페이지용 - 작게 표시) */
+.comment-delete-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 11px;
+    cursor: pointer;
+    margin-left: 8px;
+    padding: 2px 4px;
+}
+.comment-delete-btn:hover {
+    color: #ed4956;
+    text-decoration: underline;
+}
+
+.create-post-btn{
+    margin-top: 2rem;
+    border-radius: 3rem;
+    border: 1px solid #525B65;
+    background: #525B65;
+    display: flex;
+    width: 100%;
+    padding: 1.2rem 6.2rem;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: #E0DDD2;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
