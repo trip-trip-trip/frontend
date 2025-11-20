@@ -9,6 +9,8 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 // PostCreate에서 사용하는 LS_KEY
 const LS_KEY = 'tripshot_posts'; 
 
+//GET trips/isActiveTrips 로 여행중인지 가져올 수 있음 
+
 const readLocalPosts = () => {
   try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
   catch { return []; }

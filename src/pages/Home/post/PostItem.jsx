@@ -54,14 +54,14 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
 
     const nextIsLiked = !isLiked;
     const nextLikeCount = nextIsLiked ? currentLikeCount + 1 : currentLikeCount - 1;
+    
     setIsLiked(nextIsLiked);
     setCurrentLikeCount(nextLikeCount);
 
-    // 2API 호출
+    // API 호출
     try {
-      const method = nextIsLiked ? 'POST' : 'DELETE';
       const res = await fetch(`${API_BASE}/posts/${id}/like`, {
-        method: method,
+        method: 'POST', 
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -70,14 +70,12 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
       if (!res.ok) {
         throw new Error('좋아요 처리 실패');
       }
-      
-
     } catch (err) {
       console.error('toggleLike error:', err);
-      // [롤백] 에러 발생 시 UI를 이전 상태로 되돌립니다.
+      
       alert("좋아요 처리에 실패했습니다.");
-      setIsLiked(!nextIsLiked);
-      setCurrentLikeCount(currentLikeCount);
+      setIsLiked(!nextIsLiked); // 원래대로 복구
+      setCurrentLikeCount(currentLikeCount); // 원래대로 복구
     }
   };
 
