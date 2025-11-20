@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext'; 
 import './Post.css'; 
+<<<<<<< HEAD
 // Header는 안 쓰는 것 같아 일단 주석 처리하거나 유지
 // import Header from '../../../components/Header/Header';
+=======
+import Header from '../../../components/Header/Header';
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
@@ -12,9 +16,16 @@ const PostEdit = () => {
   const navigate = useNavigate();
   const { token, user } = useAuth();
 
+<<<<<<< HEAD
   const [content, setContent] = useState('');
   const [visibility, setVisibility] = useState('FRIENDS'); // 기본값
   const [originalMedia, setOriginalMedia] = useState([]); // 기존 미디어 정보 저장용
+=======
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [locationText, setLocationText] = useState(''); // 읽기 전용으로 보여줄 용도
+  const [loading, setLoading] = useState(true);
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
 
   // 1. 기존 게시물 정보 불러오기
   useEffect(() => {
@@ -28,12 +39,17 @@ const PostEdit = () => {
         
         if (data.isSuccess) {
             const p = data.result;
+<<<<<<< HEAD
             // 내 글 확인
+=======
+            // 내 글이 아니면 튕겨내기 (보안)
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
             if (p.author?.id !== user?.id) {
                 alert("수정 권한이 없습니다.");
                 navigate(-1);
                 return;
             }
+<<<<<<< HEAD
             // 데이터 채우기
             setContent(p.caption || '');
             setVisibility(p.visibility || 'FRIENDS'); // 서버에서 받은 공개범위
@@ -49,6 +65,11 @@ const PostEdit = () => {
                 setOriginalMedia(formattedMedia);
             }
 
+=======
+            setTitle(p.title || ''); // 제목이 없는 경우 대비
+            setContent(p.caption || '');
+            setLocationText(p.location || '');
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
         } else {
             alert("게시물 정보를 불러오지 못했습니다.");
             navigate(-1);
@@ -56,6 +77,11 @@ const PostEdit = () => {
       } catch (e) {
         console.error(e);
         alert("오류가 발생했습니다.");
+<<<<<<< HEAD
+=======
+      } finally {
+        setLoading(false);
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
       }
     };
     fetchPost();
@@ -65,6 +91,7 @@ const PostEdit = () => {
   const handleUpdate = async () => {
     if (!confirm("게시물을 수정하시겠습니까?")) return;
 
+<<<<<<< HEAD
     // ★ 수정할 데이터 구성 (API 스펙 준수)
     const payload = {
         caption: content,        // 내용 수정
@@ -90,6 +117,28 @@ const PostEdit = () => {
             // 에러 메시지를 띄워서 확인
             alert(`수정 실패: ${data.message}`); 
             console.log("Validation Error Detail:", data);
+=======
+    try {
+        const res = await fetch(`${API_BASE}/posts/${id}`, {
+            method: 'PATCH', 
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({
+                title: title,
+                caption: content
+                // location, media 등은 수정하지 않음 
+            })
+        });
+        const data = await res.json();
+        
+        if (data.isSuccess) {
+            alert("수정되었습니다.");
+            navigate(`/home`, { replace: true }); // 상세 페이지로 복귀
+        } else {
+            alert(data.message || "수정 실패");
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
         }
     } catch (e) {
         console.error(e);
@@ -97,6 +146,7 @@ const PostEdit = () => {
     }
   };
 
+<<<<<<< HEAD
   // 삭제하기
   const handleDelete = async () => {
     if (!confirm("정말로 이 게시물을 삭제하시겠습니까?")) return;
@@ -109,6 +159,24 @@ const PostEdit = () => {
         if (data.isSuccess) {
             alert("삭제되었습니다.");
             navigate('/home', { replace: true });
+=======
+  // 삭제하기 (DELETE)
+  const handleDelete = async () => {
+    if (!confirm("정말로 이 게시물을 삭제하시겠습니까? 복구할 수 없습니다.")) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/posts/${id}`, {
+            method: 'DELETE',
+            headers: { 
+                'Authorization': `Bearer ${token}` 
+            }
+        });
+        const data = await res.json();
+
+        if (data.isSuccess) {
+            alert("삭제되었습니다.");
+            navigate('/home', { replace: true }); // 홈으로 이동
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
         } else {
             alert(data.message || "삭제 실패");
         }
@@ -118,6 +186,7 @@ const PostEdit = () => {
     }
   };
 
+<<<<<<< HEAD
   return (
     <div className="compose">
       <header className="compose-header">
@@ -159,5 +228,65 @@ const PostEdit = () => {
     </div>
   );
 };
+=======
+  // if (loading) return <div style={{padding:20}}>로딩 중...</div>;
+  // if (!post) return (
+  //     <div className="post-detail-page">
+  //        <Header title="" toBack={true} />
+         
+  //        <div style={{marginTop: 100, textAlign: 'center', color:'#999'}}>
+  //            게시물을 찾을 수 없습니다.
+  //        </div>
+  //     </div>
+  //   );
+
+  return (
+  <div className="compose">
+    <header className="compose-header">
+      <button onClick={() => navigate(-1)}>취소</button>
+      <div>게시물 수정</div>
+      <button className="share" onClick={handleUpdate}>완료</button>
+    </header>
+    
+    <main className="compose-body">
+      {/* 위치 (읽기 전용) */}
+      <div className="form-row">
+        <label>위치</label>
+        <input 
+            value={locationText} 
+            disabled 
+            className="input-readonly" 
+        />
+      </div>
+
+      <div className="form-row">
+        <label>제목</label>
+        <input 
+            value={title} 
+            onChange={(e) => setTitle(e.target.value)} 
+        />
+      </div>
+
+      <div className="form-row">
+        <label>내용</label>
+        <textarea 
+            rows={6} 
+            value={content} 
+            onChange={(e) => setContent(e.target.value)} 
+        />
+      </div>
+      <div className="delete-section">
+          <button 
+              onClick={handleDelete}
+              className="delete-btn"
+          >
+              게시물 삭제
+          </button>
+      </div>
+
+    </main>
+  </div>
+)};
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
 
 export default PostEdit;

@@ -525,7 +525,10 @@
     font-size: 14px;
     transition: background 0.2s;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
 .delete-btn:hover {
     background-color: #ffe0e0;
 }

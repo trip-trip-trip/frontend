@@ -119,12 +119,17 @@ export default function PostCreate() {
 
   }, []);
    
+<<<<<<< HEAD
   // 위치 텍스트 자동 채우기
+=======
+  //위치 텍스트 자동 채우기
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
   const handleTripChange = (e) => {
     const newTripId = Number(e.target.value);
     setSelectedTripId(newTripId || null);
 
     if (newTripId) {
+<<<<<<< HEAD
       // 선택한 여행 찾기
       const selectedTrip = myTrips.find(t => t.id === newTripId);
       
@@ -144,6 +149,24 @@ export default function PostCreate() {
     } else {
       setLocationText('');
       setSelectedCoords({ lat: null, lng: null }); // 선택 해제 시 좌표 초기화
+=======
+      // 1) 선택한 여행 찾기
+      const selectedTrip = myTrips.find(t => t.id === newTripId);
+      
+      // 2) 여행의 placeId로 실제 지명(예: 제주도) 찾기
+      if (selectedTrip && selectedTrip.placeId) {
+        const matchedPlace = placeList.find(p => p.placeId === selectedTrip.placeId);
+        
+        // 3) 찾았으면 위치 입력창에 자동 입력
+        if (matchedPlace) {
+          // API 응답 필드명에 따라 matchedPlace.placeName 또는 matchedPlace.name 등 확인 필요
+          setLocationText(matchedPlace.placeName || matchedPlace.name || '');
+        }
+      }
+    } else {
+      // 선택 해제 시 초기화 (원하면 유지해도 됨)
+      setLocationText('');
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
     }
   };
 
@@ -329,6 +352,12 @@ export default function PostCreate() {
       <div className="compose">
         <header className="compose-header">
           <Header title="새 게시물" toBack={true} />
+<<<<<<< HEAD
+=======
+          {/* <button className="share" disabled={!canShare} onClick={share}>
+            {loading ? '업로드...' : '공유'}
+          </button> */}
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
         </header>
         
         <main className="compose-body">

@@ -8,19 +8,31 @@ import Header from '../../../components/Header/Header';
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 const PostDetail = () => {
+<<<<<<< HEAD
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, token } = useAuth();
 
+=======
+  const { id } = useParams(); // URL에서 post id 가져오기
+  const navigate = useNavigate();
+  const { user, token } = useAuth(); // 인증 정보
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
 
   const isMine = useMemo(() => {
+<<<<<<< HEAD
     if (!post || !user) return false;
     return Number(post.authorId) === Number(user.id);
   }, [post, user]);  
+=======
+    // post.authorId는 아래 normalize 과정에서 따로 저장할 예정
+    return post?.authorId === user?.id; 
+  }, [post, user]);
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
 
   /** 댓글 불러오기 */
   const fetchComments = useCallback(async () => {
@@ -61,8 +73,41 @@ const PostDetail = () => {
         if (!postRes.ok) throw new Error('게시물을 찾을 수 없습니다.');
 
         const postData = await postRes.json();
+<<<<<<< HEAD
 
         if (!postData.isSuccess) {
+=======
+        console.log('상세 조회 원본 데이터:', postData());
+        if (postData.isSuccess) {
+          const p = postData.result;
+
+          const normalized = {
+            id: p.id,
+            
+            // 1) 작성자 처리: API는 author 객체를 줌 -> username만 뽑아서 author에 넣기
+            author: p.author?.username || '알 수 없음',
+            author_avatar: p.author?.avatar_url || '/assets/default-avatar.png',
+            authorId: p.author?.id, // isMine 판별용으로 따로 저장
+            
+            // 2) 이미지 처리: API는 media 배열을 줌 -> images 배열로 변환
+            images: p.media ? p.media.map(m => m.url) : [],
+            image: p.media?.[0]?.url || null, // 대표 이미지
+            
+            // 3) 기타 필드 매핑
+            caption: p.caption || '',
+            location: p.location || '', // API에 location이 없다면 빈 값 처리
+            date: new Date(p.created_at).toLocaleDateString('ko-KR', {
+              year: 'numeric', month: '2-digit', day: '2-digit'
+            }).replace(/\./g, '.').trim(),
+            
+            like_count: p.like_count ?? 0,
+            comment_count: p.comment_count ?? 0,
+            is_liked: !!p.is_liked
+          };
+          console.log("변환된 데이터:", normalized);
+          setPost(normalized);
+        } else {
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
           throw new Error(postData.message || '게시물 로드 실패');
         }
 
@@ -132,7 +177,36 @@ const PostDetail = () => {
       alert(`댓글 작성 오류: ${err.message}`);
     }
   };
+  
 
+  //댓글 삭제
+  const handleCommentDelete = async(commentId) =>{
+    if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+    try {
+        // DELETE /posts/{post_id}/comment/{comment_id}
+        const res = await fetch(`${API_BASE}/posts/${id}/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await res.json();
+        
+        if (data.isSuccess) {
+            // 성공 시 목록 새로고침
+            fetchComments();
+        } else {
+            alert(data.message || "댓글 삭제 실패");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("댓글 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+<<<<<<< HEAD
   //  댓글 객체에서 실제 commentId를 추출하는 함수
 const extractCommentId = (c) => {
   return (
@@ -143,6 +217,87 @@ const extractCommentId = (c) => {
     null
   );
 };
+=======
+  if (loading) return <div className="post-detail-loading">불러오는 중...</div>;
+  // 게시물 데이터가 없을 때 
+
+ if (!post) return (
+    <div className="post-detail-page">
+       <Header title="" toBack={true} />
+       
+       <div style={{marginTop: 100, textAlign: 'center', color:'#999'}}>
+           게시물을 찾을 수 없습니다.
+       </div>
+    </div>
+  );
+
+return (
+  <div className="post-detail-page">
+    <Header toBack={true}/>  
+
+    <PostItem post={post} isMine={isMine} isDetail={true} />
+
+      <div className="detail-comments-area">
+        <div className="comments-list-detail">
+          {comments.map(c => {
+            const isCommentMine = c.user?.id === user?.id;
+            return (
+            <div key={c.id} className="comment-item detail-item">
+              <div className="comment-line">
+                <span className="comment-avatar-circle">
+                  <img src={c.user?.avatar_url || '/assets/default-avatar.png'} alt="" />
+                  </span>
+                  <div className="comment-right" style={{width: '100%'}}>
+                    <div className="comment-header" style={{display:'flex', justifyContent:'space-between'}}>
+                      <div>
+                        <span className="comment-user">{c.user?.username || 'Unknown'}</span>
+                        <span className="comment-date">
+                          {new Date(c.created_at).toLocaleDateString('ko-KR')}
+                          </span>
+                          </div>
+                          {isCommentMine && (
+                            <button 
+                            onClick={() => handleCommentDelete(c.id)}
+                            className="comment-delete-btn"
+                          >
+                             삭제
+                             </button>
+                            )}
+                            </div>
+                            <div className="comment-body">{c.content}</div>
+                            </div>
+                      </div>
+                    </div>
+                );
+            })}
+            
+            {comments.length === 0 && (
+              <div className="comment-empty">
+                첫 번째 댓글을 남겨보세요!
+              </div>
+            )}
+          </div>
+
+          <div className="comment-input-area detail-input">
+              <input 
+                type="text" 
+                placeholder="댓글 달기..." 
+                className="comment-input-field" 
+                value={newComment} 
+                onChange={(e) => setNewComment(e.target.value)} 
+              />
+              <button 
+                className="comment-submit-btn" 
+                onClick={handleCommentSubmit}
+                disabled={!newComment.trim()} 
+              >
+                게시
+              </button>
+          </div>
+      </div>
+  </div>
+)};
+>>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
 
 // 댓글 삭제 함수 (모든 경우 대응)
 const handleCommentDelete = async (comment) => {
