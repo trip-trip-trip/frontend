@@ -135,8 +135,7 @@ export default function PostCreate() {
         
         // 찾았으면 위치 입력창에 자동 입력
         if (matchedPlace) {
-          setLocationText(matchedPlace.name || ''); 
-         //좌표도 미리 state에 저장해두기! (구글 API 안 써도 됨)
+          setLocationText(matchedPlace.name || matchedPlace.placeName || '');         //좌표도 미리 state에 저장해두기! (구글 API 안 써도 됨)
           setSelectedCoords({
               lat: matchedPlace.lat,
               lng: matchedPlace.lng
