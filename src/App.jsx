@@ -36,7 +36,6 @@ import PostEdit from './pages/Home/post/PostEdit';
 import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
 
 
-
 const App = () => {
   // 스크린 사이즈 세팅
   function setScreenSize() {
