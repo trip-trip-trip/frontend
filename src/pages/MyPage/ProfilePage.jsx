@@ -6,7 +6,7 @@ import defaultProfile from "../../assets/default-profile.png";
 import editIcon from "../../assets/ep_edit.png";
 import settingIcon from '../../assets/setting.png';
 
-import Header from "./Header"
+
 import NavBar from "../../components/NavBar/NavBar";
 import "./ProfilePage.css";
 import { useAuth } from '../../contexts/AuthContext';
