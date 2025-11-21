@@ -109,7 +109,7 @@ export default function PostCreate() {
       } catch (e) {
         console.error('여행 목록 로드 실패, 데모 데이터를 사용합니다:', e);
         // API 실패 시에만 데모 데이터 사용
-        setMyTrips(MOCK_TRIP_LIST);
+        // setMyTrips(MOCK_TRIP_LIST);
       } finally {
         setIsLoadingTrips(false);
       }
