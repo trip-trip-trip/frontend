@@ -149,17 +149,19 @@
     color: #333;
 }
 
-/* ⬇️ 캡션 영역 */
 .post-caption-block {
-    padding: 0 16px 10px;
+  display: block !important;
 }
 
+
 .post-date {
-    font-size: 12px;
-    color: #999;
-    margin-bottom: 4px;
-    display: block;
+  display: block !important;
+  color: #555 !important;
+  font-size: 13px;
+  margin-bottom: 4px;
 }
+
+
 
 .post-content-text {
     color: #444;
