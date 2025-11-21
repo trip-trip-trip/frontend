@@ -151,7 +151,7 @@ const CreateScrap = () => {
   };
   
     //사진 개수 미달시 뒤로가기
-    if (!selectedFrameId || selectedPics.length !== 4) {
+    if (!selectedFrameId) {
       return (
         <div className="error-message">
           필수 데이터가 부족합니다. <a href="/">처음으로</a>å

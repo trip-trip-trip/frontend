@@ -33,7 +33,7 @@ import SetUsername from './pages/SignUp/SetUsername';
 import AddFriend from './pages/Album/CreateTrip/AddFriend';
 import SharePhoto from './pages/Album/SharePhoto';
 import PostEdit from './pages/Home/post/PostEdit';
-
+import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
 
 
 
@@ -80,7 +80,7 @@ const App = () => {
 
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/friends' element={<AddFriend/>}/>
-        <Route path='/trips/create' element={<CreateTrip/>}/>
+        <Route path='/trips/create' element={<SelectPlace/>}/>
         <Route path='/trips/detail/:tripId' element={<TripDetail/>}/>
         <Route path='/trips/detail/:tripId/share' element={<SharePhoto/>}/>
         <Route path='/trips/detail/:tripId/vid' element={<VideoDetail/>}/>

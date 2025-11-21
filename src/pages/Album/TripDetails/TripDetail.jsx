@@ -38,6 +38,7 @@ const TripDetail = () => {
   const [photoData, setPhotoData] = useState([]);
   // Fetch 해온 영상 정보 저장
   const [vidData, setVidData] = useState();
+  
   // 로딩상태 표시
   const [isLoading, setIsLoading] = useState(true);
 
@@ -219,6 +220,31 @@ const TripDetail = () => {
                     <div className='video-card' key={index}>
                         <video src={video.url} controls></video>
                     </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 사진 섹션 */}
+          <div className="photo_container scrapbook">
+            <img src={album_cont} alt="" className='album-cont-img scrapbook' />
+            <div className='section-photo-header scrapbook'>
+              <h2 className='photo-cont-title scrapbook'>스크랩북</h2>
+              <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : photoData } } )}>
+                <img src={more_btn} alt="" />
+              </button>
+            </div>
+            <div className="photo-grid-cont">
+              <div className='photo-grid'>
+                {photoData.map((pics, index)=>(
+                  <div className='photo-item' key={index}> 
+                      <img src={pics.url} alt="" />
+                      {showShared && pics.isShared && (
+                        <div className='shared-link-icon'>
+                          <img src={shared_icon} alt="공유됨" />
+                        </div>
+                      )}
+                  </div>
                 ))}
               </div>
             </div>

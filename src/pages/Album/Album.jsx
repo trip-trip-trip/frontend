@@ -17,6 +17,7 @@ const Album = () => {
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
   const todayDate = new Date().toISOString().split('T')[0];
+  
   const navigate = useNavigate();
   const { token, activeTripId, setActiveTripId } = useAuth();
 
