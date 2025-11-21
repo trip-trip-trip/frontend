@@ -108,7 +108,7 @@ const Navbar = () => {
             <div className="divider"></div>
             <button 
                 className="popup-item"
-                onClick={() => handleMenuItemClick('/scrapbook/create')}
+                onClick={() => handleMenuItemClick('scrapbook/frame')}
             >
                 스크랩북 만들기
             </button>
