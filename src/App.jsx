@@ -35,7 +35,6 @@ import SharePhoto from './pages/Album/SharePhoto';
 import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
 import PostEdit from './pages/Home/post/PostEdit';
 
-
 const App = () => {
   // 스크린 사이즈 세팅
   function setScreenSize() {
