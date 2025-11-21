@@ -32,8 +32,8 @@ import PostCreate from './pages/Home/post/PostCreate';
 import SetUsername from './pages/SignUp/SetUsername';
 import AddFriend from './pages/Album/CreateTrip/AddFriend';
 import SharePhoto from './pages/Album/SharePhoto';
-import PostEdit from './pages/Home/post/PostEdit';
 import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
+import PostEdit from './pages/Home/post/PostEdit';
 
 
 const App = () => {
