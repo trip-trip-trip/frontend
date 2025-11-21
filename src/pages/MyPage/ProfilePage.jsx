@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react"; // 👈 useState, useEffect 추가
 import { useNavigate } from "react-router-dom";
 import defaultProfile from "../../assets/default-profile.png";
+
+import editIcon from "../../assets/ep_edit.png";
+
 import NavBar from "../../components/NavBar/NavBar";
 import "./ProfilePage.css";
 import { useAuth } from '../../contexts/AuthContext';
@@ -9,104 +12,144 @@ import { useAuth } from '../../contexts/AuthContext';
 const API_BASE = import.meta.env.PROD 
    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
    : '/api';
-
 export default function ProfilePage() {
    const navigate = useNavigate();
-   const { user, token, isLoading } = useAuth(); // 👈 token, isLoading 가져오기
-  const [postCount, setPostCount] = useState(0); // 👈 [신규] 여행(게시물) 갯수
+   const { user, token, isLoading } = useAuth(); 
+   
+   const [postCount, setPostCount] = useState(0); 
+   const [tripCount, setTripCount] = useState(0); 
+   const [friendCount, setFriendCount] = useState(0); 
+   const [myPosts, setMyPosts] = useState([]); 
 
-  const [friendCount, setFriendCount] = useState(0); 
+   useEffect(() => {
+     if (!token || !user) return;
 
-  // 2. [신규] GET /users/me/posts API 호출
-  useEffect(() => {
-    if (!token) return; // 토큰 없으면 중지
+     const fetchData = async () => {
+       try {
+         // 1. [Post] 게시물 목록 가져오기 (썸네일용)
+         const postsRes = await fetch(`${API_BASE}/posts?user_id=${user.id}&feed_type=all`, {
+           headers: { Authorization: `Bearer ${token}` },
+         });
+         if (postsRes.ok) {
+             const data = await postsRes.json();
+             if (data.isSuccess) {
+                const posts = data.result.posts || [];
+                setMyPosts(posts); 
+                setPostCount(posts.length);
+             }
+         }
 
-    const fetchUserPosts = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/users/me/posts`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("게시물 로드 실패");
-        
-        // 🚨 API 명세서의 응답 형식 { "data": { "posts": [...] } } 기준
-        // 🚨 만약 { "posts": [...] } 라면 data.posts.length로 수정
-        const data = await res.json();
-        if (data.data && data.data.posts) {
-          setPostCount(data.data.posts.length);
-        } else if (data.posts) { // 예비 케이스
-           setPostCount(data.posts.length);
-        }
-      } catch (err) {
-        console.error("게시물 수 로드 실패:", err);
-      }
-    };
+         // 2. [Trip] 여행 목록 가져오기 (개수용)
+         const tripRes = await fetch(`${API_BASE}/trips`, {
+            headers: { Authorization: `Bearer ${token}` },
+         });
+         if (tripRes.ok) {
+            const tripData = await tripRes.json();
+            if (tripData.isSuccess) {
+                const trips = tripData.result || [];
+                setTripCount(trips.length);
+            }
+         }
 
-    fetchUserPosts();
-  }, [token]); // 👈 token이 준비되면 실행
+         // 3. [Friend] 친구 목록 가져오기 (개수용)
+         const friendRes = await fetch(`${API_BASE}/users/friendships`, { 
+            headers: { Authorization: `Bearer ${token}` },
+         });
+         if (friendRes.ok) {
+            const friendData = await friendRes.json();
+            if (friendData.isSuccess) {
+                const friends = friendData.result || [];
+                setFriendCount(friends.length);
+            }
+         }
 
-  // 3. [수정] 로딩 처리
+       } catch (err) {
+         console.error("데이터 로드 실패:", err);
+       }
+     };
+
+     fetchData();
+   }, [token, user?.id]);
+
    if (isLoading || !user) return <div>로딩 중...</div>;
 
-   // 4. [수정] safeUser를 API 명세서 키(avatarUrl 등)에 맞춤
    const safeUser = {
       username: user.username || "사용자",
-      tag: user.tag || "abcd1234", // 👈 API 필드 추가
-      bio: user.bio || "소개 메시지를 입력하세요",
-      avatarUrl: user.avatarUrl || defaultProfile, // 👈 profileImage -> avatarUrl
-      postCount: postCount, // 👈 [수정] API에서 가져온 갯수
-      friendCount: friendCount, // 👈 [수정] API가 없으므로 임시 state
-      albums: [], // 👈 [수정] API가 없으므로 임시 []
+      tag: user.tag || "abcd1234",
+      bio: user.bio || "소개 메시지가 없습니다.",
+      // DB에 이미지가 없으면 기본 이미지
+      avatarUrl: user.avatarUrl || defaultProfile, 
    };
 
    return (
-      <div className="profile-page">
+     <div className="profile-page">
+       {/* 상단바 */}
        <div className="profile-topbar">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          &lt;
-        </button>
-        <h2 className="header-title">프로필</h2>
-        <button className="settings-button" onClick={() => navigate("/mypage/settings")}>
-          ⚙️
-        </button>
-      </div>
-<div className="profile-header">
-        <div className="profile-image-wrapper">
-          <img src={safeUser.profileImage} className="profile-img" />
-        </div>
+         <button className="back-button" onClick={() => navigate(-1)}>&lt;</button>
+         <span className="header-title">프로필</span>
+         <button className="settings-button" onClick={() => navigate("/mypage/settings")}>⚙️</button>
+       </div>
 
-        {/* 6. [추가] @태그 */}
-            <div className="profile-username">{safeUser.username}</div>
-        <div className="profile-tag">@{safeUser.tag}</div> 
-            <div className="profile-bio">{safeUser.bio}</div>
-
-            <button
-               className="profile-edit-button"
-               onClick={() => navigate('/mypage/edit')}
-            >
-               프로필 수정
-            </button>
+       {/* 프로필 헤더 */}
+       <div className="profile-header">
+         <div className="profile-image-wrapper">
+           <img 
+             src={safeUser.avatarUrl} 
+             alt="프로필" 
+             className="profile-img" 
+             onError={(e) => {e.target.src = defaultProfile;}}
+           />
          </div>
 
-         <div className="profile-stats">
-            <div>
-          {/* 7. [수정] postCount */}
-               <strong>{safeUser.postCount}</strong>
-               <span>여행</span>
-            </div>
-            <div onClick={() => navigate("/mypage/friends")}>
-               <strong>{safeUser.friendCount}</strong>
-               <span>친구</span>
-            </div>
+         <div className="profile-username">{safeUser.username}</div>
+         <div className="profile-bio">{safeUser.bio}</div>
+
+         {/* 프로필 편집 버튼 */}
+         <div className="profile-edit-btn-wrap" onClick={() => navigate('/mypage/edit')}>
+            <img src={editIcon} alt="edit" className="edit-icon" />
+            <span className="profile-edit-text">프로필 편집</span>
+         </div>
+       </div>
+
+       {/* 통계 섹션 */}
+       <div className="profile-stats">
+         <div className="stat-item">
+           <span className="stat-num">{postCount}</span>
+           <span className="stat-label">Post</span>
+         </div>
+         <div className="stat-item">
+           <span className="stat-num">{tripCount}</span>
+           <span className="stat-label">Trip</span>
+         </div>
+         <div className="stat-item" onClick={() => navigate("/mypage/friends")}>
+           <span className="stat-num">{friendCount}</span>
+           <span className="stat-label">Friend</span>
+         </div>
+       </div>
+
+       {/* 앨범 그리드 (세로 직사각형 3열) */}
+       <div className="album-grid">
+         {/* 게시물 추가 버튼 (항상 첫 번째) */}
+         <div className="album-item add" onClick={() => navigate("/post_select")}>
+           +
          </div>
 
-         <div className="album-grid">
-            {safeUser.albums.map((album, i) => (
-               <div key={i} className="album-item" style={{ backgroundColor: album.color }} />
-            ))}
-            <div className="album-item add" onClick={() => navigate("/posting")}>+</div>
-         </div>
+         {/* 게시물 썸네일 */}
+         {myPosts.map((post) => {
+           // 썸네일이 없으면 기본 url 사용
+           const thumbUrl = post.media?.[0]?.thumbnail_url || post.media?.[0]?.url;
+           return (
+             <div
+               key={post.id}
+               className="album-item"
+               style={thumbUrl ? { backgroundImage: `url(${thumbUrl})` } : { backgroundColor: '#ccc' }}
+               onClick={() => navigate(`/trips/detail`)} // (상세 페이지 ID 연결 필요 시 수정)
+             />
+           );
+         })}
+       </div>
 
-         <NavBar current="mypage" />
-      </div>
+       <NavBar current="mypage" />
+     </div>
    );
 }

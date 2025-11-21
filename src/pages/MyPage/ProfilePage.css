@@ -1,132 +1,145 @@
-
-.profile-page { /* JSX의 최상위 className에 맞춰주세요 */
+.profile-page {
   display: flex;
   flex-direction: column;
-  height: 100%; /* .app-container를 꽉 채움 */
-  background-color: #ffffff; /* 페이지 배경색 */
-  overflow-y: auto; /* 스크롤이 필요하면 auto */
+  height: 100%;
+  background-color: #F6F6F5; /* 배경색 */
+  overflow-y: auto;
 }
 
+/* 1. 상단바 */
 .profile-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  padding: 15px 20px;
+  background-color: #F6F6F5;
 }
-
-.profile-topbar button {
+.profile-topbar .back-button,
+.profile-topbar .settings-button {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 2.4rem;
   cursor: pointer;
+  color: #333;
+  width: 30px;
+}
+.profile-topbar .header-title {
+  font-size: 1.8rem;
+  font-weight: 700;
   color: #333;
 }
 
-.profile-topbar h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-
+/* 2. 프로필 헤더 */
 .profile-header {
-  text-align: center;
-  margin-top: 16px;
-}
-.profile-menu{
-    display: flex;
-    flex-direction:column;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 20px 20px;
 }
 
-.profile-img {
-  width: 96px;
-  height: 96px;
+.profile-image-wrapper {
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  background-color: #eaeaea;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid #e0e0e0;
+  background-color: #fff;
+}
+.profile-img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  cursor: pointer;
 }
 
 .profile-username {
-  font-size: 16px;
-  font-weight: 600;
-  margin-top: 8px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 4px;
 }
-
 .profile-bio {
-  font-size: 13px;
-  color: #777;
-  margin-top: 4px;
-}
-
-/* ✅ 업로드 / 친구 */
-.profile-stats {
-display: flex;
-  justify-content: space-around;
-  width: 100%;
-  padding: 20px 0;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.profile-stats div {
+  font-size: 1.3rem;
+  color: #666;
+  margin-bottom: 16px;
   text-align: center;
+  line-height: 1.4;
+  max-width: 80%;
+}
+
+/* 편집 버튼 */
+.profile-edit-btn-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #fff;
   cursor: pointer;
 }
+.edit-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+.profile-edit-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #555;
+}
 
-.profile-stats strong {
-  display: block;
-  font-size: 15px;
-  font-weight: 600;
+/* 3. 통계 섹션 */
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 10px 0 20px;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+.stat-num {
+  font-size: 1.8rem;
+  font-weight: 700;
   color: #111;
+  margin-bottom: 2px;
 }
-
-.profile-stats span {
-  font-size: 13px;
+.stat-label {
+  font-size: 1.2rem;
   color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* ✅ 앨범 그리드 */
+/* 4. 앨범 그리드 */
 .album-grid {
-display: grid;
-  grid-template-columns: repeat(3, 1fr); 
-  gap: 12px;
-  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 16px 100px;
 }
 
 .album-item {
-  width: 100px;
-  height: 100px;
-  border-radius: 12px;
+  width: 100%;
+  aspect-ratio: 134 / 200; /* 134*200 비율 */
+  border-radius: 8px;
   background-color: #eee;
-  transition: transform 0.2s;
-}
-
-.album-item:hover {
-  transform: scale(1.02);
+  background-position: center;
+  background-size: cover;
+  cursor: pointer;
+  overflow: hidden;
 }
 
 .album-item.add {
+  background-color: #E0DDD2; /* 요청하신 색상 */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  color: #666;
-  background-color: #f5f5f5;
-  cursor: pointer;
-}
-
-/* ProfilePage.css에 추가 */
-.profile-edit-button {
-  margin-top: 15px;
-  padding: 8px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  font-size: 1.4rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-.profile-edit-button:hover {
-  background-color: #f0f0f0;
+  font-size: 3rem;
+  color: #fff;
+  font-weight: 300;
 }
