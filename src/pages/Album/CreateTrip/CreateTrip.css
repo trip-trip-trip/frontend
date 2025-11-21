@@ -103,7 +103,7 @@ form.create-trip-form{
     border: 1px solid #525B65;
     background: #525B65;
     display: flex;
-    width: 100%;
+    width: 80%;
     padding: 1.2rem 6.2rem;
     justify-content: center;
     align-items: center;
@@ -171,3 +171,15 @@ z-index: 0;
     font-weight: 400;
 }
 
+
+.create-trip-btn-cont{
+    background: #F6F6F5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 6rem;
+    padding-bottom: 2rem;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}

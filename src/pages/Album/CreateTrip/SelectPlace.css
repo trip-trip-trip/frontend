@@ -1,6 +1,6 @@
 .select-place{
-    padding: 9rem 0;
-    color: #17171B;
+    padding: 9rem 0 0 0;
+    color: #525B65;
     display: flex;
     background: #F6F6F5;
     flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
@@ -11,11 +11,12 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    position: relative;
 }
 
 .select-place-cont h2 {
     color: #525B65;
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 700;
     padding: 1rem 0 1rem 2.2rem;
 }
@@ -67,6 +68,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 .country-select-bar::-webkit-scrollbar {
     display: none;
 }
@@ -81,53 +83,45 @@
     color: #525B65;
     text-align: center;
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: 500;
     border: none;
     cursor: pointer;
     flex-shrink: 0;
 }
 
 .country-item.active {
-    background-color: black;
+    background-color: #525B65;
     color: white;
     font-weight: 600;
 }
 
-.city-item {
+.city-item{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
     border-bottom: 1px solid #f0f0f0;
     cursor: pointer;
+    margin: 0 2rem;
 }
 
-.city-content {
+.city-content{
+    gap: 1rem;
     display: flex;
-    align-items: center;
-}
-
-.city-image-placeholder {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #f5f5f5;
-    margin-right: 15px;
-    border: 1px dashed #ccc;
-    flex-shrink: 0;
-}
-
-.city-image-placeholder.selected-bg {
-    background-color: #e0e0e0;
+    flex-direction: column;
+    margin: 1.4rem 0;
 }
 
 .city-title {
-    font-weight: 600;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
 }
 
-.city-subtext {
-    font-size: 0.8rem;
-    color: #888;
+.city-spots{
+    font-size: 1.2rem;
+    font-style: normal;
+    font-weight: 400;
+    margin: 0;
 }
 
 .checkbox-placeholder {
@@ -148,58 +142,27 @@
     color: white;
 }
 
-/* --- 하단 액션 바 --- */
-.bottom-action-bar {
-    position: fixed;
-    bottom: 60px; /* Navbar 위에 위치하도록 조정 */
-    left: 0;
-    right: 0;
-    background-color: white;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
+.complete-btn-cont{
+    background: #F6F6F5;
     display: flex;
-    flex-direction: column;
-    transition: transform 0.3s ease-in-out;
-}
-
-.bottom-action-bar.hidden {
-    transform: translateY(100%);
-}
-
-.bottom-action-bar.visible {
-    transform: translateY(0);
-}
-
-.selected-chips-container {
-    display: flex;
-    overflow-x: scroll;
-    padding-bottom: 10px;
-    white-space: nowrap;
-    margin-bottom: 10px;
-    -ms-overflow-style: none; 
-    scrollbar-width: none;
-}
-.selected-chips-container::-webkit-scrollbar {
-    display: none;
-}
-
-.selected-chip {
-    background-color: #f0f0f0;
-    color: black;
-    border-radius: 15px;
-    padding: 5px 12px;
-    margin-right: 8px;
-    font-size: 0.8rem;
-    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    height: 6rem;
+    padding-bottom: 2rem;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 .complete-btn {
-    background-color: black;
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    border: none;
+    border-radius: 3rem;
+    border: 1px solid #525B65;
+    background: #525B65;
+    color: #E0DDD2;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
     cursor: pointer;
+    padding: 1.2rem;
+    width: 80%;
 }

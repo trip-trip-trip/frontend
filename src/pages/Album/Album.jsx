@@ -148,7 +148,6 @@ const Album = () => {
     fetchTrips();
   }, [token, activeTripId]);
 
-
   if (isLoading) {
     return (
       <div className='album'>
@@ -243,7 +242,7 @@ return(
           : <></>}
         {/* 활성화된 여행 있으면 표시 */}
         <div className="album-active-cont">
-          {activeTripInfo
+          {activeTripId
             ? <ActiveTrip tripName={activeTripInfo?.title}
                           members={activeTripInfo?.members || []}
                           img={activeTripInfo?.image || []}
