@@ -26,16 +26,7 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
   }
 
   return (
-    <div className='active-trip-container' onClick={()=>navigate(`/trips/detail/${tripId}`, {
-      state: {
-          tripState: 'active',
-          tripId: tripId,
-          title: title,  
-          startDate: startDate,
-          endDate: endDate,
-          members:members,
-      }
-    })}>
+    <div className='active-trip-container'>
       <div className="active-header">
         <div className="active-trip-title">
           <h2>지금 <span>{tripName}</span> 여행중 </h2>
@@ -55,7 +46,16 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
           <h1 className='ticket-title'>Now Traveling</h1>
           <div className="active-info-cont">
             {/* 티켓 왼쪽 */}
-            <div className="active-ticket-detail">
+            <div className="active-ticket-detail" onClick={()=>navigate(`/trips/detail/${tripId}`, {
+              state: {
+                  tripState: 'active',
+                  tripId: tripId,
+                  title: title,  
+                  startDate: startDate,
+                  endDate: endDate,
+                  members:members,
+              }
+            })}>
               <div className="active-album-date">
                 <h5 className='left-date'>{startDate.split('-')}</h5>
                 <p>-------------</p>
@@ -101,12 +101,10 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
         
           </div>
           
-            <button className="main-edit-btn-cont"  onClick={handleEditClick}>
-            <div className="main-edit-btn" >
+            <div className="main-edit-btn" onClick={handleEditClick}>
               <img src={write_icon} alt="" />
               <p>수정하기</p>
           </div>
-            </button>
         </div>
       
   )
