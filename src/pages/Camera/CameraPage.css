@@ -25,7 +25,7 @@ html,body,#root{
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background-color: #000; /* 검은색 헤더 */
+  background-color: #E0DDD2; /* 검은색 헤더 */
   color: #fff;
   position: relative;
   z-index: 10;
@@ -63,12 +63,12 @@ html,body,#root{
 
 /* 카메라 뷰 컨테이너 */
 .camera-view-container {
-  flex-grow: 1; /* 남은 공간을 모두 차지 */
+ aspect-ratio: 9 / 16;/* 남은 공간을 모두 차지 */
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #000; /* 배경 검은색 */
+  background-color: transparent; /* 배경 검은색 */
   overflow: hidden; /* 웹캠이 넘치지 않도록 */
 }
 
@@ -88,7 +88,54 @@ html,body,#root{
 .webcam-feed.environment {
   transform: scaleX(1); /* 후면 카메라일 때 원래대로 */
 }
+.film-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* 클릭 통과 */
+  z-index: 5;
+}
 
+/* 프레임 이미지: 화면 꽉 채우기 */
+.film-frame-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; /* 프레임이 찌그러져도 화면에 딱 맞게 */
+  z-index: 6;
+  opacity:0.5;
+}
+
+/* 텍스처: 화면 꽉 채우고 혼합 모드 적용 */
+.film-texture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 텍스처는 꽉 채움 */
+  z-index: 7; /* 프레임보다 위에 */
+   filter: none;
+ mix-blend-mode: overlay;
+ opacity: 0.5;
+
+}
+
+.film-date-stamp {
+  position: absolute;
+  bottom: 3%;
+  right: 8%;
+  color: #FFB800;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  font-size: 1.4rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  z-index: 8;
+}
 /* '3' 카운트다운 오버레이 */
 .countdown-overlay {
   position: absolute;
@@ -116,13 +163,19 @@ html,body,#root{
   flex-direction: column;
   align-items: center;
   position: relative;
+  border-radius: 15px;
   z-index: 30;
-  transition: all 0.3s ease;
+  transform: translateY(0);
+  transition: transform 0.35s ease;
+   padding: 0.35s ease;
 }
 
 /* 필터창이 열리면 바가 위로 살짝 올라오는 느낌을 원하시면 padding 조정 가능 */
 .camera-controls-bar.filter-open {
     padding-top: 10px;
+    transform: translateY(-18px); 
+    justify-content: center; 
+  gap: 120px;
 }
 
 /* (1) 모드 선택 캡슐 버튼 */
