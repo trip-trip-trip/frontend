@@ -86,7 +86,7 @@ const App = () => {
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail/:tripId' element={<TripDetail/>}/>
         <Route path='/trips/detail/:tripId/edit' element={<EditTrip/>}/>
-        <Route path='/trips/shared' element={<SharedList/>}/>
+        <Route path='/trips/:tripId/shared' element={<SharedList/>}/>
         <Route path='/trips/detail/:tripId/share' element={<SharePhoto/>}/>
         <Route path='/trips/detail/:tripId/vid' element={<VideoDetail/>}/>
         <Route path='/trips/detail/:tripId/pic' element={<PhotoDetail/>}/>

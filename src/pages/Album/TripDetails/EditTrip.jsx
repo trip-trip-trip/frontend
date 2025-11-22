@@ -69,7 +69,7 @@ const EditTrip = () => {
             </div>
             <h3>제목</h3>
             <div className="input-field">
-              <input type="text" value={name} placeholder='예: 제주도 가족여행' onChange={(e)=>setName(e.target.value)} />
+              <input type="text" value={name} maxLength={7} placeholder='예: 제주도 가족여행' onChange={(e)=>setName(e.target.value)} />
             </div>
             <h3>일정</h3>
             {!isCompleted && 
