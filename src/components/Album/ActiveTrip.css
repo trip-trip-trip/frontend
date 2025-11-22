@@ -101,6 +101,7 @@
     flex-direction: column;
     width: 71%;
     align-items: center;
+    cursor: pointer;
 }
 
 
@@ -236,15 +237,10 @@
     cursor: pointer;
 }
 
-.main-edit-btn-cont{
-    background: none;
-    background-color: none;
-    border: none;
-}
-
-.main-edit-btn button{
+.main-edit-btn{
     border-bottom: 0.1rem solid #525B65;
     background: none;
+    cursor: pointer;
 }
 
 .main-edit-btn img{

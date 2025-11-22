@@ -24,7 +24,6 @@ const SelectPic = () => {
     const selectedPicNum = location.state?.selectedPicNum;
     const selectedFrameUrl = location.state?.selectedFrameUrl;
     const selectedFrameId = location.state?.selectedFrameId;
-    const picList = location.state?.picList || [];
 
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedTripTitle, setSelectedTripTitle] = useState('클릭하여 여행 선택');
@@ -127,6 +126,7 @@ const SelectPic = () => {
           // 선택 추가: 4장 미만일 때만 추가
           if (selectedPics.length < selectedPicNum) {
               setSelectedPics(prev => [...prev, picUrl]);
+              console.log(currentPicList);
           } else {
               alert(`최대 ${selectedPicNum}장까지만 선택할 수 있습니다!`);
           }

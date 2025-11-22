@@ -111,18 +111,17 @@ const CreateScrap = () => {
           }
 
           const fd = new FormData();
-          // 파일명은 'scrapbook.png', MIME 타입은 'image/png'로 가정합니다.
           fd.append("file", fileBlob, `scrapbook_${Date.now()}.png`); 
 
           // 'meta' 필드는 JSON을 Blob으로 변환하여 추가합니다.
           const metaData = {
               "media": {
-                  "tripId": tripId,
+                  "tripId": `${tripId}`,
                   "mediaKind": "PHOTO",
                   "captureType": "SCRAPBOOK",
                   "comment": '' 
               },
-              "tripId": tripId,
+              "tripId": `${tripId}`,
               "title": 'New Scrapbook'
           };
           const metaBlob = new Blob([JSON.stringify(metaData)], { type: "application/json" });
