@@ -42,7 +42,7 @@ const SharePhoto = () => {
             throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
         }
         const data = await response.json();
-        const fetchedMedia = data.result[0].contents;
+        const fetchedMedia = data.result.contents;
 
         // PHOTO, SCRAPBOOK, REEL 미디어를 하나의 목록으로 통합
         const aggregatedMedia = [

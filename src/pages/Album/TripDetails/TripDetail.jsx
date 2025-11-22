@@ -22,9 +22,11 @@ const TripDetail = () => {
 
   const navigate = useNavigate();
   const { token } = useAuth();
-  const { tripId } = useParams();
+  const params = useParams();
   const location = useLocation();
   const todayDate = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  const tripId = params.tripId || location.state?.tripId;
 
   const [currentTripStatus, setCurrentTripStatus] = useState(location.state?.tripState || 'active');
   const [inviteInfo, setInviteInfo] = useState([]);
