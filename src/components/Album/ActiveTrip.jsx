@@ -22,7 +22,7 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
   // 수정 버튼 핸들러
   const handleEditClick = (e) => {
       e.stopPropagation();
-      navigate(`trips/detail/${tripId}/edit`); 
+      navigate(`/trips/detail/${tripId}/edit`); 
   }
 
   return (

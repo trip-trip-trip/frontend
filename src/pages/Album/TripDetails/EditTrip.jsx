@@ -47,9 +47,6 @@ const EditTrip = () => {
   }, [oneday, startDate]);
 
 
-  // =======================================================
-  // 💡 STEP 1: 기존 데이터 불러오기 (GET)
-  // =======================================================
   const fetchTripInfo = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -93,14 +90,11 @@ const EditTrip = () => {
 
         setTripInfo(initialData);
 
-        // 💡 Original Data Ref에 저장: 비교의 기준이 됩니다.
         originalTripRef.current = initialData; 
 
         // 당일치기 여부 설정
         setOneday(startDate === endDate);
 
-        // 여행 상태 설정 (API에서 status를 직접 받거나, 날짜 비교로 설정)
-        // 여기서는 API 응답에 status가 있다고 가정
         setCurrentTripStatus(status || 'pending');
         
       }
@@ -119,10 +113,6 @@ const EditTrip = () => {
     }
   }, [token, tripId, fetchTripInfo]) // 의존성 배열에 fetchTripInfo 추가
 
-
-  // =======================================================
-  // 💡 변경된 필드만 추출하는 헬퍼 함수
-  // =======================================================
   const getChanges = () => {
     const original = originalTripRef.current;
     if (!original) return {};
@@ -157,9 +147,7 @@ const EditTrip = () => {
     return changes;
   };
 
-  // =======================================================
-  // 💡 STEP 2: 수정된 데이터 전송 (PATCH)
-  // =======================================================
+
   const editTrip = async (requestBody) => {
     setIsLoading(true);
 
@@ -196,9 +184,7 @@ const EditTrip = () => {
   };
 
   
-  // =======================================================
-  // 💡 버튼 클릭 핸들러: 변경 사항 확인 및 PATCH 호출
-  // =======================================================
+
   const handleEditBtn = async () => {
     if (isCompleted) {
         alert("이미 완료된 여행은 수정할 수 없습니다.");

@@ -220,28 +220,6 @@ const Album = () => {
       // console.log(activeTripInfo);
     }
   }
-
-  // 상단(헤더) <+> 클릭시 동작
-  const handleCreateBtn = () => {
-    if (activeTripId){
-      alert("이미 활성화된 여행이 있어 새 여행을 만들 수 없습니다.")
-      navigate('/trips');
-    } else {
-      navigate('/trips/create')
-    }
-  }
-
-  // // CreateTrip에서 생성한 newTrip 읽기
-  // useEffect(() => {
-  //   const newActiveTrip = location.state?.newActiveTrip;
-  //   if (newActiveTrip && !activeTrip) {
-  //     setActiveTripInfo(newActiveTrip);
-  //     setHasActiveTrip(true);
-  //   }
-  // }, [location.state, activeTrip]);
-
-
-  
   
 return(
     <div className='album'>
