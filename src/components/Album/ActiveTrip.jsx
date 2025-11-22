@@ -12,6 +12,19 @@ import write_icon from '/icons/write_icon.png'
 
 const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmCount, vidCount}) => {
     const navigate = useNavigate();
+
+    // 카메라 버튼 핸들러
+    const handleCameraClick = (e) => {
+      e.stopPropagation();
+      navigate(`/camera/${tripId}`, {state: {tripState: 'active'}} );
+  }
+
+  // 수정 버튼 핸들러
+  const handleEditClick = (e) => {
+      e.stopPropagation();
+      navigate(`trips/detail/${tripId}/edit`); 
+  }
+
   return (
     <div className='active-trip-container' onClick={()=>navigate(`/trips/detail/${tripId}`, {
       state: {
@@ -75,7 +88,7 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
 
             {/* 티켓 오른쪽 */}
             <div className="goto-camera">
-              <img src={camera_btn} alt="" className='goto-camera-btn' onClick={()=>navigate(`/camera/${tripId}`, {state: {tripState: 'active'}} )} />
+              <img src={camera_btn} alt="" className='goto-camera-btn' onClick={handleCameraClick} />
               <div className="goto-camera-cont">
                   <img src={camera_icon} alt="" />
                   <h6>촬영하기</h6>
@@ -88,8 +101,8 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
         
           </div>
           
-            <button>
-            <div className="main-edit-btn" onClick={()=>navigate(`trips/detail/${tripId}/edit`)}>
+            <button onClick={handleEditClick}>
+            <div className="main-edit-btn" >
               <img src={write_icon} alt="" />
               <p>수정하기</p>
           </div>

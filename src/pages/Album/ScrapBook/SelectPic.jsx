@@ -44,7 +44,7 @@ const SelectPic = () => {
       if (!token) {
         console.error("인증 토큰(accessToken)이 로컬 스토리지에 없습니다. 로그인 상태를 확인하세요.");
         setIsLoading(false);
-        // navigate('/login');
+        navigate('/login');
         return;
       }
 
@@ -77,7 +77,10 @@ const SelectPic = () => {
           const tripData = {
             id: trip.id,
             title: trip.title,
-            image: contents.photos.map(p => p.media.url),
+            image: contents.photos.map( p => ({
+              tripId : p.media.tripId,
+              url : p.media.url,
+            })),
             endDate: trip.endDate,
           };
 
@@ -88,7 +91,6 @@ const SelectPic = () => {
 
         setCompletedTrips(completedList);
 
-        // **초기 사진 목록 설정 로직**
         let initialTrip;
 
         if (initialTripId) {
