@@ -8,6 +8,7 @@ import wait_icon from '/icons/request_wait.png'
 import shared_icon from '/icons/shared_list.png'
 import cancel_btn from '/icons/cancel_btn.png'
 import dropdown_icon from '/icons/dropdown_icon.png'
+import { useLocation } from 'react-router-dom';
 
 // 📝 API 응답을 가정한 더미 데이터
 const tripData = {
@@ -45,38 +46,33 @@ const DropdownIcon = ({ isOpen }) => (
 const SharedList = () => {
     const [isPendingOpen, setIsPendingOpen] = useState(true);
     const [isMembersOpen, setIsMembersOpen] = useState(true);
-    
-    // 💡 useState 초기값은 빈 배열로 설정
+    const location = useLocation();
+
+    const invitationData = location.state?.inviteInfo || [];
+    const tripName = location.state?.name || '';
+    const startDate = location.state?.startDate || '';
+    const endDate = location.state?.endDate || '';
+
     const [confirmedMembers, setConfirmedMembers] = useState([]);
     const [pendingInvitations, setPendingInvitations] = useState([]);
-    
-    // 💡 useState 초기값은 tripData에서 직접 가져오도록 설정
-    const [startDate, setStartDate] = useState(tripData.startDate);
-    const [endDate, setEndDate] = useState(tripData.endDate);
 
 
-    // 🚀 useEffect를 사용하여 컴포넌트 마운트 시점에 한 번만 데이터 가공 및 상태 설정
     useEffect(() => {
         const pendingList = [];
         const confirmedList = [];
         
-        tripData.invitations.forEach((i) => { // map 대신 forEach 사용 권장
+        invitationData.forEach((i) => { // map 대신 forEach 사용 권장
             if (i.status === "PENDING"){
                 pendingList.push(i);
-            } else if (i.status === "ACCEPTED" || i.status === "OWNER_STATUS") { // 확정 상태 추가
+            } else if (i.status === "ACCEPTED") { // 확정 상태 추가
                 confirmedList.push(i)
             }
         });
         
-        // 상태 설정 (컴포넌트 마운트 시 한 번만 실행)
         setConfirmedMembers(confirmedList);
         setPendingInvitations(pendingList);
         
-        // 날짜 상태는 이미 useState 초기값으로 설정되었으나, tripData에 없었다면 여기서 설정 가능
-        // setStartDate(tripData.startDate); 
-        // setEndDate(tripData.endDate); 
-        
-    }, []); // 💡 빈 배열 의존성: 컴포넌트 마운트 시 딱 한 번만 실행
+    }, [invitationData]); // 💡 빈 배열 의존성: 컴포넌트 마운트 시 딱 한 번만 실행
 
     const handleEditClick = () => {
         alert("여행 수정 페이지로 이동합니다.");
@@ -89,7 +85,7 @@ const SharedList = () => {
             {/* 여행정보 */}
             <div className='trip-detail-container'>
               <div className="trip-info-section">
-                <h1>{tripData.tripTitle}</h1> 
+                <h1>{tripName}</h1> 
                 <div className="date-edit-section">
                   <div className="date-range">
                     {/* 💡 상태 변수를 사용하거나, tripData 값을 바로 사용 */}

@@ -27,6 +27,7 @@ const TripDetail = () => {
   const todayDate = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const [currentTripStatus, setCurrentTripStatus] = useState(location.state?.tripState || 'active');
+  const [inviteInfo, setInviteInfo] = useState([]);
   // 사진 공유 여부 표시(isShared)
   const [showShared, setShowShared] = useState(false);
   // Fetch 해온 여행 기본 정보 저장
@@ -45,6 +46,7 @@ const TripDetail = () => {
   
   // 로딩상태 표시
   const [isLoading, setIsLoading] = useState(true);
+  const [isPending, setIsPending] = useState(false);
 
 
   const handleToggleShared = (e) => {
@@ -146,10 +148,44 @@ const TripDetail = () => {
     }
   };
 
+  //여행 초대 정보
+  const fetchTripInvite = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/trips/${tripId}/invite`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+      }
+      const data = await response.json();
+      const fetchedInvitation = data.result;
+
+      if (fetchedInvitation.invitations.length > 0){
+        setIsPending(true);
+        setInviteInfo(fetchedInvitation.invitations);
+      }
+
+    } catch (error) {
+      console.error("Error fetching invitation data:", error);
+    } finally{
+      setIsLoading(false);
+    }
+  };
+
   // 컴포넌트 마운트 시 API 호출
   useEffect(() => {
     if (token && tripId) {
       fetchTripDetail();
+      fetchTripInvite();
     }
   }, [token, tripId]); // token 또는 tripId가 변경될 때 다시 호출
 
@@ -303,6 +339,16 @@ const TripDetail = () => {
             <div className="shared-friend">
               <SharedFriends data={tripInfo.members} invite={true} onInviteClick={handleInvite} />
             </div>
+            {isPending &&
+            <div className="pending-shared" onClick={()=>navigate(`/trips/${tripInfo.id}/shared`, 
+              {state : {inviteInfo: inviteInfo,
+                        startDate: tripInfo.startDate,
+                        endDate: tripInfo.endDate,
+                        name: tripInfo.title
+              }})}>
+              수락 대기 중 {'>'}
+            </div>
+            }
           </div>
 
         </div>
