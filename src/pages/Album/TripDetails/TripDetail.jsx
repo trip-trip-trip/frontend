@@ -12,7 +12,7 @@ import more_btn from '/icons/more_btn.png'
 import { useState } from 'react';
 import shared_icon from '/icons/shared_icon.png'
 import { useAuth } from '../../../contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 const TripDetail = () => {
 
@@ -24,9 +24,9 @@ const TripDetail = () => {
   const { token } = useAuth();
   const { tripId } = useParams();
   const location = useLocation();
+  const todayDate = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  const tripState = location.state || 'active';
-
+  const [currentTripStatus, setCurrentTripStatus] = useState(location.state?.tripState || 'active');
   // 사진 공유 여부 표시(isShared)
   const [showShared, setShowShared] = useState(false);
   // Fetch 해온 여행 기본 정보 저장
@@ -81,6 +81,9 @@ const TripDetail = () => {
       const fetchedTripDetail = data.result;
 
       if (fetchedTripDetail && fetchedTripDetail.trip){
+        const tripEndDate = fetchedTripDetail.trip.endDate;
+        const tripStartDate = fetchedTripDetail.trip.startDate;
+
         setTripInfo({
           tripId: fetchedTripDetail.trip.id,
           title: fetchedTripDetail.trip.title,
@@ -92,6 +95,15 @@ const TripDetail = () => {
               tag: fetchedTripDetail.trip.inviteesTagList[index] || ''
           })),
         })
+
+          if (tripEndDate < todayDate) {
+            setCurrentTripStatus('completed');
+        } else if (tripStartDate < todayDate && todayDate < tripEndDate) {
+            // 종료일이 오늘이거나 미래면 'active'
+            setCurrentTripStatus('active');
+        } else{
+          setCurrentTripStatus('pending');
+        }
       }
 
     const photoInfo = (fetchedTripDetail?.contents?.photos || []).map( p => ({
@@ -156,7 +168,7 @@ const TripDetail = () => {
     );
   }
 
-  if (tripState === 'completed') {
+  if (currentTripStatus === 'completed') {
     return (
       <div className='trip-detail'>
         <Header toBack={true}/>
@@ -274,7 +286,7 @@ const TripDetail = () => {
         <Navbar/>
       </div>
     );
-  } else if ( tripState === 'active'){
+  } else if ( currentTripStatus === 'active'){
     return (
       <div className='trip-detail'>
         <Header toBack={true}/>

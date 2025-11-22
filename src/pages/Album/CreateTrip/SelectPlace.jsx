@@ -56,7 +56,7 @@ const SelectPlace = () => {
             return;
         }
 
-        navigate('/trips/create/schedule', { 
+        navigate('/trips/create', { 
             state: { 
               selectedPlace: selectedPlace,     
             } 
@@ -126,7 +126,7 @@ const SelectPlace = () => {
             // 최상위 COUNTRY (parentId가 null) 항목들을 국내/해외로 분류
             allItems.forEach(item => {
                 if (item.parentId === null && item.type === 'COUNTRY') {
-                    if (item.name === 'South Korea') {
+                    if (item.name === '대한민국') {
                       parceDomestic.push(item);   
                     } else {
                       parceOverseas.push(item);
@@ -201,12 +201,12 @@ const SelectPlace = () => {
                         const placeId = cityItem.id; 
                         return (
                             <CityItem 
-                                key={placeId}
-                                cityName={cityItem.name}
-                                spotInfo={cityItem.spots.map(spot => spot.name).join(', ') || ''}
-                                placeId={placeId}
-                                isSelected={isPlaceSelected(placeId)}
-                                onToggle={handlePlaceToggle}
+                              key={placeId}
+                              cityName={cityItem.name}
+                              spotInfo={cityItem.spots.map(spot => spot.name).join(', ') || ''}
+                              placeId={placeId}
+                              isSelected={isPlaceSelected(placeId)}
+                              onToggle={handlePlaceToggle}
                             />
                         );
                     })}
