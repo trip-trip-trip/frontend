@@ -101,7 +101,7 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
         
           </div>
           
-            <button onClick={handleEditClick}>
+            <button className="main-edit-btn-cont"  onClick={handleEditClick}>
             <div className="main-edit-btn" >
               <img src={write_icon} alt="" />
               <p>수정하기</p>
