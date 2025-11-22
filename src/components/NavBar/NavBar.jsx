@@ -100,7 +100,7 @@ const Navbar = () => {
             <div className="upload-popup" onClick={(e) => e.stopPropagation()}>
             <button 
                 className={`popup-item ${isTripActive ? 'disabled' : ''}`}
-                onClick={() => !isTripActive && handleMenuItemClick('/trips/create')}
+                onClick={() => !isTripActive && handleMenuItemClick('/trips/places')}
                 disabled={isTripActive}
             >
                 여행 만들기
