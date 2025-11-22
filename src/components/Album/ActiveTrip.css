@@ -233,6 +233,13 @@
     justify-content: end;
     gap: 0.7rem;
     align-items: center;
+    cursor: pointer;
+}
+
+.main-edit-btn-cont{
+    background: none;
+    background-color: none;
+    border: none;
 }
 
 .main-edit-btn button{

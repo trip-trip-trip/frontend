@@ -11,6 +11,10 @@ import { toBlob } from 'html-to-image';
 import { useAuth } from '../../../contexts/AuthContext';
 
 
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
+
 // === 프레임에 따른 사진 위치 정보 (실제 디자인에 맞게 조정 필요) ===
 const FRAME_POSITIONS = {
     1: [ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
@@ -37,14 +41,13 @@ const FRAME_POSITIONS = {
 };
 
 const CreateScrap = () => {
-    const API_BASE = import.meta.env.PROD 
-    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-    : '/api';
+    
     const location = useLocation();
     const { 
         selectedPics = [], 
         selectedFrameId,
-        selectedFrameUrl 
+        selectedFrameUrl,
+        tripId 
     } = location.state || {};
 
     const scrapRef = useRef(null);
@@ -87,8 +90,7 @@ const CreateScrap = () => {
         alert('이미지 저장에 실패했습니다.');
       }
     };
-
-    // 💾 앨범에 저장하기 (API 연동) 함수
+// API ------------------------------------------
     const handleSaveToAlbum = async () => {
 
       if (!scrapRef.current) {
@@ -115,19 +117,19 @@ const CreateScrap = () => {
           // 'meta' 필드는 JSON을 Blob으로 변환하여 추가합니다.
           const metaData = {
               "media": {
-                  "tripId": selectedPics[0].tripId,
-                  "mediaKind": "PHOTO", // 스크랩북이므로 PHOTO
-                  "captureType": "SCRAPBOOK", // 스크랩북 고유 타입
+                  "tripId": tripId,
+                  "mediaKind": "PHOTO",
+                  "captureType": "SCRAPBOOK",
                   "comment": '' 
               },
-              "tripId": selectedPics[0].tripId,
+              "tripId": tripId,
               "title": 'New Scrapbook'
           };
           const metaBlob = new Blob([JSON.stringify(metaData)], { type: "application/json" });
           fd.append("meta", metaBlob);
 
           // 3. API 요청
-          const res = await fetch("/media/upload/scrapbook", {
+          const res = await fetch(`${API_BASE}/media/upload/scrapbook`, {
               method: "POST",
               headers: { 
                   Authorization: `Bearer ${token}`,
@@ -139,7 +141,7 @@ const CreateScrap = () => {
 
           if (result.isSuccess) {
               alert('스크랩북이 앨범에 성공적으로 저장되었습니다!');
-              // navigate('/album'); 
+              navigate(`/trips/detail/${tripId}`); 
           } else {
               console.error('API 응답 오류:', result);
               alert(`스크랩북 저장에 실패했습니다: ${result.message || '서버 오류'}`);
@@ -149,15 +151,6 @@ const CreateScrap = () => {
           alert('스크랩북을 앨범에 저장하는 중 네트워크 오류가 발생했습니다.');
       }
   };
-  
-    //사진 개수 미달시 뒤로가기
-    if (!selectedFrameId) {
-      return (
-        <div className="error-message">
-          필수 데이터가 부족합니다. <a href="/">처음으로</a>å
-        </div>
-      );
-    }
 
     return (
         <div className='create-scrap'>
