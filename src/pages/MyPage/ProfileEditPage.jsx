@@ -2,7 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
 import defaultProfile from "../../assets/default-profile.png";
-import editIcon from "../../assets/ep_edit.png"; // ⚠️ [확인] 아이콘 경로
+import editIcon from "../../assets/ep_edit.png"; // 아이콘
+import backIcon from "../../assets/back.png"; // 뒤로가기 아이콘
+import NavBar from "../../components/NavBar/NavBar"; // 네비게이션 바
 import "./ProfileEditPage.css"; 
 
 const API_BASE = import.meta.env.PROD 
@@ -13,20 +15,22 @@ export default function ProfileEditPage() {
    const navigate = useNavigate();
    const { user, token, fetchUserProfile } = useAuth();
 
-   const [username, setUsername] = useState(user?.username || "");
-   const [bio, setBio] = useState(user?.bio || "");
-   const [profileImage, setProfileImage] = useState(user?.avatarUrl || defaultProfile); 
+   const [username, setUsername] = useState("");
+   const [tag, setTag] = useState(""); // ID(Tag) 상태 추가
+   const [bio, setBio] = useState("");
+   const [profileImage, setProfileImage] = useState(defaultProfile); 
    const [imageFile, setImageFile] = useState(null); 
-   const [privacy, setPrivacy] = useState(user?.privacy || "public"); // 기본값 public
    
    const [isLoading, setIsLoading] = useState(false);
    const fileInputRef = useRef(null);
    const cameraInputRef = useRef(null);
    const [menuOpen, setMenuOpen] = useState(false);
 
+   // 초기 데이터 로드
    useEffect(() => {
      if (user) {
        setUsername(user.username || "");
+       setTag(user.tag || ""); // 초기 태그 설정
        setBio(user.bio || "");
        setProfileImage(user.avatarUrl || defaultProfile);
      }
@@ -42,49 +46,43 @@ export default function ProfileEditPage() {
       setMenuOpen(false);
    };
 
-   
-const handleCameraClick = () => {
-     cameraInputRef.current.click();
-     setMenuOpen(false);
+   const handleCameraClick = () => {
+      cameraInputRef.current.click();
+      setMenuOpen(false);
    };
 
    const handleDeleteImage = () => {
-     setProfileImage(defaultProfile); 
-     setImageFile(null); 
-     setMenuOpen(false);
+      setProfileImage(defaultProfile); 
+      setImageFile(null); 
+      setMenuOpen(false);
    };
+
    const handleSave = async () => {
-    if (!token) {
-      alert("로그인 정보가 없습니다.");
-      return;
-    }
+    if (!token) return alert("로그인 정보가 없습니다.");
+    
+    if (!username.trim()) return alert("이름을 입력해주세요.");
+    if (!tag.trim()) return alert("ID를 입력해주세요.");
+
     setIsLoading(true);
 
     try {
-      // 1. FormData 생성
       const formData = new FormData();
 
-      // 2. 이미지 파일이 변경되었다면 'file' 키에 추가
       if (imageFile) {
         formData.append("file", imageFile);
       }
 
-      // 3. 나머지 텍스트 데이터(JSON)를 'data' 키에 Blob으로 추가
-      // (백엔드가 요구하는 방식: File은 file에, 나머지는 data에)
       const updateData = {
         username: username,
+        tag: tag, // 수정된 ID(Tag) 전송
         bio: bio,
-        // tag: user.tag // 태그도 수정 가능하다면 추가
       };
 
-      // 🚨 중요: JSON을 Blob으로 감싸고 type을 application/json으로 지정해야 백엔드가 인식함
       formData.append("data", new Blob([JSON.stringify(updateData)], { type: "application/json" }));
 
-      // 4. PATCH 요청 전송
       const res = await fetch(`${API_BASE}/users/me`, {
         method: "PATCH",
         headers: {
-          // 'Content-Type': 'multipart/form-data', // ⚠️ 주의: 이 헤더는 직접 설정하면 안 됩니다! 브라우저가 자동으로 설정함.
           'Authorization': `Bearer ${token}`
         },
         body: formData
@@ -93,11 +91,9 @@ const handleCameraClick = () => {
       const data = await res.json();
       
       if (!res.ok || !data.isSuccess) {
-        // 태그 중복 등 에러 처리
         throw new Error(data.message || "프로필 수정 실패");
       }
 
-      // 5. 수정 성공 시 내 정보 갱신
       if (fetchUserProfile) {
         await fetchUserProfile(token); 
       }
@@ -115,64 +111,90 @@ const handleCameraClick = () => {
 
    return (
       <div className="profile-edit-page">
-         {/* 1. 헤더 (왼쪽 정렬 제목 + 아이콘) */}
+         {/* 1. 헤더 */}
          <header className="edit-header">
-            <div className="header-left">
-                <button className="back-button" onClick={() => navigate(-1)}>&lt;</button>
-                <div className="header-title">
-                    <img src={editIcon} alt="" className="header-icon" />
-                    프로필 수정
-                </div>
-            </div>
-            <button className="save-button" onClick={handleSave} disabled={isLoading}>
-               {isLoading ? "..." : "수정 완료"}
+            <button className="back-button" onClick={() => navigate(-1)}>
+                <img src={backIcon} alt="back" style={{width: 24, height: 24}}/>
             </button>
+            {/* 중앙 정렬을 위한 여백 */}
          </header>
-<main className="edit-content">
+
+         <main className="edit-content">
+            {/* 2. 이미지 섹션 */}
+            <div className="page-title-area" style={{ textAlign: 'left', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '18px' }}>
+            <img src={editIcon} alt="" className="header-icon" style={{ width: '24px', height: '24px' }} />
+            프로필 수정
+         </div>
             <section className="edit-image-section">
-               <img src={profileImage} alt="프로필" className="profile-img" onError={(e)=>e.target.src=defaultProfile}/>
-               <button className="change-image-button" onClick={() => setMenuOpen(true)}>
-                  새로운 프로필 이미지
-               </button>
+               <div className="image-wrapper">
+                   <img src={profileImage} alt="프로필" className="profile-img" onError={(e)=>e.target.src=defaultProfile}/>
+               </div>
+               {/* 피그마처럼 텍스트 버튼으로 변경 */}
+               <div className="change-image-text" onClick={() => setMenuOpen(true)}>
+                  사진 바꾸기
+               </div>
+
+               {/* 이미지 변경 팝업 */}
                {menuOpen && (
-                  <div className="profile-menu active">
-                     <button onClick={() => fileInputRef.current.click()}>앨범에서 선택</button>
-                     <button onClick={handleCameraClick}>사진 찍기</button>
-                     <button onClick={handleDeleteImage} className="delete">기본 이미지로 변경</button>
-                     <button onClick={() => setMenuOpen(false)} className="cancel">취소</button>
-                  </div>
+                  <>
+                    <div className="modal-overlay" onClick={() => setMenuOpen(false)} />
+                    <div className="profile-menu active">
+                       <button onClick={() => fileInputRef.current.click()}>앨범에서 선택</button>
+                       <button onClick={handleCameraClick}>사진 찍기</button>
+                       <button onClick={handleDeleteImage} className="delete">기본 이미지로 변경</button>
+                       <button onClick={() => setMenuOpen(false)} className="cancel">취소</button>
+                    </div>
+                  </>
                )}
             </section>
 
-            {/* 3. 폼 섹션 */}
+            {/* 3. 입력 폼 섹션 */}
             <section className="edit-form-section">
                <div className="form-group">
-                  <label htmlFor="username">아이디 이름</label>
-                  <input id="username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                  <label htmlFor="username">이름</label>
+                  <input 
+                    id="username" 
+                    type="text" 
+                    value={username} 
+                    onChange={(e) => setUsername(e.target.value)} 
+                    placeholder="이름을 입력하세요"
+                  />
                </div>
-               <div className="form-group">
-                  <label htmlFor="bio">프로필 소개</label>
-                  <input id="bio" type="text" value={bio} onChange={(e) => setBio(e.target.value)} />
-               </div>
-            </section>
 
-          
+               <div className="form-group">
+                  <label htmlFor="tag">ID</label>
+                  <input 
+                    id="tag" 
+                    type="text" 
+                    value={tag} 
+                    onChange={(e) => setTag(e.target.value)} 
+                    placeholder="아이디를 입력하세요"
+                  />
+                </div>
+
+               <div className="form-group">
+                  <label htmlFor="bio">소개글</label>
+                  <input 
+                    id="bio" 
+                    type="text" 
+                    value={bio} 
+                    onChange={(e) => setBio(e.target.value)} 
+                    placeholder="소개글을 입력하세요"
+                  />
+               </div>
+
+               {/* 4. 저장하기 버튼 (폼 아래 배치) */}
+               <button className="bottom-save-button" onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? "저장 중..." : "저장하기"}
+               </button>
+            </section>
          </main>
 
-         {/* 팝업 메뉴 */}
-         {menuOpen && (
-            <>
-                <div className="modal-overlay" onClick={() => setMenuOpen(false)} style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.3)', zIndex:99}} />
-                <div className="profile-menu active">
-                    <button onClick={() => fileInputRef.current.click()}>앨범에서 선택</button>
-                    <button onClick={() => {cameraInputRef.current.click(); setMenuOpen(false);}}>사진 찍기</button>
-                    <button onClick={() => {setProfileImage(defaultProfile); setImageFile(null); setMenuOpen(false);}} className="delete">기본 이미지로 변경</button>
-                    <button onClick={() => setMenuOpen(false)} className="cancel">취소</button>
-                </div>
-            </>
-         )}
+         {/* hidden inputs */}
          <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleImageChange} />
          <input type="file" accept="image/*" capture="user" ref={cameraInputRef} style={{ display: "none" }} onChange={handleImageChange} />
+
+         <NavBar current="mypage" />
       </div>
    );
 }
