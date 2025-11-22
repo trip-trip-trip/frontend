@@ -149,15 +149,6 @@ const CreateScrap = () => {
           alert('스크랩북을 앨범에 저장하는 중 네트워크 오류가 발생했습니다.');
       }
   };
-  
-    //사진 개수 미달시 뒤로가기
-    if (!selectedFrameId) {
-      return (
-        <div className="error-message">
-          필수 데이터가 부족합니다. <a href="/">처음으로</a>å
-        </div>
-      );
-    }
 
     return (
         <div className='create-scrap'>
