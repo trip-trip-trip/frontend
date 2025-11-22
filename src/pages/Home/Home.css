@@ -40,3 +40,43 @@
 
 
 
+.home-trip-section {
+  padding: 2rem 0;
+  margin-bottom: 1rem;
+}
+
+.new-trip-container{
+  margin-top: 2rem;
+  padding-top: 1rem; /* 상단 여백 조정 */
+  position: relative;
+  cursor: pointer;
+  background: rgba(224, 221, 210);
+}
+
+.new-trip-container img{
+  width: 100%;
+  height:18rem;      
+  object-fit: contain; 
+}
+
+.new-trip-text{
+  position: absolute;
+  display: flex;
+  top: 56%;
+  align-items: center;
+  gap: 1.1rem;
+  width: 90%;
+  justify-content: center;
+}
+
+.new-trip-text img{
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+.new-trip-text h1{
+  color: #525B65;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
