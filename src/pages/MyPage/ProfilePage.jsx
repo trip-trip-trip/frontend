@@ -29,7 +29,7 @@ export default function ProfilePage() {
      const fetchData = async () => {
        try {
          // 1. [Post] 게시물 목록 가져오기 (썸네일용)
-         const postsRes = await fetch(`${API_BASE}/posts?user_id=${user.id}&feed_type=all`, {
+         const postsRes = await fetch(`${API_BASE}/posts?user_id=${user.id}&feed_type=profile`, {
            headers: { Authorization: `Bearer ${token}` },
          });
          if (postsRes.ok) {
@@ -156,7 +156,7 @@ return (
                key={post.id}
                className="album-item"
                style={thumbUrl ? { backgroundImage: `url(${thumbUrl})` } : { backgroundColor: '#ccc' }}
-               onClick={() => navigate(`/trips/detail`)} 
+               onClick={() => navigate(`/post/${post.id}`)} 
              />
            );
          })}

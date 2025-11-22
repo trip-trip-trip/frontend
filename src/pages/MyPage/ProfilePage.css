@@ -86,7 +86,7 @@
 }
 .profile-userid{
  display: inline-block; /* 글자 크기에 맞춰 배경이 감싸지도록 */
-  background-color: #E0DDD2; /* 요청하신 배경색 */
+  background-color: #E0DDD2; 
   color: #555; /* 글자색 (적절히 조절 가능) */
   font-size: 1.1rem; /* 글자 크기 */
   font-weight: 500;

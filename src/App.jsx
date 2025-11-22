@@ -13,7 +13,9 @@ import PickFrame from './pages/Album/ScrapBook/PickFrame';
 import SelectPic from './pages/Album/ScrapBook/SelectPic';
 import CreateScrap from './pages/Album/ScrapBook/CreateScrap';
 import ProfilePage from './pages/MyPage/ProfilePage';
+import FriendSearchPage from './pages/MyPage/FriendSearchPage'
 import FriendListPage from './pages/MyPage/FriendListPage';
+import UserProfilePage from './pages/MyPage/UserProfilePage';
 import SettingsPage from './pages/MyPage/SettingPage';
 import FeedPage from './pages/MyPage/FeedPage';
 import CameraPage from './pages/Camera/CameraPage'; // 새로 만들 컴포넌트
@@ -110,6 +112,8 @@ const App = () => {
 <Route path="/mypage/edit" element={<ProfileEditPage />} />
         {/* 프로필 하위 페이지들 */}
         <Route path="/mypage/friends" element={<FriendListPage />} />
+        <Route path="/mypage/friends/add" element={<FriendSearchPage />} />
+        <Route path="/user/:userId" element={<UserProfilePage />} />
         <Route path="/mypage/settings" element={<SettingsPage />} />
         <Route path="/mypage/feed" element={<FeedPage />} />
         <Route path="/camera/:tripId" element={<CameraPage />} />
