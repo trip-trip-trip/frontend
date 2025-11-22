@@ -28,6 +28,7 @@ const Album = () => {
 
   const [activeTripInfo, setActiveTripInfo] = useState(null);
   const [completedTrips, setCompletedTrips] = useState([]);
+  const [plannedTrips, setPlannedTrips] = useState([]);
   
   // 친구 초대 요청 존재 여부
   const [hasInviteRequest, setHasInviteRequest]=useState(false);
@@ -103,12 +104,12 @@ const Album = () => {
         const fetchedTrips = data.result || [];
 
         let completedList =[];
-        let newActiveTrip = null;
+        let activeTrips = [];
+        let plannedTrip = [];
 
         fetchedTrips.forEach(item => {
           const trip = item.trip;
           const contents = item.contents;
-          const isCompleted = trip.endDate < todayDate;
           
           const tripData = {
             id: trip.id,
@@ -126,18 +127,34 @@ const Album = () => {
             coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
           };
 
-          if (isCompleted) {
+          if (trip.endDate < todayDate) {
             completedList.push(tripData);
-          } else if (trip.endDate > todayDate) {
-            if (trip.id === activeTripId) {
-              newActiveTrip = tripData;
-            }
+          } else if (trip.startDate > todayDate) {
+            plannedTrip.push(tripData);
+          } else {
+            activeTrips.push(tripData);
           }
-
         });
 
+        activeTrips.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+        let newActiveTrip = null;
+        if (activeTrips.length > 0) {
+            newActiveTrip = activeTrips[0];
+            // 활성 여행 ID가 바뀌었으면 AuthContext의 activeTripId를 업데이트
+            if (newActiveTrip.id !== activeTripId) {
+                // setActiveTripId는 AuthContext에서 로컬스토리지까지 업데이트하는 함수입니다.
+                setActiveTripId(newActiveTrip.id); 
+            }
+        } else {
+            // 진행 중인 여행이 하나도 없다면 activeTripId를 초기화
+            if (activeTripId) {
+                setActiveTripId(null);
+            }
+        }
+        
         setActiveTripInfo(newActiveTrip);
         setCompletedTrips(completedList);
+        setPlannedTrips(plannedTrip);
 
       } catch (error) {
         console.error("Error fetching trips:", error);
