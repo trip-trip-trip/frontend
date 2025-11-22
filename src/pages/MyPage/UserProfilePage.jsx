@@ -87,7 +87,7 @@ const fetchStatsAndPosts = async () => {
 
         // (2) [Trip] 여행 목록 및 개수
         // API: /trips?user_id={userId}
-        const tripRes = await fetch(`${API_BASE}/trips?user_id=${userId}`, {
+        const tripRes = await fetch(`${API_BASE}/trips?user_id=${userId}&feed_type=profile`, {
             headers: getHeaders(),
         });
         if (tripRes.ok) {
@@ -100,7 +100,7 @@ const fetchStatsAndPosts = async () => {
 
         // (3) [Friend] 친구 목록 및 개수
         // API: /users/friendships?user_id={userId}
-        const friendRes = await fetch(`${API_BASE}/users/friendships?user_id=${userId}`, { 
+        const friendRes = await fetch(`${API_BASE}/users/friendships?user_id=${userId}&feed_type=profile`, { 
             headers: getHeaders(),
         });
         if (friendRes.ok) {
