@@ -17,64 +17,66 @@ const SharePhoto = () => {
     
     const [allMedia, setAllMedia] = useState([]);
     const [selectedMediaIds, setSelectedMediaIds] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const {token} = useAuth();
 
-    
-    // 2. 미디어 데이터 로딩 로직 (fetch API 사용)
-    const fetchMedia = useCallback(async () => {
-        if (!tripId) {
-            setError("여행 ID가 존재하지 않습니다.");
-            setLoading(false);
-            return;
-        }
 
+
+     //여행 상세정보
+    const fetchMedia = async () => {
+        setIsLoading(true);
         try {
-            setLoading(true);
-            setError(null);
-            
-            const response = await fetch(`${API_BASE}/trips/${tripId}`);
-            const data = await response.json();
-            
-            if (!response.ok || !data.isSuccess) {
-                throw new Error(data.message || "여행 미디어를 불러오는 데 실패했습니다.");
+        const response = await fetch(
+            `${API_BASE}/trips/${tripId}`,
+            {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
             }
-            
-            const tripData = data.result[0].contents;
-            
-            // PHOTO, SCRAPBOOK, REEL 미디어를 하나의 목록으로 통합
-            const aggregatedMedia = [
-                ...tripData.photos.map(p => p.media),
-                ...tripData.scrapbooks.map(s => s.media).filter(m => m !== null),
-                ...tripData.reelItems.map(r => r.media).filter(m => m !== null)
-            ].map(media => ({
-                mediaAssetId: media.mediaAssetId,
-                url: media.url,
-                isShared: media.isShared,
-                contentType: media.contentType
-            }));
+        );
 
-            setAllMedia(aggregatedMedia);
-            
-            // 초기 선택 상태 설정: 현재 isShared=true 인 미디어를 선택 상태로 설정
-            const initiallySharedIds = aggregatedMedia
-                .filter(media => media.isShared)
-                .map(media => media.mediaAssetId);
-            
-            setSelectedMediaIds(initiallySharedIds);
-
-        } catch (err) {
-            console.error("미디어 로딩 실패:", err);
-            setError(err.message || "여행 미디어를 불러오는 중 알 수 없는 에러가 발생했습니다.");
-        } finally {
-            setLoading(false);
+        if (!response.ok) {
+            throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
         }
-    }, [tripId]);
+        const data = await response.json();
+        const fetchedMedia = data.result[0].contents;
+
+        // PHOTO, SCRAPBOOK, REEL 미디어를 하나의 목록으로 통합
+        const aggregatedMedia = [
+            ...fetchedMedia.photos.map(p => p.media),
+            ...fetchedMedia.scrapbooks.map(s => s.media).filter(m => m !== null),
+            ...fetchedMedia.reelItems.map(r => r.media).filter(m => m !== null)
+        ].map(media => ({
+            mediaAssetId: media.mediaAssetId,
+            url: media.url,
+            isShared: media.isShared,
+            contentType: media.contentType
+        }));
+
+        setAllMedia(aggregatedMedia);
+        
+        // 초기 선택 상태 설정: 현재 isShared=true 인 미디어를 선택 상태로 설정
+        const initiallySharedIds = aggregatedMedia
+            .filter(media => media.isShared)
+            .map(media => media.mediaAssetId);
+        
+        setSelectedMediaIds(initiallySharedIds);
+
+        } catch (error) {
+            console.error("Error fetching trip data:", error);
+        } finally{
+            setIsLoading(false);
+        }
+    };
+
+
 
     useEffect(() => {
         fetchMedia();
-    }, [fetchMedia]);
+    }, []);
 
 
     // 이미지 개별 선택/선택 해제
@@ -135,7 +137,7 @@ const SharePhoto = () => {
     };
 
     // 로딩 및 에러 처리
-    if (loading) {
+    if (isLoading) {
         return <div>미디어를 불러오는 중입니다...</div>;
     }
     if (error) {

@@ -19,7 +19,13 @@ const PickFrame = () => {
 
   const location = useLocation();
   const [tripId, setTripId] = useState();
-  setTripId(location.state?.tripId);
+  
+  useEffect(() => {
+    if (location?.state?.tripId) {
+      setTripId(location.state.tripId);
+    }
+  }, [location]);
+
   const API_BASE = import.meta.env.PROD 
       ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
       : '/api';
