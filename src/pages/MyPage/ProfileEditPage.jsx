@@ -116,15 +116,15 @@ export default function ProfileEditPage() {
             <button className="back-button" onClick={() => navigate(-1)}>
                 <img src={backIcon} alt="back" style={{width: 24, height: 24}}/>
             </button>
-            <div className="header-title">
-                <img src={editIcon} alt="" className="header-icon" />
-                프로필 수정
-            </div>
-            <div style={{width: 24}}></div> {/* 중앙 정렬을 위한 여백 */}
+            {/* 중앙 정렬을 위한 여백 */}
          </header>
 
          <main className="edit-content">
             {/* 2. 이미지 섹션 */}
+            <div className="page-title-area" style={{ textAlign: 'left', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '18px' }}>
+            <img src={editIcon} alt="" className="header-icon" style={{ width: '24px', height: '24px' }} />
+            프로필 수정
+         </div>
             <section className="edit-image-section">
                <div className="image-wrapper">
                    <img src={profileImage} alt="프로필" className="profile-img" onError={(e)=>e.target.src=defaultProfile}/>
@@ -170,8 +170,7 @@ export default function ProfileEditPage() {
                     onChange={(e) => setTag(e.target.value)} 
                     placeholder="아이디를 입력하세요"
                   />
-                  <span className="input-helper">고유한 사용자 ID입니다.</span>
-               </div>
+                </div>
 
                <div className="form-group">
                   <label htmlFor="bio">소개글</label>
