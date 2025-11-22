@@ -1,124 +1,206 @@
-/* src/pages/Camera/CaptureCompletePage.css */
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #2c2c2c; /* 전체 배경 어둡게 */
+}
 
 .capture-complete-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%; 
-  background-color: #515151; /* 피그마 배경색 */
-  color: #fff;
+  height: 100dvh;
+  max-width: 43rem;
+  margin: 0 auto;
+  background-color: #2c2c2c; /* 하단 코멘트 섹션과 이어지는 배경 */
+  position: relative;
 }
 
-/* 헤더 스타일 */
+/* 1. 상단 헤더 (베이지색) */
 .capture-header {
+  height: 50px;
+  background-color: #E0DDD2; /* 요청하신 색상 */
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 15px;
-  position: relative;
-  flex-shrink: 0; /* 헤더 크기 고정 */
+  padding: 0 15px;
+  flex-shrink: 0;
 }
 
 .capture-header .back-button {
-  position: absolute;
-  left: 15px;
   background: none;
   border: none;
-  color: #fff;
-  font-size: 24px;
-  cursor: pointer;
   padding: 0;
-}
-
-.capture-header .header-title {
-font-size: 1.8rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-/* 메인 콘텐츠 영역 (헤더/푸터 제외) */
-.content-area {
-  flex-grow: 1; /* 남은 공간 모두 차지 */
-  padding: 20px;
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto; /* 내용 길어지면 스크롤 (필요시) */
-}
-
-/* 미리보기 */
-.preview-wrapper {
-  position: relative; /* 오버레이 텍스트 위치 지정을 위해 */
-  width: 100%;
-  height: 300px; /* 미리보기 영역 높이 (조절 가능) */
-  overflow: hidden; /* 블러 처리된 부분이 넘치지 않도록 */
-  background-color: #f0f0f0; /* 로딩 중 배경색 */
-  display: flex; /* 내부 요소 중앙 정렬용 */
-  justify-content: center;
   align-items: center;
 }
 
-.blurred-preview {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 이미지가 잘리지 않게 꽉 채움 */
-  filter: blur(20px); /* 블러 효과 적용 (20px는 강도, 조절 가능) */
-  transform: scale(1.1); /* 블러 처리 시 테두리 빈 공간 안 보이게 살짝 확대 */
+.capture-header .back-button img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
-/* 코멘트 박스 */
-.blur-overlay-text {
+/* 2. 서브 헤더 (검은색 바 - 다시 찍기) */
+.sub-header-bar {
+  height: 40px;
+  background-color: #1A1A1A; /* 요청하신 색상 */
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.retake-text {
+  color: #fff;
+  font-size: 14px;
+  text-decoration: underline; /* 밑줄 */
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* 스크롤 가능한 콘텐츠 영역 */
+.content-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 3. 프리뷰 컨테이너 */
+.preview-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4; /* 대략적인 비율, 필요시 height: 400px 등으로 고정 가능 */
+  overflow: hidden;
+  background-color: #000;
+}
+
+.blurred-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(15px); /* 강한 블러 */
+  opacity: 0.8; /* 살짝 어둡게 */
+  transform: scale(1.1); /* 블러 테두리 깨짐 방지 확대 */
+}
+
+/* 오버레이 콘텐츠 (아이콘 + 텍스트) */
+.preview-overlay-content {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
-  font-size: 1.8rem; /* 18px */
-  font-weight: 600;
-  text-align: center;
-  width: 80%;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* 가독성을 위한 그림자 */
-  pointer-events: none; /* 텍스트가 클릭 방해하지 않도록 */
-}
-
-.comment-box{
-    width:100%;
-}
-/* 코멘트 박스 */
-.comment-box textarea {
-width: 100%;
-  height: 100px;
-  background-color: #333;
-  border: 2px dashed #888;
-  border-radius: 8px;
-  padding: 10px;
-  color: #fff;
-  font-family: 'Pretendard', sans-serif;
-  font-size: 1.6rem;
-  resize: none;
-  box-sizing: border-box;
-}
-
-.comment-box textarea::placeholder {
-  color: #aaa;
-}
-/* 하단 저장 버튼 */
-.footer-area {
-  padding: 20px;
-  flex-shrink: 0; /* 푸터 크기 고정 */
-}
-
-.save-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 15px;
-  background-color: #007aff; /* 피그마의 파란색 (정확한 헥스 코드로 변경하세요) */
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
+  z-index: 10;
 }
 
-.save-button:hover {
-  background-color: #0056b3;
+.film-overlay-icon {
+  width: 100%; /* 피그마처럼 화면 가로로 꽉 차는 필름 이미지 */
+  max-width: 390px;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.overlay-text-main {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.overlay-text-sub {
+  color: #fff;
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.9;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+/* 4. 코멘트 섹션 */
+.comment-section {
+  background-color: #1A1A1A; /* 어두운 배경 */
+  padding: 20px;
+  flex-grow: 1; /* 남은 공간 채우기 */
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-label {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  margin-left: 4px;
+}
+
+/* 코멘트 박스 (이미지 배경) */
+.comment-input-wrapper {
+  width: 100%;
+  /* 비율 유지하며 높이 설정 (이미지 비율에 따라 조절 필요) */
+  min-height: 120px; 
+  background-repeat: no-repeat;
+  background-size: 100% 100%; /* 이미지를 박스에 꽉 채움 */
+  padding: 20px; /* 이미지 테두리 안쪽 여백 */
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+}
+
+.transparent-textarea {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+.transparent-textarea::placeholder {
+  color: #888;
+}
+
+/* 5. 하단 저장 버튼 */
+.footer-area {
+  background-color: #1A1A1A; /* 코멘트 섹션과 동일 */
+  padding: 0 20px 30px 20px; /* 하단 여백 */
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.img-save-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  max-width: 350px; /* 버튼 최대 너비 */
+  transition: transform 0.1s;
+}
+
+.img-save-button:active {
+  transform: scale(0.98);
+}
+
+.img-save-button img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.img-save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
