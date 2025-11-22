@@ -35,7 +35,7 @@ const PickFrame = () => {
             selectedPicNum: picNum,  
             selectedFrameUrl: frameUrl,
             selectedFrameId: frameId,
-            tripId: tripId
+            tripId: tripId,
         }
     });
   };

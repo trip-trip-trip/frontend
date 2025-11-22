@@ -261,7 +261,7 @@ const TripDetail = () => {
               </div>
             </div>
   
-            <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { tripId: tripInfo.id } } )}>
+            <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { tripId: tripInfo.tripId } } )}>
               <h1>스크랩북 만들기</h1>
             </button>
   
