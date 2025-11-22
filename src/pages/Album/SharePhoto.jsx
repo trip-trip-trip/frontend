@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// import axios from 'axios'; // axios 대신 fetch 또는 custom client 사용
 import './SharePhoto.css';
 import shared_icon from '/icons/shared_icon.png';
 import Header from '../../components/Header/Header';
 import Navbar from '../../components/NavBar/NavBar';
 import { useAuth } from '../../contexts/AuthContext';
 
-// 1. API BASE URL 설정 (제공된 환경 변수 사용)
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
@@ -36,16 +34,13 @@ const SharePhoto = () => {
             setLoading(true);
             setError(null);
             
-            // 여행 상세 정보 및 미디어 목록을 가져오는 API 호출 가정
-            const response = await fetch(`${API_BASE}/trips/${tripId}/details`);
+            const response = await fetch(`${API_BASE}/trips/${tripId}`);
             const data = await response.json();
             
             if (!response.ok || !data.isSuccess) {
-                // HTTP 에러 또는 isSuccess=false인 경우 처리
                 throw new Error(data.message || "여행 미디어를 불러오는 데 실패했습니다.");
             }
             
-            // 데이터 구조에서 미디어 정보 추출 (첫 번째 결과만 사용)
             const tripData = data.result[0].contents;
             
             // PHOTO, SCRAPBOOK, REEL 미디어를 하나의 목록으로 통합
@@ -81,8 +76,6 @@ const SharePhoto = () => {
         fetchMedia();
     }, [fetchMedia]);
 
-    
-    // 3. 핸들러 함수
 
     // 이미지 개별 선택/선택 해제
     const handleSelectShare = (mediaAssetId) => {
@@ -108,7 +101,6 @@ const SharePhoto = () => {
         }
     };
     
-    // 4. API 호출 함수 (공유 상태 변경 - fetch API 사용)
     const handleShare = async () => {
         const requestBody = {
             sharedMediaIds: selectedMediaIds // 선택된 미디어 ID 목록
@@ -133,7 +125,6 @@ const SharePhoto = () => {
                 alert(data.message);
                 navigate(`/trips/${tripId}/detail`); // 성공 후 상세 페이지로 이동
             } else {
-                // 서버에서 isSuccess=false를 보냈거나, HTTP 상태 코드가 에러인 경우
                 throw new Error(data.message || `공유 상태 변경에 실패했습니다. (HTTP Status: ${response.status})`);
             }
         } catch (err) {
@@ -151,7 +142,6 @@ const SharePhoto = () => {
         return <div>오류: {error}</div>;
     }
     
-    // 5. 렌더링
     const isAllSelected = allMedia.length > 0 && selectedMediaIds.length === allMedia.length;
 
     return (
