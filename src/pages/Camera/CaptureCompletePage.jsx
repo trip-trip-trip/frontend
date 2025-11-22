@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const API_BASE = import.meta.env.PROD 
   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
   : '/api';
-
+  
 const CaptureCompletePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ if (!token) {
     endpoint = `${API_BASE}/media/upload`;
     meta = {
       tripId: effectiveTripId,
-      mediaKind: "PHOTO",
+      mediaKind: "MEDIA",
       captureType: "NORMAL",
       comment: comment || " ",
     };
@@ -60,7 +60,7 @@ if (!token) {
       
      media: {
         tripId: effectiveTripId,
-        mediaKind: "VIDEO",
+        mediaKind: "MEDIA",
         captureType: "VIDEO",
         comment: comment || " ",
      },

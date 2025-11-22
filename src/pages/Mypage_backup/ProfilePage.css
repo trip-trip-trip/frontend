@@ -1,0 +1,145 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #F6F6F5; /* 배경색 */
+  overflow-y: auto;
+}
+
+/* 1. 상단바 */
+.profile-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background-color: #F6F6F5;
+}
+.profile-topbar .back-button,
+.profile-topbar .settings-button {
+  background: none;
+  border: none;
+  font-size: 2.4rem;
+  cursor: pointer;
+  color: #333;
+  width: 30px;
+}
+.profile-topbar .header-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* 2. 프로필 헤더 */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 20px 20px;
+}
+
+.profile-image-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid #e0e0e0;
+  background-color: #fff;
+}
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-username {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 4px;
+}
+.profile-bio {
+  font-size: 1.3rem;
+  color: #666;
+  margin-bottom: 16px;
+  text-align: center;
+  line-height: 1.4;
+  max-width: 80%;
+}
+
+/* 편집 버튼 */
+.profile-edit-btn-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #fff;
+  cursor: pointer;
+}
+.edit-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+.profile-edit-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #555;
+}
+
+/* 3. 통계 섹션 */
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 10px 0 20px;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+.stat-num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 2px;
+}
+.stat-label {
+  font-size: 1.2rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 4. 앨범 그리드 */
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 16px 100px;
+}
+
+.album-item {
+  width: 100%;
+  aspect-ratio: 134 / 200; /* 134*200 비율 */
+  border-radius: 8px;
+  background-color: #eee;
+  background-position: center;
+  background-size: cover;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.album-item.add {
+  background-color: #E0DDD2; /* 요청하신 색상 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #fff;
+  font-weight: 300;
+}

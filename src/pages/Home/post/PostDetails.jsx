@@ -1,100 +1,268 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import PostItem from './PostItem';
 import './Post.css';
+import { useAuth } from '../../../contexts/AuthContext'; 
+import Header from '../../../components/Header/Header';
 
-const LS_KEY = 'tripshot_posts';
-const readPosts = () => {
-    try {
-        return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
-    } catch {
-        return [];
-    }
-};
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 const PostDetail = () => {
-    const { id } = useParams();
-    const [post, setPost] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [comments, setComments] = useState([]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
 
-    const currentUserId = "me"; // 로그인 된 유저라고 가정
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
-    useEffect(() => {
-        setLoading(true);
-        const all = readPosts();
-        const found = all.find(p => String(p.id) === id);
+  const isMine = useMemo(() => {
+    if (!post || !user) return false;
+    return Number(post.authorId) === Number(user.id);
+  }, [post, user]);  
 
-        if (found) {
-            const normalized = {
-                ...found,
-                author: found.userName,
-                location: found.location,
-                caption: found.content,
-                images: found.images || (found.image ? [found.image] : []),
-                like_count: found.likes || 0,
-                comment_count: found.comments?.length || 0,
-                comments: [
-                    {
-                        id: 1,
-                        user: { username: "그냥미친사람", avatar_url: "" },
-                        content: "도쿄에 다녀왔대 너무너무 재밌었다 또 가고 싶다.",
-                        created_at: "2025.11.12"
-                    },
-                    {
-                        id: 2,
-                        user: { username: "그냥미친사람", avatar_url: "" },
-                        content: "도쿄에 다녀왔대 너무너무 재밌었다 또 가고 싶다.",
-                        created_at: "2025.11.12"
-                    }
-                ]
-            };
-            setPost(normalized);
-            setComments(normalized.comments);
+  /** 댓글 불러오기 */
+  const fetchComments = useCallback(async () => {
+    if (!id || !token) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/posts/${id}/comments`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('댓글 로드 실패');
+
+      const data = await res.json();
+
+      const commentsList = data.result?.comments || [];
+      setComments(commentsList);
+
+    } catch (err) {
+      console.error(err);
+    }
+  }, [id, token]);
+
+  /** 게시물 + 댓글 로딩 */
+  useEffect(() => {
+    const fetchPostAndComments = async () => {
+      if (!id || !token) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const postRes = await fetch(`${API_BASE}/posts/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!postRes.ok) throw new Error('게시물을 찾을 수 없습니다.');
+
+        const postData = await postRes.json();
+
+        if (!postData.isSuccess) {
+          throw new Error(postData.message || '게시물 로드 실패');
         }
 
+        const p = postData.result;
+        const createdTime = p.created_at || p.createdAt;
+
+        const normalized = {
+          id: p.id,
+          author: p.author?.username || '알 수 없음',
+          author_avatar: p.author?.avatar_url || '/assets/default-avatar.png',
+          authorId: p.author?.id,
+          images: p.media ? p.media.map(m => m.url) : [],
+          image: p.media?.[0]?.url || null,
+          caption: p.caption || '',
+          location: p.location || '',
+          date: createdTime
+            ? new Date(createdTime).toLocaleDateString('ko-KR', {
+                year: 'numeric', month: '2-digit', day: '2-digit'
+              }).replace(/\./g, '.').trim()
+            : '날짜 미상',
+          like_count: p.like_count ?? 0,
+          comment_count: p.comment_count ?? 0,
+          is_liked: !!p.is_liked
+        };
+
+        setPost(normalized);
+
+        await fetchComments();
+
+      } catch (err) {
+        console.error(err);
+        setPost(null);
+
+      } finally {
         setLoading(false);
-    }, [id]);
+      }
+    };
 
-    const isMine = useMemo(() => post?.userName === currentUserId, [post]);
+    fetchPostAndComments();
+  }, [id, token, fetchComments]);
 
-    if (loading) return <div className="post-detail-loading">불러오는 중...</div>;
-    if (!post) return <div className="post-detail-error">게시물을 찾을 수 없습니다.</div>;
+  /** 댓글 작성 */
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) return;
+    if (!token) return alert("로그인이 필요합니다.");
 
-    return (
-        <div className="post-detail-page">
-            <PostItem post={post} isMine={isMine} isDetail={true} />
+    try {
+      const res = await fetch(`${API_BASE}/posts/${id}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ comment: newComment })
+      });
 
-            {/* 댓글 영역 */}
-            <div className="detail-comments-area">
+      const data = await res.json();
 
-                <div className="comments-list-detail">
-                    {comments.map(c => (
-                        <div key={c.id} className="comment-item detail-item">
-                            <div className="comment-line">
-                                <span className="comment-avatar-circle"></span>
+      if (!res.ok || !data.isSuccess) {
+        throw new Error(data.message || '댓글 작성 실패');
+      }
 
-                                <div className="comment-right">
-                                    <div className="comment-header">
-                                        <span className="comment-user">{c.user.username}</span>
-                                        <span className="comment-date">{c.created_at}</span>
-                                    </div>
+      setNewComment("");
+      fetchComments();
 
-                                    <div className="comment-body">{c.content}</div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+    } catch (err) {
+      alert(`댓글 작성 오류: ${err.message}`);
+    }
+  };
+
+  //  댓글 객체에서 실제 commentId를 추출하는 함수
+const extractCommentId = (c) => {
+  return (
+    c.comment_id ??
+    c.commentId ??
+    c.id ??
+    c.comment?.id ??
+    null
+  );
+};
+
+// 댓글 삭제 함수 (모든 경우 대응)
+const handleCommentDelete = async (comment) => {
+  const commentId = extractCommentId(comment);
+
+  if (!commentId) {
+    console.error("❌ 댓글 ID를 찾을 수 없습니다:", comment);
+    alert("댓글 ID를 인식할 수 없습니다.");
+    return;
+  }
+
+  if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/posts/${id}/comment/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (data.isSuccess) {
+      fetchComments();
+    } else {
+      alert(data.message || "댓글 삭제 실패");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("댓글 삭제 중 오류가 발생했습니다.");
+  }
+};
+
+
+  /** UI 렌더링 */
+  if (loading) return <div className="post-detail-loading">불러오는 중...</div>;
+
+  if (!post) return (
+    <div className="post-detail-page">
+      <Header title="" toBack={true} />
+      <div style={{marginTop: 100, textAlign: 'center', color:'#999'}}>
+        게시물을 찾을 수 없습니다.
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="post-detail-page">
+      <Header toBack={true}/>  
+
+      <PostItem post={post} isMine={isMine} isDetail={true} />
+
+      {/* 댓글 영역 */}
+      <div className="detail-comments-area">
+        <div className="comments-list-detail">
+
+          {Array.isArray(comments) && comments.map(c => {
+            const commenter = c.commenter || c.user || {}; 
+            const isCommentMine = Number(commenter.id) === Number(user?.id);
+
+            return (
+              <div key={c.id} className="comment-item detail-item">
+                <div className="comment-line">
+                  <span className="comment-avatar-circle">
+                    <img src={commenter.avatar_url || '/assets/default-avatar.png'} alt="" />
+                  </span>
+
+                  <div className="comment-right">
+                    <div className="comment-header">
+                      <div>
+                        <span className="comment-user">{commenter.username || 'Unknown'}</span>
+                        <span className="comment-date">
+                          {new Date(c.createdAt || c.created_at).toLocaleDateString('ko-KR')}
+                        </span>
+                      </div>
+
+                      <button
+                      onClick={() => handleCommentDelete(c)}
+                      className="comment-delete-btn"
+                      > 삭제 </button>
+
+                    </div>
+
+                    <div className="comment-body">
+                      {c.comment || c.content}
+                    </div>
+
+                  </div>
                 </div>
+              </div>
+            );
+          })}
 
-                {/* 댓글 입력 */}
-                <div className="comment-input-area detail-input">
-                    <input type="text" placeholder="댓글을 입력해주세요..." className="comment-input-field" />
-                    <button className="comment-submit-btn">작성</button>
-                </div>
-            </div>
+          {comments.length === 0 && (
+            <div className="comment-empty">첫 번째 댓글을 남겨보세요!</div>
+          )}
+
         </div>
-    );
+
+        <div className="comment-input-area detail-input">
+          <input 
+            type="text"
+            placeholder="댓글 달기..." 
+            className="comment-input-field"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+          />
+
+          <button 
+            className="comment-submit-btn"
+            onClick={handleCommentSubmit}
+            disabled={!newComment.trim()}
+          >
+            게시
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default PostDetail;

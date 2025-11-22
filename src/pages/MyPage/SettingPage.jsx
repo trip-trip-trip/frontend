@@ -1,18 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SettingPage.css";
 import NavBar from "../../components/NavBar/NavBar";
 import { useAuth } from "../../contexts/AuthContext"; 
 
-const API_BASE =(import.meta.env.VITE_API_BASE_URL || "http://localhost:4000").replace(/\/$/, "");
+// 아이콘 임포트
+import offIcon from "../../assets/off.png";
+import onIcon from "../../assets/on.png";
+import bellIcon from "../../assets/bell.png";
+import settingIcon from "../../assets/setting.png";
 
+const API_BASE = import.meta.env.PROD 
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+  : '/api';
+
+// 유틸 함수: Base64 -> Uint8Array
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);
-
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
@@ -20,15 +27,15 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export default function SettingPage() {
-   const navigate = useNavigate();
-  // 1. [수정] user가 null일 수 있으므로 안전하게 user만 가져옴
-   const { user,token } = useAuth(); 
+  const navigate = useNavigate();
+  const { user, token } = useAuth(); 
 
-   const [isOn, setIsOn] = useState(false); // 2. [수정] 기본값 false로 변경
-   const [alertCount, setAlertCount] = useState(3);
-   const [selectedTimes, setSelectedTimes] = useState(["오전"]);
+  const [isOn, setIsOn] = useState(false); 
+  const [alertCount, setAlertCount] = useState(3);
+  const [selectedTimes, setSelectedTimes] = useState(["오전"]);
 
-    const TIME_RANGES = {
+  //
+  const TIME_RANGES = {
     오전: [7, 12],   // 07~12
     오후: [12, 17],  // 12~17
     저녁: [17, 20],  // 17~20
@@ -37,35 +44,77 @@ export default function SettingPage() {
     점심: [11, 14],  // 11~14
   };
 
-    const buildTimezoneRange = (times) => {
+  const buildTimezoneRange = (times) => {
     const hours = times.flatMap((t) => TIME_RANGES[t] || []);
     if (hours.length === 0) {
-      // 아무것도 선택 안 했으면 기본값 (예: 9~21)
-      return [9, 21];
+      return [9, 21]; // 기본값
     }
     const start = Math.min(...hours);
     const end = Math.max(...hours);
     return [start, end];
   };
 
-    const saveSettingsToBE = async (count, times) => {
-    if (!user||!token) return;
+  const restoreSelectedTimes = (timezone) => {
+    if (!timezone || timezone.length < 2) return ["오전"];
+    const [start, end] = timezone;
+    return Object.entries(TIME_RANGES)
+      // 범위가 겹치는 시간대를 찾음
+      .filter(([_, range]) => !(range[1] <= start || range[0] >= end))
+      .map(([key]) => key);
+  };
 
+  // 1. BE에서 설정 불러오기 (초기화)
+  useEffect(() => {
+    if (!user || !token) return;
+
+    const loadSettingsFromBE = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/push/settings`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error("설정 불러오기 실패");
+
+        const data = await res.json();
+
+        if (data.isSuccess && data.result) {
+          const { timesPerDay, timezone } = data.result;
+          setAlertCount(timesPerDay);
+          // BE에서 받은 [start, end]를 UI용 ["오전", "오후"]로 변환
+          setSelectedTimes(restoreSelectedTimes(timezone));
+          setIsOn(timesPerDay > 0);
+        }
+      } catch (err) {
+        console.error("설정 로드 실패:", err);
+      }
+    };
+
+    loadSettingsFromBE();
+  }, [user, token]);
+
+
+  // 2. 설정을 BE에 저장하는 함수
+  const saveSettingsToBE = async (count, times) => {
+    if (!user || !token) return;
+
+    // 
     const timezone = buildTimezoneRange(times);
-    console.log("BE로 알림 설정 전송:", { timesPerDay: count, timezone });
+    console.log("BE 저장:", { timesPerDay: count, timezone });
 
     try {
-      const res = await fetch(`${API_BASE}/push/settings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" 
-          ,"Authorization": `Bearer ${token}`},
+      const res = await fetch(`${API_BASE}/push/settings`, { 
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify({
           timesPerDay: count,
-          timezone, // [start, end]
+          timezone, 
         }),
       });
 
-      if (!res.ok) {
+     if (!res.ok) {
         const msg = await res.text();
         console.error("설정 저장 실패:", res.status, msg);
         return;
@@ -78,58 +127,39 @@ export default function SettingPage() {
     }
   };
 
-    const handleToggle = async () => {
+  // 3. 토글 핸들러
+  const handleToggle = async () => {
     const nextState = !isOn;
-
-    if (nextState) {
-      // --- 알림 켜기 ---
-      if (!user) {
-        alert("로그인이 필요합니다.");
-        return;
-      }
-      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-        alert("푸시 알림이 지원되지 않는 환경입니다. (홈 화면에 추가 필요)");
-        return;
-      }
-
-      console.log("푸시 알림 구독 시작...");
+    
+    if (nextState) { // ON
+      if (!user || !user.id || !token) return alert("로그인 필요");
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return alert("푸시 미지원");
 
       try {
-        // 1) VAPID 공개 키 받아오기
         const vapidKeyRes = await fetch(`${API_BASE}/push/vapid-key`);
-        if (!vapidKeyRes.ok) {
-          throw new Error(`vapid-key 실패: ${vapidKeyRes.status}`);
-        }
-
-        //  수정: 스펙에 맞게 파싱 (result X)
-        const vapidJson = await vapidKeyRes.json();
-        const vapidPublicKey = vapidJson.vapidPublicKey;
-        if (!vapidPublicKey) {
-          throw new Error("vapidPublicKey 없음");
-        }
-
+        if (!vapidKeyRes.ok) throw new Error('VAPID 키 로드 실패');
+        const vapidData = await vapidKeyRes.json();
+        const vapidPublicKey = vapidData.result?.vapidPublicKey || vapidData.vapidPublicKey;
+        
         const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
-        // 2) 서비스 워커 준비
         const reg = await navigator.serviceWorker.ready;
-
-        // 3) 브라우저에 푸시 구독 요청
         const subscription = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey,
         });
 
-        console.log("구독 성공:", subscription.endpoint);
+               console.log("구독 성공:", subscription.endpoint);
         const { endpoint, keys } = subscription.toJSON();
-
-        // 4) BE 서버로 구독 정보 전송
+        
         const subRes = await fetch(`${API_BASE}/push/subscribe`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-           },
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          },
           body: JSON.stringify({
-            userId: String(user.id), //  String으로 맞춰줌
+            userId: String(user.id), 
             endpoint,
             p256dh: keys.p256dh,
             auth: keys.auth,
@@ -174,61 +204,80 @@ export default function SettingPage() {
       setIsOn(false);
     }
   };
-   // ✅ 시간대 선택
-   const toggleTime = (time) => {
-      setSelectedTimes((prev) =>
-         prev.includes(time)
-            ? prev.filter((t) => t !== time)
-            : [...prev, time]
-      );
-   };
-  
+
+  // 4. 시간대 버튼 클릭 핸들러
+  const toggleTime = (time) => {
+    setSelectedTimes((prev) =>
+      prev.includes(time) ? prev.filter((t) => t !== time) : [...prev, time]
+    );
+  };
+ 
+  // 5. 설정 변경 시 자동 저장 (토글 켜져 있을 때만)
   useEffect(() => {
-    if (isOn) {
+    if (isOn && user && token) { 
       saveSettingsToBE(alertCount, selectedTimes);
     }
   }, [alertCount, selectedTimes, isOn]);
- return (
-    <div className="setting-page"> {/* 1. className 오타 수정 */}
 
+  // 6. 수동 저장 버튼 핸들러
+  const handleManualSave = () => {
+      if (isOn) {
+          saveSettingsToBE(alertCount, selectedTimes);
+          alert("설정이 저장되었습니다.");
+      } else {
+          alert("알림이 꺼져있습니다.");
+      }
+  };
+
+  return (
+    <div className="setting-page"> 
+      {/* 상단바 */}
       <header className="setting-header">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          &lt;
-        </button>
-        <h2 className="header-title">설정</h2>
+        <button className="back-button" onClick={() => navigate(-1)}>&lt;</button>
+        <h2 className="header-title"></h2>
       </header>
 
-
       <main className="setting-content">
+        
+        {/* 페이지 타이틀 */}
+        <div className="page-title-section">
+            <img src={settingIcon} alt="설정" className="page-title-icon" />
+            <h1 className="page-title-text">계정 설정</h1>
+        </div>
+
+        {/* 알림 설정 섹션 */}
         <section className="setting-section">
-          <h3>🔔 알림 설정</h3>
-          <div className="setting-item">
-            <label htmlFor="alert-toggle">순간 기록 알림</label>
-            <label className="switch">
-              <input
-                id="alert-toggle"
-                type="checkbox" /* 2. 따옴표 수정 */
-                checked={isOn}
-                onChange={handleToggle}
-              />
-              <span className="slider"></span>
-            </label>
+         <div className="notification-item">
+             {/* 왼쪽: 벨 아이콘 (원형 배경) */}
+             <div className="notification-icon-wrapper">
+               <img src={bellIcon} alt="bell" className="bell-icon" />
+             </div>
+
+             {/* 가운데: 텍스트 */}
+             <div className="notification-text-wrapper">
+               <span className="notification-title">순간 기록 알림</span>
+               <span className="notification-desc">여행 중 특별한 순간을 놓치지 마세요!</span>
+             </div>
+             <button className="toggle-btn" onClick={handleToggle}>
+               <img src={isOn ? onIcon : offIcon} alt="toggle" className="toggle-icon" />
+             </button>
           </div>
-          <p className="setting-subtext">여행 중 특별한 순간을 놓치지 마세요!</p>
         </section>
 
-        {/* 3. no-border 오타 수정 */}
-        <section className="setting-section no-border">
-          <div className="setting-item">
-            <label htmlFor="alert-count">하루 알림 횟수 </label>
-            {/* 4. 변수 위치 수정 */}
-            <span>{alertCount}회</span>
+        {/* 횟수 설정 섹션 */}
+        <section className="setting-section">
+          <div className="count-row">
+             <span className="count-label">하루 알림 횟수</span>
+             <span className="count-value">{alertCount}회</span>
           </div>
-
-          {/* 5, 6. 구조 오류 수정 */}
+          
           <div className="range-slider-wrapper">
+             <div className="range-labels">
+              <span>1회</span>
+              <span>5회</span>
+              <span>10회</span>
+            </div>
             <input
-              id="alert-count"
               type="range"
               min="1"
               max="10"
@@ -236,14 +285,11 @@ export default function SettingPage() {
               onChange={(e) => setAlertCount(Number(e.target.value))}
               className="range-slider"
             />
-            <div className="range-labels">
-              <span>1회</span>
-              <span>5회</span>
-              <span>10회</span>
-            </div>
+           
           </div>
         </section>
         
+        {/* 시간대 설정 섹션 */}
         <section className="setting-section">
           <h3>알림 시간대</h3>
           <p className="setting-subtext">설정한 시간대에 알림을 받을 수 있어요.</p>
@@ -252,7 +298,7 @@ export default function SettingPage() {
               <button
                 key={t}
                 onClick={() => toggleTime(t)}
-                className={selectedTimes.includes(t) ? "selected" : ""}
+                className={`time-btn ${selectedTimes.includes(t) ? "selected" : ""}`}
               >
                 {t}
               </button>
@@ -260,20 +306,16 @@ export default function SettingPage() {
           </div>
         </section>
 
-        {/* 기타 섹션 (피그마 디자인 반영) */}
-        <section className="setting-section">
-          <h3>기타</h3>
-          <div className="setting-item-row">
-            <span>저장 공간</span>
-            <span className="item-value">2.2GB / 5GB 사용 중</span>
-          </div>
-          <div className="setting-item-row">
-            <span>고객 지원</span>
-            <span className="item-value">&gt;</span>
-          </div>
-        </section>
-
+      
+<div className="save-btn-container">
+          <button className="save-btn" onClick={handleManualSave}>
+              저장하기
+          </button>
+      </div>
       </main>
+
+      {/* 하단 저장 버튼 */}
+      
       
       <NavBar current="mypage" />
     </div>

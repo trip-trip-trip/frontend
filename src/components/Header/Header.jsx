@@ -5,12 +5,14 @@ import logoTop from '../../assets/logoTop.png';
 import go_map from '../../assets/go-map.png';
 import lgt from '../../assets/logout_icon.png'; 
 import { useAuth } from '../../contexts/AuthContext'; // 
+import back_btn from '/icons/back_btn.png'
 
-const Header = ({ title, setTab, currentTab }) => { 
+const Header = ({ title, setTab, currentTab, toBack }) => { 
     const { pathname } = useLocation();
     const navigate = useNavigate();
     const { logout } = useAuth(); 
     const isHome = pathname === '/home';
+    const isAlbum = pathname ==='/trips';
     
     const handleLogout = () => {
         logout(); // Context의 로그아웃 함수 실행
@@ -36,7 +38,7 @@ const Header = ({ title, setTab, currentTab }) => {
 
                 {/* 2. 중앙 - 로고 (Flex-grow로 중앙 정렬 담당) */}
                 <div className="header-center">
-                    {isHome ? (
+                    {(isHome || isAlbum) ? (
                         <img
                             src={logoTop}
                             alt="TripShot"
@@ -47,10 +49,10 @@ const Header = ({ title, setTab, currentTab }) => {
                         <span className="page-title">{title}</span>
                     )}
                 </div>
-
+                
                 {/* 3. 오른쪽 - 지도 아이콘 (대칭되는 flex-basis를 가짐) */}
                 <div className="header-right">
-                    {isHome && (
+                    {(isHome || isAlbum) && (
                         <button
                             className="header-icon-btn" // CSS에서 이미지 크기를 제어할 클래스 사용
                             onClick={() => setTab('place')} 
@@ -63,6 +65,12 @@ const Header = ({ title, setTab, currentTab }) => {
                             />
                         </button>
                     )}
+                    {/* 홈 페이지가 아닐 때는 오른쪽 공간을 비워둡니다. */}
+                {!isHome && !isAlbum && <div className="header-side" />} 
+                {toBack && 
+                    <button className="back-btn" onClick={() => navigate(-1)}>
+                        <img src={back_btn} alt=""/>
+                    </button>}
                 </div>
             </div>
             {/* 탭 구분선 */}

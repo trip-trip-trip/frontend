@@ -1,15 +1,29 @@
 
   .trip-detail{
-    padding: 5rem 0;
-    height: auto;
+    padding: 10rem 0 20rem 0;
     color: #17171B;
+    position: relative;
+    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
+    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
   }
+
   /* 전체 화면 영역 */
   .trip-detail-container {
     display: flex;
     flex-direction: column;
     padding: 0 2rem;
-    gap: 1rem;
+    gap: 1.1rem;
+    position: relative;
+  }
+
+  .trip-detail-container h1{
+    color: #525B65;
+    font-family: Pretendard;
+    font-size: 3rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin: 0;
   }
 
   .trip-detail h2{
@@ -17,94 +31,194 @@
     font-weight: 600;
     padding: 0;
   }
-  
-  /* 공유 토글 & 공유 뱃지 */
-  .share-row {
+
+  /* 공유된 친구 + 공유 사진 관리 컨테이너 */
+  .shared-cont{
     display: flex;
-    flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    margin-top: 0.5rem;
   }
 
-  .share-button{
-    width: 100%;
+  /* 공유 사진 관리하기 버튼 */
+  .share-btn{
+    background: none;
+    border: none;
+    border-bottom: 0.1rem solid #525B65;
     display: flex;
-    justify-content: start;
-  }
-  
-  .share-toggle {
-    display: inline-flex;
-    border-radius: 999px;
-    border: 1px solid #d0d0d0;
-    overflow: hidden;
-  }
-  
-  .share-toggle-btn {
-    border: none;
-    background: #ffffff;
-    padding: 0.2rem 0.9rem;
-    font-size: 1.1rem;
+    align-items: center;
+    gap: 0.4rem;
     cursor: pointer;
+    padding: 0 0.1rem;
   }
-  
-  .share-toggle-btn.active {
-    background: #4285f4;
-    color: #ffffff;
+
+  .share-btn img{
+    width: 1.4rem;
+    height: 1.4rem;
+    padding: 0.4rem 0;
   }
-  
-  .share-pill {
+
+  .share-btn p{
+    color: #525B65;
+    text-align: center;
+    font-family: Pretendard;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin: 0;
+    padding: 0.4rem 0;
+  }
+
+  .display-shared{
+    margin: 1.2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .display-checked{
     border: none;
-    background: #e3f0ff;
-    color: #356ad9;
-    font-size: 1.1rem;
-    padding: 0.3rem 1.3rem;
-    border-radius: 999px;
-    cursor: pointer;
+    background: #E0DDD2;
   }
+
+  .display-shared p{
+    margin: 0;
+    color: #525B65;
+    font-size: 1.4rem;
+    font-weight: 400;
+  }
+
+  .date-and-edit{
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed #525B65;
+  }
+
+  .date-and-edit h3{
+    color: #525B65;
+    font-size: 1.6rem;
+    font-weight: 300;
+    margin: 0 0 0.2rem 0;
+  }
+
+  .edit-btn{
+    background: none;
+    border: none;
+  }
+  
   
   /* 섹션 공통 css */
-  .section {
+  /* .section {
     margin-top: 1.2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    width: 100%;
+  } */
+/* 사진 섹션 */
+  .photo_container{
+    position: relative;
+    width: 100%;
+    margin-top: 1rem;
   }
-  
-  .section-header {
+/* 사진 배경 */
+  .album-cont-img{
+    width: 100%;
+  }
+/* 사진 배경 */
+  .photo-container img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 1;
+  }
+
+  .section-photo-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
+    z-index: 5;
   }
-  
-  .section-title {
-    font-size: 0.8rem;
-    font-weight: 600;
+
+  .photo-cont-title {
+    color: #525B65;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-left: 2rem;
   }
-  
-  .more-button {
+
+  .more-photo-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: none;
     background: transparent;
     font-size: 1.7rem;
     color: #555;
+    margin-right: 1rem;
+    cursor: pointer;
   }
 
-  .more-button:hover{
-    cursor: pointer;
-    text-decoration: underline;
+  /* 사진 그리드 */
+  .photo-grid-cont{
+    position: absolute;
+    top: 6rem;
+    left: 0;
+    width: 100%; /* 부모 전체 너비를 사용하도록 설정 */
+    z-index: 100;
+  }
+
+  .photo-grid {
+    position: relative;
+    margin-top: 0.4rem;
+    margin: 0.4rem 1rem 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+  }
+
+  .photo-item {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* 정사각형 비율 */
+    border-radius: 0.3rem;
+    overflow: hidden;
+  }
+  
+  .photo-item img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.3rem;
+  }
+
+  .shared-link-icon img{
+    padding-left: 0.5rem;
+    width: 1.2rem;
+    height: 2rem;
   }
   
   /* 3초영상 */
   .video-grid {
-    width: 100%;
     height: 25rem;
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     grid-template-rows: repeat(2, 1fr);
-    gap: 1.2rem;
+    gap: 1rem;
+    position: relative;
+    margin: 0.4rem 1rem 0 1rem;
   }
-  
+
   .video-card {
     background: #e6e6e6;
     font-size: 0.7rem;
@@ -122,32 +236,17 @@
     min-height: 7rem;
     border-radius: 0.8rem;
   }
-  
-  /* 사진 그리드 */
-  .photo-grid {
-    margin-top: 0.4rem;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
 
-  .photo-item {
-    position: relative;
-    width: 100%;
-    padding-top: 100%; /* 정사각형 비율 */
-    border-radius: 0.5rem;
-    overflow: hidden;
-  }
-  
-  .photo-item img{
+  /* 영상 그리드 */
+  .video-grid-cont{
     position: absolute;
-    top: 0;
+    top: 6rem;
     left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0.5rem;
+    z-index: 100;
   }
+
+  
 
   /* 스크랩북 버튼 */
   .scrapbook-actions {
@@ -158,22 +257,24 @@
   }
   
   .scrapbook-btn {
-    flex: 1;
-    border-radius: 1.4rem;
-    border: 1px solid #262626;
-    background: #ffffff;
-    padding: 0.75rem 0.4rem;
-    margin-bottom: 3rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    line-height: 1.4;
+    display: flex;
+    padding: 1.2rem 6.2rem;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 3rem;
+    border: 1px solid #525B65;
+    background: #525B65;
     cursor: pointer;
-    color: #17171B;
   }
 
-  .scrapbook-btn:hover{
-    background: #e3e3e3;
-    transition: ease-in-out 0.2s;
+  .scrapbook-btn h1{
+    color: #f5f3e9;
+    text-align: center;
+    font-size: 1.6rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
   }
 
 .scrapbook-btn h1{
@@ -181,4 +282,58 @@
     font-weight: 500;
     margin: 0;
 }
-  
+
+
+/* 비디오 섹션 */
+.video_container{
+  position: relative;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.album-cont-vid{
+  width: 100%;
+}
+
+.video-container img{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 1;
+}
+
+.section-video-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  z-index: 5;
+}
+
+.video-cont-title {
+  color: #525B65;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-left: 2rem;
+}
+
+.more-video-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background: transparent;
+  font-size: 1.7rem;
+  color: #555;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+

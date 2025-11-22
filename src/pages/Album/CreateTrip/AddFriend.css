@@ -1,0 +1,252 @@
+.add-friend{
+    padding: 5rem 0 22rem 0;
+    position: relative;
+    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
+    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+    background: #F6F6F5;
+}
+
+.add-friend-container{
+    margin-top: 5rem;
+    position: relative;
+}
+
+.friend-search{
+    display: flex;
+    gap: 2.4rem;
+    align-items: center;
+    margin-bottom: 2.8rem;
+    padding: 0 2rem;
+}
+
+.friend-search input{
+    display: flex;
+    padding: 2rem 2rem 2rem 4.3rem;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    margin: 0;
+    gap: 1rem;
+    background: #E0DDD2;
+    width: 100%;
+    border: none;
+}
+
+input::placeholder{
+    font-size: 1.4rem;
+    color: #525B65;
+}
+
+.friend-list{
+    display: flex;
+    flex-direction: column;
+}
+
+.friend-list-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 91%;
+    cursor: pointer;
+    padding: 2rem 2rem;
+    transition: ease-in-out 0.2s;
+}
+
+.friend-list-row.selected{
+    background: #E0DDD2;
+    transition: ease-in-out 0.2s;
+}
+
+.friend-profile{
+    display: flex;
+    gap: 1.8rem;
+    align-items: center;
+}
+
+.friend-profile p{
+    color: #525B65;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.friend-profile img{
+    width: 5rem;
+    height: 5rem;
+    border-radius: 5rem;
+    object-fit: cover;
+}
+
+
+.selection-box {
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 0.4rem; 
+    background-color: #E0DDD2; /* 체크 해제 상태 색 */
+    cursor: pointer;
+
+    transition: ease-in-out 0.2s;
+}
+
+/* 체크됐을 때의 배경색 */
+.selection-box.checked {
+    background-color: #525B65;
+    transition: ease-in-out 0.2s;
+}
+
+.friend-search{
+    position: relative;
+}
+
+input[type="search"]{
+    height: 2.3rem;
+    width: 100%;
+}
+
+.friend-search-bar{
+    display: flex;
+}
+
+
+.search-icon{
+    position: absolute;
+    width: 1.5rem;
+    height: 1.5rem;
+    left: 3.5rem;
+    top: 1.2rem;
+}
+
+.search-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    opacity: 0.5;
+  }
+  
+  .friend-search-bar {
+    flex-grow: 1;
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #333;
+    outline: none;
+    padding: 0;
+  }
+  
+  .friend-search-bar::placeholder {
+    color: #a0a0a0;
+  }
+  
+  .friend-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .friend-list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    background-color: #F6F6F5;
+    transition: background-color 0.1s ease;
+  }
+  
+  .friend-profile-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-circle {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background-color: #E0DDD2; /* 프로필 이미지 플레이스홀더 */
+    border: 1px dashed #525B65;
+  }
+  
+  .friend-name {
+    font-size: 16px;
+    color: #333;
+  }
+  /* ///////////////////////////// */
+  /* 하단 선택된 친구 영역 */
+  .selected-friends-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #F6F6F5;
+    border-top: 0.1rem solid #e0e0e0;
+    padding: 1rem 2rem;
+    box-shadow: 0 -0.2rem 0.5rem rgba(0, 0, 0, 0.05);
+    z-index: 10;
+  }
+  
+  .selected-friends-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .selected-friend-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 6rem;
+    cursor: pointer;
+  }
+  
+  .profile-circle.selected-profile {
+    position: relative;
+    width: 5rem;
+    height: 5rem;
+    background-color: #e3dcd1;
+    border: none;
+    margin-right: 0;
+  }
+  
+  .remove-icon {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 20px;
+    height: 20px;
+    background-color: #5f7478; /* X 아이콘 배경색 */
+    color: white;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 18px;
+    text-align: center;
+    font-weight: bold;
+    opacity: 0.9;
+  }
+  
+  .selected-name {
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* 초대 버튼 */
+  .invite-button-wrapper {
+    padding: 1.1rem 2rem;
+    background-color: #F6F6F5;
+    z-index: 20;
+  }
+  
+  .invite-button {
+    width: 100%;
+    padding: 1.5rem 0;
+    background-color: #525B65;
+    color: #E0DDD2;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }

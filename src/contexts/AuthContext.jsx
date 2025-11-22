@@ -11,11 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  // 🔽 1. [수정] 초기값을 localStorage에서 읽어오기
-const [activeTripId, setActiveTripId] = useState(() => {
-    const savedTripId = localStorage.getItem("activeTripId");
-    return savedTripId ? Number(savedTripId) : null;
-  });
+  const [activeTripId, setActiveTripId] = useState(null);
 
   // 🔽 2. [추가] ID를 저장/삭제하는 새 래퍼(wrapper) 함수
   const selectActiveTrip = (tripId) => {
@@ -29,6 +25,46 @@ const [activeTripId, setActiveTripId] = useState(() => {
       setActiveTripId(null);
     }
   };
+
+  const fetchActiveTrip = useCallback(async (currentToken) => {
+    if (!currentToken) return;
+
+    // TODO: 실제 진행 중인 여행을 확인하는 API 엔드포인트로 변경하세요.
+    const TRIP_STATUS_API_URL = `${API_BASE}/trips/isActiveTrips`; 
+
+    try {
+      const res = await fetch(TRIP_STATUS_API_URL, {
+        headers: { Authorization: `Bearer ${currentToken}` },
+      });
+
+      if (!res.ok) {
+        console.error(`여행 상태 API 오류: ${res.status}`);
+        return;
+      }
+
+      const json = await res.json();
+      
+      if (json.isSuccess && json.result) {
+        const { isOngoing, trip } = json.result;
+
+        if (isOngoing && Array.isArray(trip) && trip.length > 0) {
+          // 진행 중인 여행이 있으면, 배열의 첫 번째 여행 ID를 사용
+          const ActiveTripId = trip[0].id;
+          // selectActiveTrip을 사용하여 상태 업데이트 및 로컬 스토리지에 저장
+          selectActiveTrip(ActiveTripId); 
+          console.log(`진행 중인 여행 ID를 찾았습니다: ${ActiveTripId}`);
+        } else {
+          // 진행 중인 여행이 없으면 초기화
+          selectActiveTrip(null);
+          console.log("현재 진행 중인 여행이 없습니다.");
+        }
+      }
+    } catch (err) {
+      console.error("진행 중인 여행 로드 실패:", err);
+    }
+  }, []); // 의존성 배열은 비워둡니다. (API_BASE, selectActiveTrip이 바뀌지 않는다고 가정)
+
+
   const fetchUserProfile = useCallback(async (currentToken) => {
     if (!currentToken) {
       setIsLoading(false);
@@ -48,7 +84,6 @@ const [activeTripId, setActiveTripId] = useState(() => {
         throw new Error(`서버 오류: ${res.status}`);
       }
 
-      // 🔥 여기서 단 한번만 json() 호출해야 함
       const json = await res.json();
 
       if (json?.result?.id) {
@@ -67,14 +102,19 @@ const [activeTripId, setActiveTripId] = useState(() => {
 
   useEffect(() => {
     const savedToken = localStorage.getItem("jwtToken");
+    const savedTripId = localStorage.getItem("activeTripId");
+    if (savedTripId) {
+      setActiveTripId(Number(savedTripId));
+    }
 
     if (savedToken) {
       setToken(savedToken);
       fetchUserProfile(savedToken);
+      fetchActiveTrip(savedToken);
     } else {
       setIsLoading(false);
     }
-  }, [fetchUserProfile]);
+  }, [fetchUserProfile, fetchActiveTrip]);
 
   // 로그인
   const login = (jwtToken, userObject) => {
