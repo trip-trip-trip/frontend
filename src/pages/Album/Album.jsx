@@ -261,6 +261,7 @@ return(
         <div className="album-active-cont">
           {activeTripId
             ? <ActiveTrip tripName={activeTripInfo?.title}
+                          tripId = {activeTripInfo?.id}
                           members={activeTripInfo?.members || []}
                           img={activeTripInfo?.image || []}
                           filmCount={activeTripInfo.film_count || 0}

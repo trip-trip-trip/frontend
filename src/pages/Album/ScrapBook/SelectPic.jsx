@@ -201,7 +201,7 @@ const SelectPic = () => {
 
               <div className='photo-grid'>
                 {currentPicList.map((media, index) => {
-                  const picUrl = media.url;
+                  const picUrl = media;
                   const isSelected = selectedPics.includes(picUrl);
                   return (
                     <div 
