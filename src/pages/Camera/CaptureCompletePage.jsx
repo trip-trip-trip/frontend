@@ -3,6 +3,11 @@ import { useLocation, useNavigate,useParams } from 'react-router-dom';
 import './CaptureCompletePage.css'; // CSS 파일 생성
 import { useAuth } from '../../contexts/AuthContext';
 
+import backIcon from '../../assets/back.png';
+import filmCamCap from '../../assets/filmcamcap.png'; // 중앙 필름모양 오버레이
+import commentBoxBg from '../../assets/commentbox.png'; // 코멘트 박스 배경
+import saveCamBtn from '../../assets/savecam.png'; 
+
 const API_BASE = import.meta.env.PROD 
   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
   : '/api';
@@ -130,51 +135,67 @@ formData.append("file", photoBlob);
     alert("업로드에 실패했습니다.");
   }
 };
-return (
+  return (
     <div className="capture-complete-wrapper">
       
-      {/* 1. 헤더 텍스트 수정 */}
+      {/* 1. 상단 헤더 (베이지색) */}
       <header className="capture-header">
         <button className="back-button" onClick={() => navigate(-1)}>
-          &lt;
+          <img src={backIcon} alt="Back" />
         </button>
-        {/* 👇 "완료된 사진 또는 영상" 텍스트를 지웁니다 */}
-        <span className="header-title"></span>
       </header>
 
-      <div className="content-area">
-        
-        {/* 2. 이미지 위에 텍스트 오버레이 추가 */}
-        <div className="preview-wrapper">
+      {/* 2. 서브 헤더 (검은색 바 - 다시 찍기) */}
+      <div className="sub-header-bar">
+        <span className="retake-text" onClick={() => navigate(-1)}>
+          다시 찍기
+        </span>
+      </div>
+
+      <div className="content-scroll-area">
+        {/* 3. 프리뷰 영역 (이미지/영상 블러 + 오버레이) */}
+        <div className="preview-container">
+          {/* 블러 처리된 배경 미디어 */}
           {type === 'photo' ? (
-            <img src={media} alt="촬영된 사진" className="blurred-preview" />
+            <img src={media} alt="Preview" className="blurred-media" />
           ) : (
-            <video src={media} muted className="blurred-preview" />
+            <video src={media} muted className="blurred-media" />
           )}
-          
-          {/* 👇 블러 화면 위에 텍스트를 추가합니다 */}
-          <div className="blur-overlay-text">
-            여행이 끝난 후 확인해보세요!
+
+          {/* 오버레이 (필름 아이콘 + 텍스트) */}
+          <div className="preview-overlay-content">
+             <img src={filmCamCap} alt="Complete" className="film-overlay-icon" />
+             <p className="overlay-text-main">촬영 완료!</p>
+             <p className="overlay-text-sub">여행이 끝난 후에 확인해보세요!</p>
           </div>
         </div>
 
-        {/* 코멘트 박스 (JSX는 수정 없음) */}
-        <div className="comment-box">
-          <textarea
-            placeholder="코멘트 작성 (선택 사항)"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
+        {/* 4. 코멘트 섹션 (검은 배경) */}
+        <div className="comment-section">
+          <label className="comment-label">코멘트</label>
+          
+          {/* 코멘트 박스 이미지 배경 */}
+          <div 
+            className="comment-input-wrapper"
+            style={{ backgroundImage: `url(${commentBoxBg})` }}
+          >
+            <textarea
+              placeholder="comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="transparent-textarea"
+            />
+          </div>
         </div>
       </div>
 
+      {/* 5. 하단 저장 버튼 영역 */}
       <div className="footer-area">
-        <button onClick={handleSave} className="save-button">
-          저장하기
+        <button className="img-save-button" onClick={handleSave} disabled={isLoading}>
+          <img src={saveCamBtn} alt="저장하기" />
         </button>
       </div>
     </div>
   );
 };
-
 export default CaptureCompletePage;

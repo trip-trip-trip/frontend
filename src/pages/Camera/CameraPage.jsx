@@ -12,6 +12,12 @@ import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레�
 import textureAsset from '../../assets/filmeffect.png'; // 님의 고정 텍스처
 import switchmode from '../../assets/switchcam.png';
 
+import backIcon from'../../assets/back.png';
+import filterIcon from '../../assets/filter.png';           // [추가] 기본 필터 아이콘
+import filterClickedIcon from '../../assets/filterclicked.png';
+// 필터 아이콘 (클릭됨)
+import switchModeIcon from '../../assets/switch.png';
+
 // 2. [핵심] "필터 조합 팩"을 배열로 정의
 // (프레임: null = 없음, 텍스처: null = 없음, cssFilter: 'none' = 없음)
 const FILTERS = [
@@ -139,7 +145,7 @@ const CameraPage = () => {
   const handleTouchMove = (e) => {
     touchEndX.current = e.targetTouches[0].clientX;
   };
-  const handleTouchEnd = () => {
+ /* const handleTouchEnd = () => {
     if (mode !== 'film') return; // 필름 모드일 때만
     if (touchEndX.current === 0) return; 
     const swipeThreshold = 50; 
@@ -151,6 +157,13 @@ const CameraPage = () => {
       console.log("Swipe Right (Prev Filter)");
       prevFilter();
     }
+  };*/
+  const handleTouchEnd = () => {
+    if (mode !== 'film' || isFilterOpen) return; // 필터창 열려있으면 스와이프 비활성
+    if (touchEndX.current === 0) return;
+    const distance = touchStartX.current - touchEndX.current;
+    if (distance > 50) nextFilter();
+    else if (distance < -50) prevFilter();
   };
 
   useEffect(() => {
@@ -165,9 +178,13 @@ const CameraPage = () => {
   const flipCamera = () => {
     setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
   };
+
+
+  
   const handleDataAvailable = useCallback(({ data }) => {
     if (data.size > 0) setRecordedChunks((prev) => prev.concat(data));
   }, []);
+  
 
   // 6. [수정] 캔버스 합성 함수 (filterConfig 객체를 받도록 수정)
   const applyFilmFrame = async (imageSrc, filmOverlaySrc, filmTextureSrc, dateStamp, cssFilter) => {
@@ -346,9 +363,9 @@ const CameraPage = () => {
       const selectedFilter = FILTERS[currentFilterIndex];
         const processedImageSrc = await applyFilmFrame(
         imageSrc, 
-          selectedFilter.frame,   // 👈 2번째 인자 (프레임)
-          selectedFilter.texture, // 👈 3번째 인자 (텍스처)
-          getFilmDate(),          // 👈 4번째 인자 (날짜)
+          selectedFilter.frame,   //  2번째 인자 (프레임)
+          selectedFilter.texture, //  3번째 인자 (텍스처)
+          getFilmDate(),          //  4번째 인자 (날짜)
           selectedFilter.cssFilter
       
         );
@@ -392,14 +409,13 @@ const CameraPage = () => {
 
   return (
     <div className="camera-page-wrapper">
+      {/* 1. 헤더 (배경색 E0DDD2) */}
       <header className="camera-header">
-        <button className="back-button" onClick={() => navigate(-1)}>&lt;</button>
-        <span className="header-title">촬영</span>
-        <button className="flip-camera-button" onClick={flipCamera}>
-          <img src={switchmode} alt="Switch Camera" className="flip-icon" />
+        <button className="back-button" onClick={() => navigate(-1)}>
+            <img src={backIcon} alt="back" />
         </button>
+        {/* 타이틀 및 기타 아이콘 제거 */}
       </header>
-
       {/* 12. [수정] 스와이프 이벤트를 camera-view-container에 바인딩 */}
       <div 
         className="camera-view-container"
@@ -445,10 +461,7 @@ const CameraPage = () => {
                 <div className="film-date-stamp">
                   {getFilmDate()}
                 </div>
-                {/* 17. [수정] 현재 필터 이름 표시 */}
-                <div className="film-filter-name">
-                  {currentFilter.name}
-                </div>
+                
               </div>
             );
           })()
@@ -462,51 +475,80 @@ const CameraPage = () => {
         
         {/* 18. [삭제] '사진' 모드가 없으므로 '카메라 뷰' 텍스트 불필요 */}
       </div>
-
-      <div className="camera-controls-bar">
-        <div className="mode-selector">
-          {/* 19. [삭제] '사진' 모드 버튼 삭제 */}
-          <button 
-            onClick={() => switchMode('film')} 
-            className={mode === 'film' ? 'active' : ''}
-          >
-            필름
-          </button>
-          <button 
-            onClick={() => switchMode('video')} 
-            className={mode === 'video' ? 'active' : ''}
-          >
-            영상
-          </button>
-        </div>
+<div className={`camera-controls-bar ${isFilterOpen ? 'filter-open' : ''}`}>
         
-        <div className="capture-button-area">
-          <button
-            onClick={handleStartCaptureClick}
-            disabled={
-              isRecording || 
-              (shotCount >= MAX_TOTAL_SHOTS)
-            }
-            className={`capture-button ${isRecording ? 'recording' : ''}`}
-          >
-            {isRecording && mode === 'video' ? (
-              <div className="recording-indicator"></div>
-            ) : (
-              <div className="shutter-circle"></div>
-            )}
-          </button>
+        {/* (1) 필터 슬라이더 (필터 아이콘 눌렀을 때만 표시) */}
+        {isFilterOpen && mode === 'film' && (
+            <div className="filter-slider-container">
+                <div className="selected-filter-name-pill">
+                    {FILTERS[currentFilterIndex].name}
+                </div>
+                <div className="filter-scroll-area">
+                    {FILTERS.map((filter, idx) => (
+                        <div 
+                            key={idx} 
+                            className={`filter-item-box ${currentFilterIndex === idx ? 'selected' : ''}`}
+                            onClick={() => selectFilter(idx)}
+                        >
+                            <div className="filter-preview" style={{ filter: filter.cssFilter }}>
+                                {/* 미리보기용 작은 박스 (색감만 표현) */}
+                            </div>
+                            <span className="filter-name-small">{filter.name}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        {/* (2) 모드 선택 버튼 (타원형) */}
+        {!isFilterOpen && (
+            <div className="mode-selector-capsule">
+                <button 
+                    className={`mode-btn ${mode === 'film' ? 'active' : ''}`}
+                    onClick={() => switchMode('film')}
+                >
+                    사진
+                </button>
+                <button 
+                    className={`mode-btn ${mode === 'video' ? 'active' : ''}`}
+                    onClick={() => switchMode('video')}
+                >
+                    동영상
+                </button>
+            </div>
+        )}
+
+        {/* (3) 메인 컨트롤 (필터버튼 - 셔터 - 전환버튼) */}
+        <div className="main-controls-row">
+            {/* 필터 버튼 */}
+            <button className="control-icon-btn filter-btn" onClick={() => setIsFilterOpen(!isFilterOpen)}>
+                <img 
+                    src={isFilterOpen ? filterClickedIcon : filterIcon} 
+                    alt="filter" 
+                />
+            </button>
+
+            {/* 셔터 버튼 */}
+            <div className="shutter-container">
+                <button
+                    onClick={handleStartCaptureClick}
+                    disabled={isRecording || shotCount >= MAX_TOTAL_SHOTS}
+                    className={`capture-button ${isRecording ? 'recording' : ''}`}
+                >
+                    {isRecording ? <div className="recording-square" /> : <div className="shutter-circle" />}
+                </button>
+                 {/* 샷 카운터 바 */}
+                <div className="mini-progress-bar">
+                    <div className="fill" style={{ width: `${(shotCount / MAX_TOTAL_SHOTS) * 100}%` }}></div>
+                </div>
+            </div>
+
+            {/* 카메라 전환 버튼 (오른쪽으로 이동) */}
+            <button className="control-icon-btn switch-btn" onClick={flipCamera}>
+                <img src={switchModeIcon} alt="switch" />
+            </button>
         </div>
 
-        <div className="progress-bar-container">
-          <div 
-            className="progress-bar-fill" 
-            style={{ width: `${(shotCount / MAX_TOTAL_SHOTS) * 100}%` }}
-          ></div>
-          <span className="shot-counter-text">
-            {shotCount} / {MAX_TOTAL_SHOTS}
-          </span>
-        </div>
-        
       </div>
     </div>
   );
