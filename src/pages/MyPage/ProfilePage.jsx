@@ -4,7 +4,7 @@ import defaultProfile from "../../assets/default-profile.png";
 
  import logoTop from '../../assets/logoTop.png';
 import editIcon from "../../assets/ep_edit.png";
-// import settingIcon from '../../assets/setting.png';
+import settingIcon from '../../assets/setting.png';
 
 import NavBar from "../../components/NavBar/NavBar";
 import "./ProfilePage.css";
