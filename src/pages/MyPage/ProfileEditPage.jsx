@@ -2,213 +2,200 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
 import defaultProfile from "../../assets/default-profile.png";
+import editIcon from "../../assets/ep_edit.png"; // 아이콘
+import backIcon from "../../assets/back.png"; // 뒤로가기 아이콘
+import NavBar from "../../components/NavBar/NavBar"; // 네비게이션 바
 import "./ProfileEditPage.css"; 
 
-// 1. API_BASE 정의
 const API_BASE = import.meta.env.PROD 
    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
    : '/api';
 
 export default function ProfileEditPage() {
    const navigate = useNavigate();
-  // 2. token과 'fetchUserProfile' (새로고침용) 함수 가져오기
    const { user, token, fetchUserProfile } = useAuth();
 
-  // 3. state 초기화 (user가 null일 수 있으므로)
-  const [username, setUsername] = useState(user?.username || "");
-  const [bio, setBio] = useState(user?.bio || "");
-  const [profileImage, setProfileImage] = useState(user?.avatarUrl || defaultProfile); // 👈 로컬 미리보기용
-  const [privacy, setPrivacy] = useState(user?.privacy || "private"); 
-  
-  const [isLoading, setIsLoading] = useState(false); // 로딩 상태
-  const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+   const [username, setUsername] = useState("");
+   const [tag, setTag] = useState(""); // ID(Tag) 상태 추가
+   const [bio, setBio] = useState("");
+   const [profileImage, setProfileImage] = useState(defaultProfile); 
+   const [imageFile, setImageFile] = useState(null); 
+   
+   const [isLoading, setIsLoading] = useState(false);
+   const fileInputRef = useRef(null);
+   const cameraInputRef = useRef(null);
+   const [menuOpen, setMenuOpen] = useState(false);
 
-  // 4. user 정보가 AuthContext에서 로드되면 state에 반영
-  useEffect(() => {
-    if (user) {
-      setUsername(user.username || "");
-      setBio(user.bio || "");
-      setProfileImage(user.avatarUrl || defaultProfile);
-      // setPrivacy(user.privacy || "private"); // 👈 API 명세서에 privacy 없음
-    }
-  }, [user]);
+   // 초기 데이터 로드
+   useEffect(() => {
+     if (user) {
+       setUsername(user.username || "");
+       setTag(user.tag || ""); // 초기 태그 설정
+       setBio(user.bio || "");
+       setProfileImage(user.avatarUrl || defaultProfile);
+     }
+   }, [user]);
 
-  // 5. 이미지 변경 (로컬 미리보기 - 수정 없음)
    const handleImageChange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
+      setImageFile(file); 
       const reader = new FileReader();
-      reader.onloadend = () => setProfileImage(reader.result); // 로컬 state (미리보기) 업데이트
+      reader.onloadend = () => setProfileImage(reader.result); 
       reader.readAsDataURL(file);
       setMenuOpen(false);
    };
 
-    const handleCameraClick = () => {
-    cameraInputRef.current.click();
-    setMenuOpen(false);
-  };
+   const handleCameraClick = () => {
+      cameraInputRef.current.click();
+      setMenuOpen(false);
+   };
 
-  const handleDeleteImage = () => {
-    setProfileImage(""); // state 업데이트
-    setMenuOpen(false);
-  };
+   const handleDeleteImage = () => {
+      setProfileImage(defaultProfile); 
+      setImageFile(null); 
+      setMenuOpen(false);
+   };
 
-   // 6. [핵심] "수정완료" 버튼 클릭 (API 연동)
    const handleSave = async () => {
-    if (!token) {
-      alert("로그인 정보가 없습니다.");
-      return;
-    }
+    if (!token) return alert("로그인 정보가 없습니다.");
+    
+    if (!username.trim()) return alert("이름을 입력해주세요.");
+    if (!tag.trim()) return alert("ID를 입력해주세요.");
+
     setIsLoading(true);
 
-    // 7. PATCH /users/me API로 보낼 데이터
-    const patchData = {
-      username: username,
-      bio: bio,
-    };
+    try {
+      const formData = new FormData();
 
-    //  TODO: 이미지 업로드 로직
-    // 1. "새로운 프로필 이미지" API (예: POST /media/upload/profile) 호출
-    // 2. 응답으로 URL(newUrl)을 받음
-    // 3. patchData.avatarUrl = newUrl;
-    //
+      if (imageFile) {
+        formData.append("file", imageFile);
+      }
 
-      try {
+      const updateData = {
+        username: username,
+        tag: tag, // 수정된 ID(Tag) 전송
+        bio: bio,
+      };
+
+      formData.append("data", new Blob([JSON.stringify(updateData)], { type: "application/json" }));
+
       const res = await fetch(`${API_BASE}/users/me`, {
         method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(patchData)
+        body: formData
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || "서버 오류로 수정에 실패했습니다.");
+      
+      if (!res.ok || !data.isSuccess) {
+        throw new Error(data.message || "프로필 수정 실패");
       }
 
-      // 8. [중요] 수정 성공 시, AuthContext의 user 정보를
-      //    DB에서 다시 불러와 최신화합니다.
-      //await fetchUserProfile(token);
-
-      alert("프로필이 성공적으로 수정되었습니다.");
-      navigate('/mypage/profile'); // 프로필 페이지로 복귀
+      if (fetchUserProfile) {
+        await fetchUserProfile(token); 
+      }
+      
+      alert("프로필이 수정되었습니다.");
+      navigate('/mypage/profile'); 
 
     } catch (err) {
+      console.error(err);
       alert(`저장 실패: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
-
    };
 
    return (
       <div className="profile-edit-page">
+         {/* 1. 헤더 */}
          <header className="edit-header">
             <button className="back-button" onClick={() => navigate(-1)}>
-               &lt;
+                <img src={backIcon} alt="back" style={{width: 24, height: 24}}/>
             </button>
-            <h2 className="header-title">프로필 수정</h2>
-            <button 
-          className="save-button" 
-          onClick={handleSave} 
-          disabled={isLoading} // 👈 로딩 시 비활성화
-        >
-               {isLoading ? "저장 중..." : "수정완료"}
-            </button>
+            <div className="header-title">
+                <img src={editIcon} alt="" className="header-icon" />
+                프로필 수정
+            </div>
+            <div style={{width: 24}}></div> {/* 중앙 정렬을 위한 여백 */}
          </header>
 
-      {/* ... (나머지 JSX는 기존 코드와 동일) ... */}
-       <main className="edit-content">
-        {/* 1. 프로필 이미지 섹션 */}
-        <section className="edit-image-section">
-          <img
-            src={profileImage || defaultProfile}
-            alt="프로필"
-            className="profile-img"
-          />
-          <button 
-            className="change-image-button" 
-            onClick={() => setMenuOpen(true)}
-          >
-            새로운 프로필 이미지
-          </button>
-          
-          {/* 이미지 변경 팝업  */}
-          {menuOpen && (
-            <div className="profile-menu active"> {/* 항상 보이도록 active 추가 */}
-              <button onClick={() => fileInputRef.current.click()}>앨범에서 선택</button>
-              <button onClick={handleCameraClick}>사진 찍기</button>
-              <button onClick={handleDeleteImage} className="delete">
-                삭제하기
-              </button>
-              <button onClick={() => setMenuOpen(false)} className="cancel">
-                취소
-              </button>
-            </div>
-          )}
-        </section>
+         <main className="edit-content">
+            {/* 2. 이미지 섹션 */}
+            <section className="edit-image-section">
+               <div className="image-wrapper">
+                   <img src={profileImage} alt="프로필" className="profile-img" onError={(e)=>e.target.src=defaultProfile}/>
+               </div>
+               {/* 피그마처럼 텍스트 버튼으로 변경 */}
+               <div className="change-image-text" onClick={() => setMenuOpen(true)}>
+                  사진 바꾸기
+               </div>
 
-        {/* 숨겨진 input 태그들 */}
-        <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleImageChange} />
-        <input type="file" accept="image/*" capture="user" ref={cameraInputRef} style={{ display: "none" }} onChange={handleImageChange} />
+               {/* 이미지 변경 팝업 */}
+               {menuOpen && (
+                  <>
+                    <div className="modal-overlay" onClick={() => setMenuOpen(false)} />
+                    <div className="profile-menu active">
+                       <button onClick={() => fileInputRef.current.click()}>앨범에서 선택</button>
+                       <button onClick={handleCameraClick}>사진 찍기</button>
+                       <button onClick={handleDeleteImage} className="delete">기본 이미지로 변경</button>
+                       <button onClick={() => setMenuOpen(false)} className="cancel">취소</button>
+                    </div>
+                  </>
+               )}
+            </section>
 
-        {/* 2. 폼 섹션 */}
-        <section className="edit-form-section">
-          <div className="form-group">
-            <label htmlFor="username">아이디 이름</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="bio">프로필 소개</label>
-            <input
-              id="bio"
-              type="text"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
-          </div>
-        </section>
+            {/* 3. 입력 폼 섹션 */}
+            <section className="edit-form-section">
+               <div className="form-group">
+                  <label htmlFor="username">이름</label>
+                  <input 
+                    id="username" 
+                    type="text" 
+                    value={username} 
+                    onChange={(e) => setUsername(e.target.value)} 
+                    placeholder="이름을 입력하세요"
+                  />
+               </div>
 
-        {/* 3. 공개 범위 섹션 */}
-        <section className="edit-privacy-section">
-          <h3>프로필 공개 범위</h3>
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                name="privacy"
-                value="public"
-                checked={privacy === "public"}
-                onChange={(e) => setPrivacy(e.target.value)}
-              />
-              공개
-            </label>
-          </div>
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                name="privacy"
-                value="private"
-                checked={privacy === "private"}
-                onChange={(e) => setPrivacy(e.target.value)}
-              />
-              비공개
-            </label>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
+               <div className="form-group">
+                  <label htmlFor="tag">ID</label>
+                  <input 
+                    id="tag" 
+                    type="text" 
+                    value={tag} 
+                    onChange={(e) => setTag(e.target.value)} 
+                    placeholder="아이디를 입력하세요"
+                  />
+                  <span className="input-helper">고유한 사용자 ID입니다.</span>
+               </div>
+
+               <div className="form-group">
+                  <label htmlFor="bio">소개글</label>
+                  <input 
+                    id="bio" 
+                    type="text" 
+                    value={bio} 
+                    onChange={(e) => setBio(e.target.value)} 
+                    placeholder="소개글을 입력하세요"
+                  />
+               </div>
+
+               {/* 4. 저장하기 버튼 (폼 아래 배치) */}
+               <button className="bottom-save-button" onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? "저장 중..." : "저장하기"}
+               </button>
+            </section>
+         </main>
+
+         {/* hidden inputs */}
+         <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleImageChange} />
+         <input type="file" accept="image/*" capture="user" ref={cameraInputRef} style={{ display: "none" }} onChange={handleImageChange} />
+
+         <NavBar current="mypage" />
+      </div>
+   );
 }
-
- 

@@ -53,6 +53,21 @@
 	src: local('Pretendard Thin'), url(./woff2-subset/Pretendard-Thin.subset.woff2) format('woff2'), url(./woff-subset/Pretendard-Thin.subset.woff) format('woff');
 }
 
+@font-face {
+  font-family: 'Orbit';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2310@1.0/Orbit-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Fredericka the Great';
+  font-style: normal;
+  font-weight: 400;
+  src: url('FrederickatheGreat-Regular.ttf') format('truetype');
+}
+
 /* 1rem = 10px로 설정 */
 html{
   font-size: 62.5%;
@@ -60,18 +75,26 @@ html{
 }
 
 body {
-  margin:0;
+  height: 100dvh;
+  overflow: auto;
+  margin: 0;
   padding: 0;
   font-family: 'Pretendard', sans-serif;
   background-color: rgb(179, 179, 179);
   -ms-overflow-style: none;
 }
 
+#root{
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+
 /* [병합] .app-container로 모든 페이지의 '틀'을 관리 */
 .app-container {
   /* PC에서 중앙 정렬 */
-  margin-left: auto;
-  margin-right: auto;
+  margin: auto;
   
   /* 최대 너비 (팀원 설정) */
   max-width: 43rem; /* 430px */
@@ -80,21 +103,18 @@ body {
   /* 높이 (팀원 설정 dvh 사용) */
   min-height: 100dvh;
   /* App.jsx에서 설정한 --dvh 변수 사용 (fallback으로 1dvh) */
-  height: calc(var(--dvh, 1dvh) * 100);
-  height: auto; 
+  /* height: calc(var(--dvh, 1dvh) * 100); */
+  /* height: auto;  */
   
   /* 페이지 기본 배경색 */
-  background-color: #ffffff;
-
-  
+  background-color: #F6F6F5;
   /* [중요] padding: 0 (카메라 페이지 등 꽉 차는 UI용) */
   padding: 0; 
   
   /* [중요] flex 레이아웃 (페이지 높이 100% 유지용) */
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
-  position: relative;
+  /* position: relative; */
 }
 
 
@@ -120,3 +140,4 @@ body {
   --button-tertiary: 
   --button-quaternary: 
 } */
+

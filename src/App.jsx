@@ -5,7 +5,7 @@ import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import Login from './pages/SignUp/Login';
 import StartPage from './pages/SignUp/StartPage';
 import Album from './pages/Album/Album';
-import CreateTrip from './pages/Album/CreateTrip';
+import CreateTrip from './pages/Album/CreateTrip/CreateTrip';
 import TripDetail from './pages/Album/TripDetails/TripDetail';
 import VideoDetail from './pages/Album/TripDetails/VideoDetail';
 import PhotoDetail from './pages/Album/TripDetails/PhotoDetail';
@@ -13,7 +13,9 @@ import PickFrame from './pages/Album/ScrapBook/PickFrame';
 import SelectPic from './pages/Album/ScrapBook/SelectPic';
 import CreateScrap from './pages/Album/ScrapBook/CreateScrap';
 import ProfilePage from './pages/MyPage/ProfilePage';
+import FriendSearchPage from './pages/MyPage/FriendSearchPage'
 import FriendListPage from './pages/MyPage/FriendListPage';
+import UserProfilePage from './pages/MyPage/UserProfilePage';
 import SettingsPage from './pages/MyPage/SettingPage';
 import FeedPage from './pages/MyPage/FeedPage';
 import CameraPage from './pages/Camera/CameraPage'; // 새로 만들 컴포넌트
@@ -30,8 +32,12 @@ import PostItem from './pages/Home/post/PostItem';
 import PostDetails from './pages/Home/post/PostDetails';
 import PostCreate from './pages/Home/post/PostCreate';
 import SetUsername from './pages/SignUp/SetUsername';
-
-
+import AddFriend from './pages/Album/CreateTrip/AddFriend';
+import SharePhoto from './pages/Album/SharePhoto';
+import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
+import PostEdit from './pages/Home/post/PostEdit';
+import EditTrip from './pages/Album/TripDetails/EditTrip';
+import SharedList from './pages/Album/TripDetails/SharedList';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -75,10 +81,15 @@ const App = () => {
         <Route path='/home' element={<Home/>}/>
 
         <Route path='/trips' element={<Album/>}/>
+        <Route path='/trips/friends' element={<AddFriend/>}/>
+        <Route path='/trips/places' element={<SelectPlace/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
-        <Route path='/trips/detail' element={<TripDetail/>}/>
-        <Route path='/trips/detail/vid' element={<VideoDetail/>}/>
-        <Route path='/trips/detail/pic' element={<PhotoDetail/>}/>
+        <Route path='/trips/detail/:tripId' element={<TripDetail/>}/>
+        <Route path='/trips/detail/:tripId/edit' element={<EditTrip/>}/>
+        <Route path='/trips/shared' element={<SharedList/>}/>
+        <Route path='/trips/detail/:tripId/share' element={<SharePhoto/>}/>
+        <Route path='/trips/detail/:tripId/vid' element={<VideoDetail/>}/>
+        <Route path='/trips/detail/:tripId/pic' element={<PhotoDetail/>}/>
         <Route path='/scrapbook/frame' element={<PickFrame/>}/>
         <Route path='/scrapbook/create' element={<SelectPic/>}/>
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
@@ -93,6 +104,7 @@ const App = () => {
         <Route path="/post" element={< PostItem/>} />
         <Route path="/post/:id" element={< PostDetails/>} />
         <Route path="/post/create" element={< PostCreate/>} />
+        <Route path="/post/edit/:id" element={< PostEdit/>} />
 
 
         {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
@@ -100,6 +112,8 @@ const App = () => {
 <Route path="/mypage/edit" element={<ProfileEditPage />} />
         {/* 프로필 하위 페이지들 */}
         <Route path="/mypage/friends" element={<FriendListPage />} />
+        <Route path="/mypage/friends/add" element={<FriendSearchPage />} />
+        <Route path="/user/:userId" element={<UserProfilePage />} />
         <Route path="/mypage/settings" element={<SettingsPage />} />
         <Route path="/mypage/feed" element={<FeedPage />} />
         <Route path="/camera/:tripId" element={<CameraPage />} />
