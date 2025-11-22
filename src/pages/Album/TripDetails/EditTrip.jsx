@@ -2,61 +2,233 @@ import React from 'react'
 import './EditTrip.css'
 import Header from '../../../components/Header/Header'
 import Navbar from '../../../components/NavBar/NavBar'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useState, useRef } from 'react' // useRef 추가
 import edit_icon from '/icons/edit_btn.png'
+import { useAuth } from '../../../contexts/AuthContext'
+import { useMemo, useEffect, useCallback } from 'react' // useCallback 추가
 
-const tripInfo = {
-                "id": 20,
-                "ownerId": 10,
-                "place": "Seoul",
-                "title": "2025 서울 랜드마크 여행",
-                "description": "남산타워와 한강을 중심으로 한 5일간의 여행",
-                "visibility": "FRIENDS",
-                "status": "ACTIVE", 
-                "startDate": "2025-10-15",
-                "endDate": "2025-10-20",
-                "inviteesProfileImgList": [
-                    "daisy_traveler",
-                    "ethan_explorer",
-                    "alice_traveler"
-                ],
-                "inviteesNameList": [
-                    "https://placehold.co/100x100/f0e68c/000000?text=D",
-                    "https://placehold.co/100x100/ffa500/000000?text=E",
-                    "https://placehold.co/100x100/1e90ff/ffffff?text=A"
-                ],
-                "inviteesTagList": [
-                    "daisy1234",
-                    "ethan1234",
-                    "alice1234"
-                ]
-              };
+// API 요청에 사용될 PLACEHOLDER placeId (실제로는 GET 요청 응답에서 가져와야 함)
+const MOCK_PLACE_ID = 11; 
 
 const EditTrip = () => {
-  const [name, setName] = useState(tripInfo.title);
-  const [startDate, setStartDate] = useState(tripInfo.startDate);
-  const [endDate, setEndDate] = useState(tripInfo.endDate);
-  const [oneday, setOneday] = useState(false);
+  const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
-  const [place, setPlace] = useState(tripInfo.place);
-  const tripStatus = tripInfo.status; 
+  // **Original Data**를 저장하기 위한 Ref: 이것이 변경 여부를 판단하는 기준이 됩니다.
+  const originalTripRef = useRef(null); 
+
+  const [tripInfo, setTripInfo] = useState(null); // 초기 데이터는 null
+  const [oneday, setOneday] = useState(false);
+  const { tripId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const {token} = useAuth();
+  const todayDate = useMemo(() => new Date().toISOString().split('T')[0], []);
   
-  // 🚀 여행 상태가 'COMPLETED'인지 확인하는 변수
-  const isCompleted = tripStatus === 'COMPLETED'; 
+  // 폼 입력 State
+  const [name, setName] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [place, setPlace] = useState('');
+  const [placeId, setPlaceId] = useState(MOCK_PLACE_ID); // placeId state 추가
+
+  const [currentTripStatus ,setCurrentTripStatus] = useState('pending');
+  const isCompleted = currentTripStatus === 'completed'; 
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleEditBtn = () => {
-    console.log(name, startDate, endDate, place );
-    // 여기에 여행 정보 PATCH 추가
+  // 💡 당일치기 로직 통합
+  useEffect(() => {
+    if (oneday && startDate) {
+      setEndDate(startDate);
+    }
+  }, [oneday, startDate]);
+
+
+  // =======================================================
+  // 💡 STEP 1: 기존 데이터 불러오기 (GET)
+  // =======================================================
+  const fetchTripInfo = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/trips/${tripId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+      }
+      const data = await response.json();
+      const fetchedTrip = data.result;
+
+      if (fetchedTrip){
+        const { id, title, startDate, endDate, place, placeId, status } = fetchedTrip;
+        
+        // State 초기화 (폼에 채워지는 값)
+        setName(title);
+        setStartDate(startDate);
+        setEndDate(endDate);
+        setPlace(place || '장소 없음');
+        setPlaceId(placeId || MOCK_PLACE_ID); // placeId가 응답에 포함된다고 가정
+
+        // tripInfo (GET 응답 전체를 저장하거나 필요한 정보만 저장)
+        const initialData = {
+          tripId: id,
+          title: title,
+          startDate: startDate, 
+          endDate: endDate,
+          place: place || '장소 없음',
+          placeId: placeId || MOCK_PLACE_ID,
+          status: status || 'pending' // API 응답에 status 필드가 있다고 가정
+        };
+
+        setTripInfo(initialData);
+
+        // 💡 Original Data Ref에 저장: 비교의 기준이 됩니다.
+        originalTripRef.current = initialData; 
+
+        // 당일치기 여부 설정
+        setOneday(startDate === endDate);
+
+        // 여행 상태 설정 (API에서 status를 직접 받거나, 날짜 비교로 설정)
+        // 여기서는 API 응답에 status가 있다고 가정
+        setCurrentTripStatus(status || 'pending');
+        
+      }
+    } catch (error) {
+      console.error("Error fetching trip data:", error);
+      alert('여행 정보를 불러오는 데 실패했습니다. 목록으로 돌아갑니다.');
+      // navigate('/trips'); 
+    } finally{
+      setIsLoading(false);
+    }
+  }, [API_BASE, tripId, token, navigate]);
+
+  useEffect(() => {
+    if (token && tripId){
+      fetchTripInfo();
+    }
+  }, [token, tripId, fetchTripInfo]) // 의존성 배열에 fetchTripInfo 추가
+
+
+  // =======================================================
+  // 💡 변경된 필드만 추출하는 헬퍼 함수
+  // =======================================================
+  const getChanges = () => {
+    const original = originalTripRef.current;
+    if (!original) return {};
+
+    const changes = {};
+
+    // 1. 제목 비교
+    if (name !== original.title) {
+      changes.title = name;
+    }
+    
+    // 2. 시작일 비교
+    if (startDate !== original.startDate) {
+      // API 요청 형식에 맞춰 T12:00 추가
+      changes.startDate = `${startDate}T12:00`; 
+    }
+    
+    // 3. 종료일 비교
+    if (endDate !== original.endDate) {
+      // API 요청 형식에 맞춰 T12:00 추가
+      changes.endDate = `${endDate}T12:00`; 
+    }
+    
+    // 4. 장소 ID 비교 (장소 변경 로직이 구현되었다고 가정)
+    // 현재 코드에서는 placeId 변경 로직이 없으므로, 필요하다면 여기에 추가해야 합니다.
+    // 임시로 placeName이 변경되었을 때 placeId를 포함시키지만, 
+    // 실제로는 장소 선택 컴포넌트에서 placeId를 업데이트해야 합니다.
+    if (placeId !== original.placeId) {
+       changes.placeId = placeId;
+    }
+
+    return changes;
+  };
+
+  // =======================================================
+  // 💡 STEP 2: 수정된 데이터 전송 (PATCH)
+  // =======================================================
+  const editTrip = async (requestBody) => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/trips/${tripId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`여행 수정 실패: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('여행 수정 성공:', data.result);
+
+      alert('✅ 여행 정보가 성공적으로 수정되었습니다.');
+      // 수정 후 상세 페이지로 이동
+      navigate(`/trips/${tripId}`); 
+
+    } catch (error) {
+      console.error("Error editing trip data:", error);
+      alert('❌ 여행 정보 수정에 실패했습니다.');
+    } finally{
+      setIsLoading(false);
+    }
+  };
+
+  
+  // =======================================================
+  // 💡 버튼 클릭 핸들러: 변경 사항 확인 및 PATCH 호출
+  // =======================================================
+  const handleEditBtn = async () => {
+    if (isCompleted) {
+        alert("이미 완료된 여행은 수정할 수 없습니다.");
+        return;
+    }
+    
+    const changes = getChanges();
+    
+    if (Object.keys(changes).length === 0) {
+        alert("수정된 내용이 없습니다.");
+        return;
+    }
+    
+    // ⚠️ 수정이 필요한 필드만 포함된 requestBody를 editTrip에 전달
+    await editTrip(changes);
   }
 
   const handlePlaceEdit = () => {
-    navigate('/trips/places')
+    // 장소 변경 페이지로 이동 시, 돌아올 경로 및 현재 placeId를 state로 전달하는 것이 좋습니다.
+    navigate('/trips/places', { state: { currentPlaceId: placeId, currentPlaceName: place } })
   }
     
+  if (isLoading) {
+    return (
+        <div className='edit-trip loading'>
+            <p>여행 정보를 불러오는 중...</p>
+        </div>
+    );
+  }
+  
   return (
     <div className='edit-trip'>
         <Header toBack={true}/>
@@ -64,7 +236,7 @@ const EditTrip = () => {
         <form action="" className='edit-trip-form' onSubmit={(e) => e.preventDefault()}>
           <div className="edit-trip-name">
             <div className="edit-trip-title">
-              <img src={edit_icon} alt="" />
+              <img src={edit_icon} alt="수정 아이콘" />
               <h2>여행 수정</h2>
             </div>
             <h3>제목</h3>
@@ -74,7 +246,7 @@ const EditTrip = () => {
             <h3>일정</h3>
             {!isCompleted && 
               <div className="oneday-check" hidden={isCompleted}>
-                <input type="checkbox" onClick={()=>setOneday(!oneday)}/>
+                <input type="checkbox" checked={oneday} onChange={()=>setOneday(!oneday)}/>
                 <h4>당일치기</h4>
               </div>
             }
@@ -87,30 +259,29 @@ const EditTrip = () => {
                   date-placeholder='여행 시작일' 
                   onChange={(e)=>{setStartDate(e.target.value), setEndDate(e.target.value)}}
                   disabled={isCompleted}
-                  className={`date-form ${isCompleted}`}
+                  className={`date-form ${isCompleted ? 'disabled' : ''}`}
                 />
               </div> 
             : <div className="date-info">
                 <div className="date-form">
-                  {/* 완료된 여행은 날짜 입력 필드 비활성화 */}
                   <input 
                     type="date" 
                     value={startDate} 
                     date-placeholder='여행 시작일' 
                     onChange={(e)=>setStartDate(e.target.value)}
                     disabled={isCompleted}
-                    className={`date-form ${isCompleted}`}
+                    className={`date-form ${isCompleted ? 'disabled' : ''}`}
                   />
                   <p>부터</p>
                 </div>
                 <div className="date-form">
-                  {/* 완료된 여행은 날짜 입력 필드 비활성화 */}
                   <input 
                     type="date" 
                     value={endDate} 
                     date-placeholder='여행 종료일' 
                     onChange={(e)=>setEndDate(e.target.value)}
-                    className={`date-form ${isCompleted}`}
+                    disabled={isCompleted}
+                    className={`date-form ${isCompleted ? 'disabled' : ''}`}
                     />
                   <p>까지</p>
                 </div>
@@ -126,14 +297,12 @@ const EditTrip = () => {
               : 
                 <h4 className='no-edit'>*이미 지난 여행의 일정과 장소는 바꿀 수 없어요.</h4>
               }
-
             </div>
-
             </div>
           </form>
           
           {
-            name && startDate && endDate && place &&
+            name && startDate && endDate && place && !isLoading &&
             <div className="edit-trip-btn-cont">
               <button className='edit-trip-btn' onClick={handleEditBtn}>여행 수정하기</button>
             </div>
