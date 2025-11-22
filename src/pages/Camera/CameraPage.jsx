@@ -132,6 +132,7 @@ const CameraPage = () => {
 
   // 4. 스와이프 및 필터 인덱스 state
   const [currentFilterIndex, setCurrentFilterIndex] = useState(0);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   
