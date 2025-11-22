@@ -38,6 +38,7 @@ const TripDetail = () => {
     endDate: '', 
     members: []
   });
+
   // Fetch 해온 사진 정보 저장
   const [photoData, setPhotoData] = useState([]);
   // Fetch 해온 영상 정보 저장
@@ -260,7 +261,7 @@ const TripDetail = () => {
               </div>
             </div>
   
-            <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { tripId: tripInfo.tripId } } )}>
+            <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { tripId: tripInfo.id } } )}>
               <h1>스크랩북 만들기</h1>
             </button>
   
@@ -276,13 +277,13 @@ const TripDetail = () => {
               <div className="video-grid-cont">
                 <div className='video-grid'>
                   {/* 메인 영상 */}
-                  {vidData.madeVideo && (
+                  {vidData?.madeVideo && (
                       <div className='video-card video-main'>
                           <video src={vidData.madeVideo.url} controls></video>
                       </div>
                   )}
                   {/* 릴 아이템들 */}
-                  {vidData.videoItems && vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
+                  {vidData?.videoItems && vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
                       <div className='video-card' key={index}>
                           <video src={video.url} controls></video>
                       </div>
