@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("activeTripId");
+    const savedToken = localStorage.getItem("jwtToken");
     const savedTripId = localStorage.getItem("activeTripId");
     if (savedTripId) {
       setActiveTripId(Number(savedTripId));
@@ -110,10 +110,11 @@ export const AuthProvider = ({ children }) => {
     if (savedToken) {
       setToken(savedToken);
       fetchUserProfile(savedToken);
+      fetchActiveTrip(savedToken);
     } else {
       setIsLoading(false);
     }
-  }, [fetchUserProfile]);
+  }, [fetchUserProfile, fetchActiveTrip]);
 
   // 로그인
   const login = (jwtToken, userObject) => {
