@@ -41,6 +41,7 @@ const TripDetail = () => {
   const [photoData, setPhotoData] = useState([]);
   // Fetch 해온 영상 정보 저장
   const [vidData, setVidData] = useState();
+  const [scrapData, setScrapData] = useState([]);
   
   // 로딩상태 표시
   const [isLoading, setIsLoading] = useState(true);
@@ -100,6 +101,14 @@ const TripDetail = () => {
       isShared: p.media.isShared || false,
     }));
     setPhotoData(photoInfo);
+
+    const scrapInfo = (fetchedTripDetail?.contents?.scrapbooks || []).map( s => ({
+      tripId: s.media.tripId,
+      comment: s.media.comment || '',
+      url: s.media.url || '',
+      isShared: s.media.isShared || false,
+    }));
+    setScrapData(scrapInfo);
 
     const videoInfo = {
       madeVideo : fetchedTripDetail.contents.reel ? {
@@ -163,7 +172,7 @@ const TripDetail = () => {
             <div className="shared-friend">
               <SharedFriends data={tripInfo.members} />
             </div>
-            <button className='share-btn'>
+            <button className='share-btn' onClick={() => navigate(`/trips/detail/${tripId}/share`)}>
               <img src={link_icon} alt="" />
               <p>공유 사진 관리하기</p>
             </button>
@@ -188,7 +197,7 @@ const TripDetail = () => {
               </div>
               <div className="photo-grid-cont">
                 <div className='photo-grid'>
-                  {photoData.map((pics, index)=>(
+                  {photoData.slice(0,8).map((pics, index)=>(
                     <div className='photo-item' key={index}> 
                         <img src={pics.url} alt="" />
                         {showShared && pics.isShared && (
@@ -202,7 +211,7 @@ const TripDetail = () => {
               </div>
             </div>
   
-            <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { picList : photoData } } )}>
+            <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { tripId: tripInfo.tripId } } )}>
               <h1>스크랩북 만들기</h1>
             </button>
   
@@ -233,30 +242,34 @@ const TripDetail = () => {
               </div>
             </div>
   
-            {/* 사진 섹션 */}
-            <div className="photo_container scrapbook">
-              <img src={album_cont} alt="" className='album-cont-img scrapbook' />
-              <div className='section-photo-header scrapbook'>
-                <h2 className='photo-cont-title scrapbook'>스크랩북</h2>
-                <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : photoData } } )}>
-                  <img src={more_btn} alt="" />
-                </button>
-              </div>
-              <div className="photo-grid-cont">
-                <div className='photo-grid'>
-                  {photoData.map((pics, index)=>(
-                    <div className='photo-item' key={index}> 
-                        <img src={pics.url} alt="" />
-                        {showShared && pics.isShared && (
-                          <div className='shared-link-icon'>
-                            <img src={shared_icon} alt="공유됨" />
-                          </div>
-                        )}
-                    </div>
-                  ))}
+            {/* 스크랩북 섹션 */}
+            {
+              scrapData &&
+              <div className="photo_container scrapbook">
+                <img src={album_cont} alt="" className='album-cont-img scrapbook' />
+                <div className='section-photo-header scrapbook'>
+                  <h2 className='photo-cont-title scrapbook'>스크랩북</h2>
+                  <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : photoData } } )}>
+                    <img src={more_btn} alt="" />
+                  </button>
+                </div>
+                <div className="photo-grid-cont">
+                  <div className='photo-grid'>
+                    {scrapData.map((pics, index)=>(
+                      <div className='photo-item' key={index}> 
+                          <img src={pics.url} alt="" />
+                          {showShared && pics.isShared && (
+                            <div className='shared-link-icon'>
+                              <img src={shared_icon} alt="공유됨" />
+                            </div>
+                          )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            }
+            
         </div>
         <Navbar/>
       </div>

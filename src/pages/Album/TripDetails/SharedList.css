@@ -1,0 +1,220 @@
+/* TripDetail.css */
+
+.shared-list{
+    padding: 5rem 0 22rem 0;
+    color: #525B65;
+    position: relative;
+    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
+    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+    background: #F6F6F5;
+}
+
+.shared-list-container{
+    display: flex;
+    flex-direction: column;
+    margin-top: 5rem;
+}
+
+.date-edit-section{
+    display: flex;
+    justify-content: space-between;
+}
+
+.trip-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.date-edit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.date-range{
+    display: flex;
+    justify-content: space-between;
+    border-bottom: none;
+}
+
+.date-and-edit h3{
+    color: #525B65;
+    font-size: 1.6rem;
+    font-weight: 300;
+    margin: 0 0 0.2rem 0;
+}
+
+.edit-btn{
+    background: none;
+    border: none;
+}
+
+.edit-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+.dotted-line {
+    border-bottom: 1px dotted #525b6575;
+    margin-top: 1.2rem;
+}
+
+/* --- 2. 목록 공통 섹션 스타일 --- */
+
+.section-block {
+    margin-top: 20px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.header-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-title-wrapper img{
+    height: 1.9rem;
+}
+
+.icon-placeholder {
+    font-size: 18px;
+    margin-right: 10px;
+    color: #5f7478; /* 아이콘 색상 */
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.name-tag-wrapper p{
+    margin: 0;
+}
+
+.name-tag-wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+
+.dropdown.open{
+    width: 1.5rem;
+    transition: transform 0.6s;
+}
+
+.dropdown.closed {
+    width: 1.5rem;
+    transform: rotate(180deg);
+    transition: transform 0.6s;
+}
+
+.member-list {
+    padding: 10px 0;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+}
+
+.member-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+}
+
+.profile-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #E0DDD2; /* 프로필 이미지 플레이스홀더 */
+    border: 1px dashed #525B65;
+    margin-right: 15px;
+}
+
+.name-tag-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.name-title{
+    display: flex;
+    gap: 1rem;
+}
+
+.member-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.member-tag {
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.status-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 대기중 */
+.status-badge {
+    display: flex;
+    padding: 0.4rem 1.8rem;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 1.2rem;
+    background: #E0DDD2;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.status-badge.pending {
+    background: #E0DDD2;
+    color: #8c8c8c;
+}
+
+/* 초대 취소 버튼 */
+.cancel-btn {
+    width: 2.1rem;
+    height: 2.1rem;
+}
+
+.close-icon {
+    color: #a0a0a0;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.owner-badge {
+    border-radius: 1rem;
+    background: #525B65;
+    display: flex;
+    padding: 0.2rem 1.2rem;
+    justify-content: center;
+    align-items: center;
+    color: #E0DDD2;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+}

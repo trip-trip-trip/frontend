@@ -7,17 +7,15 @@ import './AddFriend.css'
 
 const AddFriend = () => {
   const [searchFriend, setSearchFriend] = useState("");
-  // 선택된 친구를 친구 '객체'로 저장
   const [selectedFriends, setSelectedFriends] = useState([]);
-
-  // 📝 요청하신 데이터 형식으로 friendList를 수정했습니다.
+// 더미값
   const friendList = [
-      { id: 11, username: '사람', tag: 'person', avatarUrl: '/profile-img-1.png', bio: '안녕하세요'},
-      { id: 12, username: '사라', tag: 'sara', avatarUrl: '/profile-img-2.png', bio: '여행 좋아해요'},
-      { id: 13, username: '또사람', tag: 'another', avatarUrl: '/profile-img-3.png', bio: 'react 개발자'},
-      { id: 14, username: '눈사람', tag: 'snowman', avatarUrl: '/profile-img-4.png', bio: '겨울 조아요'},
-      { id: 15, username: '김멋사', tag: 'musa', avatarUrl: '/profile-img-5.png', bio: '프론트엔드'},
-      { id: 16, username: '김친구', tag: 'kimfriend', avatarUrl: '/profile-img-6.png', bio: '같이 가자'},
+      { id: 11, username: '사람', tag: 'person', avatarUrl: '/profile-img.png', bio: '안녕하세요'},
+      { id: 12, username: '사라', tag: 'sara', avatarUrl: '', bio: '여행 좋아해요'},
+      { id: 13, username: '또사람', tag: 'another', avatarUrl: '', bio: 'react 개발자'},
+      { id: 14, username: '눈사람', tag: 'snowman', avatarUrl: '/profile-img.png', bio: '겨울 조아요'},
+      { id: 15, username: '김멋사', tag: 'musa', avatarUrl: '', bio: '프론트엔드'},
+      { id: 16, username: '김친구', tag: 'kimfriend', avatarUrl: '', bio: '같이 가자'},
   ];
   
     // 검색 필터링 (username으로 필터링)
@@ -40,6 +38,10 @@ const AddFriend = () => {
         prev.filter((friend) => friend.id !== friendToRemove.id)
       );
     };
+
+    const handleFriendBtn = () => {
+      console.log(selectedFriends);
+    }
     
 
 
@@ -69,12 +71,13 @@ const AddFriend = () => {
               className={`friend-list-row ${isSelected(friend) ? 'selected' : ''}`}
               key={friend.id}
               onClick={() => toggleFriend(friend)}>
-              <div className="friend-profile-info">
-                <div className="profile-circle">
-                    {/* 아바타 URL 대신 원형 플레이스홀더 사용 */}
-                    {/* 실제 이미지 사용: <img src={friend.avatarUrl} alt={friend.username} /> */}
-                </div>
-                <p className='friend-name'>{friend.username}</p> {/* 📝 username 표시 */}
+              <div className="friend-profile">
+                {friend.avatarUrl 
+                ? <img src={friend.avatarUrl} alt={""} className='profile-img'/>
+                : <div className="profile-circle">
+                  </div>
+                }
+                <p className='friend-name'>{friend.username}</p>
               </div>
               {/* 선택 상태를 나타내는 사각형 */}
               <div className={`selection-box ${isSelected(friend) ? 'checked' : 'unchecked'}`}>
@@ -82,30 +85,27 @@ const AddFriend = () => {
             </div>
           ))}
         </div>
-              
-              <div className="separator-line"></div>
-              
-              {/* 하단에 선택된 친구 목록 표시 */}
-              <div className="selected-friends-bottom">
-                  <div className="selected-friends-list">
-                      {selectedFriends.map((friend) => (
-                          <div className="selected-friend-item" key={friend.id}> {/* 🔑 id를 key로 사용 */}
-                              <div className="profile-circle selected-profile" onClick={() => removeFriend(friend)}>
-                                  {/* X 아이콘 */}
-                                  <span className="remove-icon">×</span>
-                              </div>
-                              <p className='selected-name'>{friend.username}</p> {/* 📝 username 표시 */}
-                          </div>
-                      ))}
-                  </div>
-              </div>
-
-              <div className="invite-button-wrapper">
-                <button className='invite-button'>
-                    {selectedFriends.length}명 초대하기
-                </button>
-              </div>
-              
+        {
+          selectedFriends.length>0 &&
+          <div className="selected-friends-bottom">
+            <div className="selected-friends-list">
+                {selectedFriends.map((friend) => (
+                    <div className="selected-friend-item" key={friend.id}>
+                        <div className="profile-circle selected-profile" onClick={() => removeFriend(friend)}>
+                            <span className="remove-icon">×</span>
+                        </div>
+                        <p className='selected-name'>{friend.username}</p>
+                    </div>
+                ))}
+            </div>
+            <div className="invite-button-wrapper">
+            <button className='invite-button' onClick={handleFriendBtn}>
+                {selectedFriends.length}명 초대하기
+            </button>
+          </div>
+        </div>
+        }              
+      
       </div>
     </div>
   )

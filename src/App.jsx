@@ -34,6 +34,8 @@ import AddFriend from './pages/Album/CreateTrip/AddFriend';
 import SharePhoto from './pages/Album/SharePhoto';
 import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
 import PostEdit from './pages/Home/post/PostEdit';
+import EditTrip from './pages/Album/TripDetails/EditTrip';
+import SharedList from './pages/Album/TripDetails/SharedList';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -78,9 +80,12 @@ const App = () => {
 
         <Route path='/trips' element={<Album/>}/>
         <Route path='/trips/friends' element={<AddFriend/>}/>
-        <Route path='/trips/create' element={<SelectPlace/>}/>
-        <Route path='/trips/create/schedule' element={<CreateTrip/>}/>
+        <Route path='/trips/places' element={<SelectPlace/>}/>
+        <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail/:tripId' element={<TripDetail/>}/>
+        {/* <Route path='/trips/detail/:tripId/edit' element={<TripDetail/>}/> */}
+        <Route path='/trips/detail/edit' element={<EditTrip/>}/>
+        <Route path='/trips/shared' element={<SharedList/>}/>
         <Route path='/trips/detail/:tripId/share' element={<SharePhoto/>}/>
         <Route path='/trips/detail/:tripId/vid' element={<VideoDetail/>}/>
         <Route path='/trips/detail/:tripId/pic' element={<PhotoDetail/>}/>

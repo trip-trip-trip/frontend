@@ -86,3 +86,83 @@
     color: #E0DDD2;
     cursor: pointer;
 }
+
+/* trip-select-dropdown 스타일 */
+.trip-select-dropdown {
+    position: relative;
+    width: 90%; /* 화면 너비에 맞게 조정 */
+    margin: 10px auto 20px auto;
+    text-align: left;
+}
+
+.dropdown-toggle {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    color: #333;
+}
+
+.arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 10px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    transition: transform 0.3s;
+}
+
+.arrow.down {
+    border-top: 5px solid #333;
+    transform: translateY(2px);
+}
+
+.arrow.up {
+    border-bottom: 5px solid #333;
+    transform: rotate(180deg) translateY(2px);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%; /* 버튼 바로 아래 위치 */
+    left: 0;
+    width: 100%;
+    max-height: 200px; /* 스크롤을 위한 최대 높이 설정 */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background-color: #fff;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 10; /* 다른 요소 위에 표시 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-menu li {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.dropdown-menu li:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu li:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-menu li.selected {
+    font-weight: bold;
+    background-color: #e6f7ff; /* 선택된 항목 강조 */
+}
