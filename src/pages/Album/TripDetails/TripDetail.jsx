@@ -121,6 +121,7 @@ const TripDetail = () => {
       isShared: s.media.isShared || false,
     }));
     setScrapData(scrapInfo);
+    console.log(scrapInfo);
 
     const videoInfo = {
       madeVideo : fetchedTripDetail.contents.reel ? {
@@ -176,7 +177,7 @@ const TripDetail = () => {
           <h1>{tripInfo.title}</h1> 
           <div className="date-and-edit">
             <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
-            <button className='edit-btn'><img src={edit_btn} alt="" /></button>
+            <button className='edit-btn' onClick={()=>navigate(`/trips/detail/${tripId}/edit`)}><img src={edit_btn} alt="" /></button>
           </div>
   
           {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
@@ -256,7 +257,7 @@ const TripDetail = () => {
   
             {/* 스크랩북 섹션 */}
             {
-              scrapData &&
+              (scrapData.length > 0) &&
               <div className="photo_container scrapbook">
                 <img src={album_cont} alt="" className='album-cont-img scrapbook' />
                 <div className='section-photo-header scrapbook'>

@@ -80,7 +80,7 @@ const Album = () => {
       if (!token) {
         console.error("인증 토큰(accessToken)이 로컬 스토리지에 없습니다. 로그인 상태를 확인하세요.");
         setIsLoading(false);
-        // navigate('/login');
+        navigate('/login');
         return;
       }
 

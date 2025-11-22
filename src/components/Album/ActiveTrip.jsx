@@ -10,18 +10,26 @@ import members_icon from '/icons/members_icon.png'
 import camera_icon from '/icons/camera_icon.png'
 import write_icon from '/icons/write_icon.png'
 
-const ActiveTrip = ({tripName, startDate, endDate, members, filmCount, vidCount}) => {
+const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmCount, vidCount}) => {
     const navigate = useNavigate();
   return (
-    <div className='active-trip-container'>
-
+    <div className='active-trip-container' onClick={()=>navigate(`/trips/detail/${tripId}`, {
+      state: {
+          tripState: 'active',
+          tripId: tripId,
+          title: title,  
+          startDate: startDate,
+          endDate: endDate,
+          members:members,
+      }
+    })}>
       <div className="active-header">
         <div className="active-trip-title">
           <h2>지금 <span>{tripName}</span> 여행중 </h2>
         </div>
         <div className="active-trip-members">
           {/* 친구 수 + 1명(본인) 추가 */}
-          <h5><span>{(members.length) + 1}명</span> | {startDate.slice(2)} ~ {endDate.slice(2)}</h5>
+          <h5><span>{(members.length) + 1}명</span> | {startDate?.slice(2).split('-').join('.')} ~ {endDate.slice(2).split('-').join('.')}</h5>
         </div>
       </div>
 
@@ -67,7 +75,7 @@ const ActiveTrip = ({tripName, startDate, endDate, members, filmCount, vidCount}
 
             {/* 티켓 오른쪽 */}
             <div className="goto-camera">
-              <img src={camera_btn} alt="" className='goto-camera-btn' onClick={()=>navigate('/camera/:tripId', {state: {tripState: 'active'}} )} />
+              <img src={camera_btn} alt="" className='goto-camera-btn' onClick={()=>navigate(`/camera/${tripId}`, {state: {tripState: 'active'}} )} />
               <div className="goto-camera-cont">
                   <img src={camera_icon} alt="" />
                   <h6>촬영하기</h6>
@@ -81,7 +89,7 @@ const ActiveTrip = ({tripName, startDate, endDate, members, filmCount, vidCount}
           </div>
           
             <button>
-            <div className="main-edit-btn">
+            <div className="main-edit-btn" onClick={()=>navigate(`trips/detail/${tripId}/edit`)}>
               <img src={write_icon} alt="" />
               <p>수정하기</p>
           </div>
