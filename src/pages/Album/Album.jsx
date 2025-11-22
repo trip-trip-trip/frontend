@@ -16,7 +16,9 @@ const Album = () => {
   const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
+  const [isLoading, setIsLoading] = useState(true); 
   const todayDate = new Date().toISOString().split('T')[0];
+  
   const navigate = useNavigate();
   const { token, activeTripId, setActiveTripId } = useAuth();
 
@@ -26,7 +28,6 @@ const Album = () => {
 
   const [activeTripInfo, setActiveTripInfo] = useState(null);
   const [completedTrips, setCompletedTrips] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   
   // 친구 초대 요청 존재 여부
   const [hasInviteRequest, setHasInviteRequest]=useState(false);
@@ -147,7 +148,6 @@ const Album = () => {
     fetchTrips();
   }, [token, activeTripId]);
 
-
   if (isLoading) {
     return (
       <div className='album'>
@@ -242,7 +242,7 @@ return(
           : <></>}
         {/* 활성화된 여행 있으면 표시 */}
         <div className="album-active-cont">
-          {activeTripInfo
+          {activeTripId
             ? <ActiveTrip tripName={activeTripInfo?.title}
                           members={activeTripInfo?.members || []}
                           img={activeTripInfo?.image || []}

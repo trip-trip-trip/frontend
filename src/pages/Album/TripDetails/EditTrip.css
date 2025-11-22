@@ -1,4 +1,4 @@
-.create-trip{
+.edit-trip{
     padding: 9rem 0;
     color: #17171B;
     display: flex;
@@ -7,14 +7,32 @@
     overflow-y: auto; /* 이 영역에만 스크롤 적용 */
 }
 
-.create-trip-container{
+.edit-trip-cont{
     display: flex;
     flex-direction: column;
     width: 100%;
     align-items: center;
+    position: relative;
 }
 
-.create-trip-name h3{
+.edit-trip-title{
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.edit-trip-title img{
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.edit-trip-name h2{
+    color: #525B65;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.edit-trip-name h3{
     color: #525B65;
     font-size: 1.7rem;
     font-weight: 700;
@@ -23,7 +41,7 @@
     margin: 0.5rem 0;
 }
 
-form.create-trip-form{
+form.edit-trip-form{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -31,7 +49,7 @@ form.create-trip-form{
     width: 90%;
 }
 
-.create-trip-name{
+.edit-trip-name{
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -69,10 +87,6 @@ form.create-trip-form{
     border-radius: 0.4rem; 
     background-color: #E0DDD2; /* 체크 해제 상태 색 */
     cursor: pointer;
-    
-    /* display: inline-flex;
-    align-items: center;
-    justify-content: center; */
 
     transition: ease-in-out 0.2s;
 }
@@ -83,38 +97,8 @@ form.create-trip-form{
     transition: ease-in-out 0.2s;
 }
 
-/* 헤더에 <만들기> 위치할 때 CSS */
-/* .create-trip-btn{
-    position: absolute;
-    background: none;
-    border: none;
-    font-size: 1.8rem;
-    font-weight: 600;
-    top: 1.5rem;
-    right: 2rem;
-    z-index: 999;
-    cursor: pointer;
-    color: #131BF6;
-}
-*/
 
-.create-trip-btn{
-    border-radius: 3rem;
-    border: 1px solid #525B65;
-    background: #525B65;
-    display: flex;
-    width: 80%;
-    padding: 1.2rem 6.2rem;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    color: #E0DDD2;
-    text-align: center;
-    font-size: 1.6rem;
-    font-weight: 700;
-}
-
-.create-trip-form input[type='text'], input[type='date']{
+.edit-trip-form input[type='text'], input[type='date']{
     padding: 1.2rem 1.4rem;
     border-radius: 0.6rem;
     border: 0.1rem solid #525B65;
@@ -143,27 +127,6 @@ form.create-trip-form{
     width: 100%;
 }
   
-/* input[type="date"]::-webkit-clear-button,
-input[type="date"]::-webkit-inner-spin-button { 
-    display: none;
-} 
-input[type="date"]::-webkit-calendar-picker-indicator { 
-    background: transparent;
-    z-index: 1;
-}  */
-
-/* .input_date_box input:after{
-position: absolute;
-top:50%;
-right:10px;
-content: '';
-width: 20px;
-height:22px;
-transform: translateY(-50%);
-z-index: 0;
-} */
-
-  
 .date-form p{
     color: #525B65;
     font-family: Pretendard;
@@ -171,15 +134,75 @@ z-index: 0;
     font-weight: 400;
 }
 
+.date-form.true{
+    border-radius: 0.6rem;
+    border: none;
+    background: rgba(236, 235, 232, 0.772);
+    color: rgba(180, 185, 192, 0.687);
+}
 
-.create-trip-btn-cont{
+
+.edit-trip-btn-cont{
     background: #F6F6F5;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 6rem;
-    padding-bottom: 2rem;
     position: absolute;
     bottom: 0;
     width: 100%;
+}
+
+
+.edit-trip-btn{
+    border-radius: 3rem;
+    border: 1px solid #525B65;
+    background: #525B65;
+    display: flex;
+    width: 88%;
+    padding: 1.2rem 6.2rem;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: #E0DDD2;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.place-info-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.place-info-row h4{
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+.to-edit-complete{
+    border-bottom: 0.1rem solid #525B65;
+    cursor: pointer;
+}
+
+.place-info{
+    border-radius: 2rem;
+    background: #E0DDD2;
+    display: flex;
+    padding: 0.9rem 2rem;
+    gap: 1rem;
+    color: #525B65;
+    text-align: center;
+    align-items: center;
+}
+
+.place-info h4{
+    margin: 0;
+    font-weight: 400;
+    font-size: 1.4rem;
+    border: none;
+    cursor: default;
 }

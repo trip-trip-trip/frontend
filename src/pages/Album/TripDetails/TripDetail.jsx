@@ -23,6 +23,9 @@ const TripDetail = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
   const { tripId } = useParams();
+  const location = useLocation();
+
+  const tripState = location.state || 'active';
 
   // 사진 공유 여부 표시(isShared)
   const [showShared, setShowShared] = useState(false);
@@ -38,6 +41,8 @@ const TripDetail = () => {
   const [photoData, setPhotoData] = useState([]);
   // Fetch 해온 영상 정보 저장
   const [vidData, setVidData] = useState();
+  const [scrapData, setScrapData] = useState([]);
+  
   // 로딩상태 표시
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,7 +59,7 @@ const TripDetail = () => {
     // } = location.state || {};
 
 
-  //수업 상세정보
+  //여행 상세정보
   const fetchTripDetail = async () => {
     setIsLoading(true);
     try {
@@ -97,6 +102,14 @@ const TripDetail = () => {
     }));
     setPhotoData(photoInfo);
 
+    const scrapInfo = (fetchedTripDetail?.contents?.scrapbooks || []).map( s => ({
+      tripId: s.media.tripId,
+      comment: s.media.comment || '',
+      url: s.media.url || '',
+      isShared: s.media.isShared || false,
+    }));
+    setScrapData(scrapInfo);
+
     const videoInfo = {
       madeVideo : fetchedTripDetail.contents.reel ? {
         tripId : fetchedTripDetail.contents.reel.media.tripId,
@@ -127,6 +140,10 @@ const TripDetail = () => {
     }
   }, [token, tripId]); // token 또는 tripId가 변경될 때 다시 호출
 
+  const handleInvite = () => {
+    navigate('/trips/create'); //임시..
+  }
+
   if (isLoading) {
     return (
       <div className='trip-detail'>
@@ -139,94 +156,147 @@ const TripDetail = () => {
     );
   }
 
-  return (
-    <div className='trip-detail'>
-      <Header toBack={true}/>
-      <div className='trip-detail-container'>
-        <h1>{tripInfo.title}</h1> 
-        <div className="date-and-edit">
-          <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
-          <button className='edit-btn'><img src={edit_btn} alt="" /></button>
-        </div>
-
-        {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
-        <div className="shared-cont">
-          <div className="shared-friend">
-            <SharedFriends data={tripInfo.members} />
+  if (tripState === 'completed') {
+    return (
+      <div className='trip-detail'>
+        <Header toBack={true}/>
+        <div className='trip-detail-container'>
+          <h1>{tripInfo.title}</h1> 
+          <div className="date-and-edit">
+            <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
+            <button className='edit-btn'><img src={edit_btn} alt="" /></button>
           </div>
-          <button className='share-btn'>
-            <img src={link_icon} alt="" />
-            <p>공유 사진 관리하기</p>
-          </button>
-        </div>
-        <div className="display-shared">
-          <input type="checkbox" 
-            className='display-checked'
-            checked={showShared}
-            onChange={handleToggleShared}
-          />
-          <p>공유된 미디어 표시</p>
-        </div>
-
-        {/* 사진 섹션 */}
-          <div className="photo_container">
-            <img src={album_cont} alt="" className='album-cont-img' />
-            <div className='section-photo-header'>
-              <h2 className='photo-cont-title'>사진</h2>
-              <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : photoData } } )}>
-                <img src={more_btn} alt="" />
-              </button>
+  
+          {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
+          <div className="shared-cont">
+            <div className="shared-friend">
+              <SharedFriends data={tripInfo.members} />
             </div>
-            <div className="photo-grid-cont">
-              <div className='photo-grid'>
-                {photoData.map((pics, index)=>(
-                  <div className='photo-item' key={index}> 
-                      <img src={pics.url} alt="" />
-                      {showShared && pics.isShared && (
-                        <div className='shared-link-icon'>
-                          <img src={shared_icon} alt="공유됨" />
-                        </div>
-                      )}
+            <button className='share-btn' onClick={() => navigate(`/trips/detail/${tripId}/share`)}>
+              <img src={link_icon} alt="" />
+              <p>공유 사진 관리하기</p>
+            </button>
+          </div>
+          <div className="display-shared">
+            <input type="checkbox" 
+              className='display-checked'
+              checked={showShared}
+              onChange={handleToggleShared}
+            />
+            <p>공유된 미디어 표시</p>
+          </div>
+  
+          {/* 사진 섹션 */}
+            <div className="photo_container">
+              <img src={album_cont} alt="" className='album-cont-img' />
+              <div className='section-photo-header'>
+                <h2 className='photo-cont-title'>사진</h2>
+                <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : photoData } } )}>
+                  <img src={more_btn} alt="" />
+                </button>
+              </div>
+              <div className="photo-grid-cont">
+                <div className='photo-grid'>
+                  {photoData.slice(0,8).map((pics, index)=>(
+                    <div className='photo-item' key={index}> 
+                        <img src={pics.url} alt="" />
+                        {showShared && pics.isShared && (
+                          <div className='shared-link-icon'>
+                            <img src={shared_icon} alt="공유됨" />
+                          </div>
+                        )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+  
+            <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { tripId: tripInfo.tripId } } )}>
+              <h1>스크랩북 만들기</h1>
+            </button>
+  
+            {/* video 섹션 */}
+            <div className="video_container">
+              <img src={album_cont_vid} alt="" className='album-cont-vid' />
+              <div className='section-video-header'>
+                <h2 className='video-cont-title'>3초 영상</h2>
+                <button className='more-video-button' onClick={()=>navigate(`/trips/detail/${tripId}/vid`)}>
+                  <img src={more_btn} alt="" />
+                </button>
+              </div>
+              <div className="video-grid-cont">
+                <div className='video-grid'>
+                  {/* 메인 영상 */}
+                  {vidData.madeVideo && (
+                      <div className='video-card video-main'>
+                          <video src={vidData.madeVideo.url} controls></video>
+                      </div>
+                  )}
+                  {/* 릴 아이템들 */}
+                  {vidData.videoItems && vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
+                      <div className='video-card' key={index}>
+                          <video src={video.url} controls></video>
+                      </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+  
+            {/* 스크랩북 섹션 */}
+            {
+              scrapData &&
+              <div className="photo_container scrapbook">
+                <img src={album_cont} alt="" className='album-cont-img scrapbook' />
+                <div className='section-photo-header scrapbook'>
+                  <h2 className='photo-cont-title scrapbook'>스크랩북</h2>
+                  <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : photoData } } )}>
+                    <img src={more_btn} alt="" />
+                  </button>
+                </div>
+                <div className="photo-grid-cont">
+                  <div className='photo-grid'>
+                    {scrapData.map((pics, index)=>(
+                      <div className='photo-item' key={index}> 
+                          <img src={pics.url} alt="" />
+                          {showShared && pics.isShared && (
+                            <div className='shared-link-icon'>
+                              <img src={shared_icon} alt="공유됨" />
+                            </div>
+                          )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          </div>
-
-          <button className='scrapbook-btn' onClick={()=>navigate('/scrapbook/frame', {state: { picList : photoData } } )}>
-            <h1>스크랩북 만들기</h1>
-          </button>
-
-          {/* video 섹션 */}
-          <div className="video_container">
-            <img src={album_cont_vid} alt="" className='album-cont-vid' />
-            <div className='section-video-header'>
-              <h2 className='video-cont-title'>3초 영상</h2>
-              <button className='more-video-button' onClick={()=>navigate(`/trips/detail/${tripId}/vid`)}>
-                <img src={more_btn} alt="" />
-              </button>
-            </div>
-            <div className="video-grid-cont">
-              <div className='video-grid'>
-                {/* 메인 영상 */}
-                {vidData.madeVideo && (
-                    <div className='video-card video-main'>
-                        <video src={vidData.madeVideo.url} controls></video>
-                    </div>
-                )}
-                {/* 릴 아이템들 */}
-                {vidData.videoItems && vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
-                    <div className='video-card' key={index}>
-                        <video src={video.url} controls></video>
-                    </div>
-                ))}
-              </div>
-            </div>
-          </div>
+            }
+            
+        </div>
+        <Navbar/>
       </div>
-      <Navbar/>
-    </div>
-  );
+    );
+  } else if ( tripState === 'active'){
+    return (
+      <div className='trip-detail'>
+        <Header toBack={true}/>
+        <div className='trip-detail-container'>
+          <h1>{tripInfo.title}</h1> 
+          <div className="date-and-edit">
+            <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
+            <button className='edit-btn'><img src={edit_btn} alt="" /></button>
+          </div>
+  
+          {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
+          <div className="shared-cont">
+            <div className="shared-friend">
+              <SharedFriends data={tripInfo.members} invite={true} onInviteClick={handleInvite} />
+            </div>
+          </div>
+
+        </div>
+        <Navbar/>
+      </div>
+    );
+  }
 };
 
 export default TripDetail;

@@ -13,6 +13,7 @@ const EndedTripItem = ( {tripId, title, startDate, endDate, members, coverImage,
   return (
     <div className='EndedTripItem' onClick={()=>navigate(`/trips/detail/${tripId}`, {
       state: {
+          tripState: 'completed',
           tripId: tripId,
           title: title,  
           startDate: startDate,

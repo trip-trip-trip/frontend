@@ -67,7 +67,7 @@ const ActiveTrip = ({tripName, startDate, endDate, members, filmCount, vidCount}
 
             {/* 티켓 오른쪽 */}
             <div className="goto-camera">
-              <img src={camera_btn} alt="" className='goto-camera-btn' onClick={()=>navigate('/camera/:tripId')} />
+              <img src={camera_btn} alt="" className='goto-camera-btn' onClick={()=>navigate('/camera/:tripId', {state: {tripState: 'active'}} )} />
               <div className="goto-camera-cont">
                   <img src={camera_icon} alt="" />
                   <h6>촬영하기</h6>

@@ -3,6 +3,9 @@ import Header from '../../../components/Header/Header';
 import Navbar from '../../../components/NavBar/NavBar';
 import './PickFrame.css'
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
 
 // 프레임 목록 더미
 const FrameList = [
@@ -16,7 +19,16 @@ const PickFrame = () => {
 
   const location = useLocation();
   const picList = location.state?.picList;
+  const [completedTrips, setCompletedTrips] = useState([]);
+  const todayDate = new Date().toISOString().split('T')[0];
+  const [tripId, setTripId] = useState();
+  const API_BASE = import.meta.env.PROD 
+      ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+      : '/api';
+  const [isLoading, setIsLoading] = useState(true); 
 
+  const {token} = useAuth();
+  
   // 프레임 선택 핸들러
   const handleFrameSelect = (frameId, picNum, frameUrl) => {
     // 사진 선택 페이지로 이동하면서 선택된 프레임 정보를 state로 전달
@@ -25,7 +37,8 @@ const PickFrame = () => {
             selectedPicNum: picNum,  
             selectedFrameUrl: frameUrl,
             selectedFrameId: frameId,
-            picList: picList
+            picList: picList,
+            tripId: tripId
         }
     });
   };
