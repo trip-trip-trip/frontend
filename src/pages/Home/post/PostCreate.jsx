@@ -8,15 +8,17 @@ import { useAuth } from '../../../contexts/AuthContext';
 import Navbar from '../../../components/NavBar/NavBar';
 
 // 1. HTTPS 주소 적용
-const API_BASE = import.meta.env.PROD 
-    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-    : '/api';
+// const API_BASE = import.meta.env.PROD 
+//     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+//     : '/api';
 
+const API_BASE = 'https://tripshot.duckdns.org'
+const test = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzMyIsImlhdCI6MTc2MzkwNjY1MywiZXhwIjoxNzYzOTEwMjUzfQ.V80Ux2rc9eA_gpQrMxbhZ-MW5n28VdCytKDIO48kt3ji5WcAeAabVMczABsz9M4t2Icid_-_0f3wfykQ_MM-qA'
 export default function PostCreate() {
   const navigate = useNavigate();
   
   // 2. useAuth에서 객체 구조 분해로 token 가져오기 (필수)
-  const { token } = useAuth(); 
+  // const { token } = useAuth(); 
 
   // --- 상태 관리 ---
   const [step, setStep] = useState(1); // 1: 여행선택, 2: 미디어선택, 3: 글작성
@@ -32,10 +34,10 @@ export default function PostCreate() {
   // 여행 목록 불러오기
   useEffect(() => {
     const fetchMyTrips = async () => {
-      if (!token) return;
+      // if (!token) return;
       try {
         const res = await fetch(`${API_BASE}/trips`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${test}` },
         });
         const data = await res.json();
         
@@ -47,7 +49,7 @@ export default function PostCreate() {
       }
     };
     fetchMyTrips();
-  }, [token]);
+  }, [test]);
 
   // --- [Step 1 -> 2] 여행 선택 핸들러 ---
   const handleSelectTrip = (tripItem) => {
@@ -122,7 +124,7 @@ export default function PostCreate() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${test}`,
         },
         body: JSON.stringify(payload)
       });
@@ -265,6 +267,7 @@ export default function PostCreate() {
         {/* === STEP 3: 글 작성 === */}
         {step === 3 && (
           <div className="step-write">
+            
             <h2 className="step-title">코멘트를 작성해주세요</h2>
             
             <div className="write-preview-box">
@@ -305,14 +308,14 @@ export default function PostCreate() {
                     비공개 포스트로 올리기
                 </label>
             </div>
-
+            
             <textarea 
                 className="comment-box" 
                 placeholder="내용을 입력해주세요"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
             ></textarea>
-
+            
             <button className="submit-btn" onClick={handleUpload} disabled={loading}>
                 {loading ? '게시 중...' : '게시하기!'}
             </button>
@@ -321,5 +324,5 @@ export default function PostCreate() {
       </main>
     </div>
   );
-  
+
 }

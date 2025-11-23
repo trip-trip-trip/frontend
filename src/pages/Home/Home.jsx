@@ -13,9 +13,11 @@ import plus_btn from '/icons/plus_icon.png';
 const TabAll = lazy(() => import('./tabs/TabAll'));
 const TabPlace = lazy(() => import('./tabs/TabPlace'));
 
-const API_BASE = import.meta.env.PROD 
-    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-    : '/api';
+// const API_BASE = import.meta.env.PROD 
+//     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+//     : '/api';
+const API_BASE = 'https://tripshot.duckdns.org'
+const test = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzMyIsImlhdCI6MTc2MzkwNjY1MywiZXhwIjoxNzYzOTEwMjUzfQ.V80Ux2rc9eA_gpQrMxbhZ-MW5n28VdCytKDIO48kt3ji5WcAeAabVMczABsz9M4t2Icid_-_0f3wfykQ_MM-qA'
 
 const Home = () => {
   const { user, login, setUser, isLoading, activeTripId, token } = useAuth();
@@ -56,14 +58,14 @@ const Home = () => {
   // 여행 상태 조회
   useEffect(() => {
     const fetchActiveTripStatus = async () => {
-      if (!token) return;
+      // if (!token) return;
 
       try {
         const response = await fetch(`${API_BASE}/trips/isActiveTrips`, {
           method: "GET",
           headers: {
             "Content-type": "application/json",
-            "Authorization": `Bearer ${token}`, 
+            "Authorization": `Bearer ${test}`, 
           },
         });
 
