@@ -143,7 +143,7 @@
   align-items: center;
 }
 .toggle-icon {
-  width: 50px; /* 적절한 크기로 조절 */
+  width: 80px; /* 적절한 크기로 조절 */
   height: auto;
   object-fit: contain;
 }

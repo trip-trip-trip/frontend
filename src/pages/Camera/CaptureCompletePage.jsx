@@ -11,6 +11,8 @@ import saveCamBtn from '../../assets/savecam.png';
 const API_BASE = import.meta.env.PROD 
   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
   : '/api';
+
+
   
 const CaptureCompletePage = () => {
   const location = useLocation();
@@ -46,7 +48,9 @@ if (!token) {
       alert("로그인 토큰이 없습니다.");
       setIsLoading(false);
       return;
-    }
+    } 
+ 
+
   let meta;
   let endpoint;
 

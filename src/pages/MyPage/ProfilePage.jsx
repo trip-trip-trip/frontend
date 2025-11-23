@@ -147,7 +147,7 @@ return (
 
        {/* 3. 앨범 그리드 */}
        <div className="album-grid">
-         <div className="album-item add" onClick={() => navigate("/post_select")}>+</div>
+         <div className="album-item add" onClick={() => navigate("/post/create")}>+</div>
          
          {myPosts.map((post) => {
            const thumbUrl = post.media?.[0]?.thumbnail_url || post.media?.[0]?.url;
