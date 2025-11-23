@@ -5,8 +5,10 @@ import './Post.css';
 import { useAuth } from '../../../contexts/AuthContext'; 
 import Header from '../../../components/Header/Header';
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
-
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
+    
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
