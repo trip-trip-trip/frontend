@@ -220,7 +220,7 @@ const selectFilter = (index) => setCurrentFilterIndex(index);
             textureImg.crossOrigin = "anonymous";
             textureImg.src = filmTextureSrc;
             textureImg.onload = () => {
-              ctx.globalAlpha = 0.7;
+              ctx.globalAlpha = 0.2;
               ctx.globalCompositeOperation = 'overlay';
 
               const ratio = textureImg.width / textureImg.height;

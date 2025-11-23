@@ -61,6 +61,8 @@ const fetchData = async () => {
       // 3. [NEW] 보낸 요청 목록 (type=sent)
       const sentRes = await fetch(`${API_BASE}/friendships/requests?type=sent`, { headers: getHeaders() });
       const sentData = await sentRes.json();
+      console.log(">>> 3. 보낸 친구 요청 API 응답:", sentData);
+
       if (sentData.isSuccess) {
         // API 응답(receiver...)을 UI에 맞는 키(username, avatarUrl...)로 매핑
         const mappedSent = (sentData.result || []).map(item => ({
@@ -199,7 +201,7 @@ const fetchData = async () => {
             <div className="section-list">
               {sentRequests.length > 0 ? sentRequests.map(req => (
                 <div className="friend-item" key={req.id}>
-                  <div className="friend-info" onClick={() => navigate(`/user/${req.receiverId}`)}
+                  <div className="friend-info" onClick={() => navigate(`/user/${req.userId}`)}
                     style={{cursor:'pointer'}}>
                     <img src={req.avatarUrl || defaultProfile} className="friend-img" alt="프사"/>
                     <div className="friend-text">

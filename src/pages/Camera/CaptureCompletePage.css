@@ -52,7 +52,7 @@ html, body, #root {
 }
 
 .retake-text {
-  color: #fff;
+  color: #E0DDD2;
   font-size: 14px;
   text-decoration: underline; /* 밑줄 */
   cursor: pointer;
@@ -71,8 +71,10 @@ html, body, #root {
 .preview-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 9/ 16; /* 대략적인 비율, 필요시 height: 400px 등으로 고정 가능 */
+  aspect-ratio: 9/ 16; 
+
   overflow: hidden;
+  flex-shrink: 0;
   background-color: #000;
 }
 
@@ -100,7 +102,7 @@ html, body, #root {
 }
 
 .film-overlay-icon {
-  width: 100%; /* 피그마처럼 화면 가로로 꽉 차는 필름 이미지 */
+  width: 90%; 
   max-width: 390px;
   height: auto;
   object-fit: contain;
@@ -117,7 +119,7 @@ html, body, #root {
 }
 
 .overlay-text-sub {
-  color: #fff;
+  color: #E0DDD2;
   font-size: 14px;
   margin: 0;
   opacity: 0.9;

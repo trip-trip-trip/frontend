@@ -121,7 +121,7 @@ html,body,#root{
   z-index: 7; /* 프레임보다 위에 */
    filter: none;
  mix-blend-mode: overlay;
- opacity: 0.5;
+ opacity: 0.2;
 
 }
 
@@ -161,21 +161,21 @@ html,body,#root{
   padding: 20px 20px 40px; /* 하단 패딩 넉넉히 */
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
   position: relative;
   border-radius: 15px;
   z-index: 30;
   transform: translateY(0);
-  transition: transform 0.35s ease;
-   padding: 0.35s ease;
+  transition: all 0.3s ease; /* 애니메이션 부드럽게 */
+ min-height: 160px;
 }
 
 /* 필터창이 열리면 바가 위로 살짝 올라오는 느낌을 원하시면 padding 조정 가능 */
 .camera-controls-bar.filter-open {
-    padding-top: 10px;
-    transform: translateY(-18px); 
+    padding-top: 20px;
     justify-content: center; 
-  gap: 120px;
+  gap: 10px;
 }
 
 /* (1) 모드 선택 캡슐 버튼 */
@@ -282,11 +282,11 @@ html,body,#root{
 /* (3) 필터 슬라이더 영역 */
 .filter-slider-container {
     width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 /* 선택된 필터 이름 (타원형 뱃지) */
