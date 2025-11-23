@@ -238,7 +238,6 @@
 }
 
 .main-edit-btn{
-    border-bottom: 0.1rem solid #525B65;
     background: none;
     cursor: pointer;
 }
@@ -251,4 +250,5 @@
 .main-edit-btn p{
     font-size: 1.2rem;
     font-weight: 400;
+    border-bottom: 0.1rem solid #525B65;
 }
