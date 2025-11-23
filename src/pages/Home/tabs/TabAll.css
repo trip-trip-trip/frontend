@@ -2,14 +2,13 @@
 .taball {
   width: 100%;
   min-height: 100vh;
-  padding-top: 20px; /* 상단 여백 추가 */
   background-color: #f6f6f5; /* Image 1의 밝은 배경색 */
 }
 
 .feed-list {
   display: flex;
   flex-direction: column;
-  padding: 20px 0; /* 상하 패딩 추가 */
+  padding: 0 0 20px 0; 
 }
 
 .feed-skeleton, .feed-error {
