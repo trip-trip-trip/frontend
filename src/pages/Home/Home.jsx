@@ -13,11 +13,13 @@ import plus_btn from '/icons/plus_icon.png';
 const TabAll = lazy(() => import('./tabs/TabAll'));
 const TabPlace = lazy(() => import('./tabs/TabPlace'));
 
+// 이미지 경로 에러 방지를 위해 URL 상수로 대체
+const new_trip = "https://placehold.co/200x200?text=New+Trip";
+const plus_btn = "https://placehold.co/50x50?text=+";
+
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
-// const API_BASE = 'https://tripshot.duckdns.org'
-// const test = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzMyIsImlhdCI6MTc2MzkwNjY1MywiZXhwIjoxNzYzOTEwMjUzfQ.V80Ux2rc9eA_gpQrMxbhZ-MW5n28VdCytKDIO48kt3ji5WcAeAabVMczABsz9M4t2Icid_-_0f3wfykQ_MM-qA'
 
 const Home = () => {
   const { user, login, setUser, isLoading, activeTripId, token } = useAuth();
@@ -77,6 +79,10 @@ const Home = () => {
              const activeData = tripList.find(item => item.status === 'ACTIVE');
 
              if (activeData) {
+                const contents = activeData.contents || {};
+                const photos = contents.photos || [];
+                const videos = contents.reelItems || [];
+
                 setHomeTripInfo({
                   id: activeData.id,
                   title: activeData.title,
@@ -87,9 +93,9 @@ const Home = () => {
                     profile: activeData.inviteesNameList?.[index] || '',
                     tag: tag
                   })),
-                  image: [], 
-                  film_count: 0, 
-                  vid_count: 0,
+                  image: photos.map(p => p.media?.url || ''), 
+                  film_count: photos.length, 
+                  vid_count: videos.length,
                 });
              } else {
                 setHomeTripInfo(null); 
@@ -109,17 +115,36 @@ const Home = () => {
   // --- 클릭 핸들러 ---
   const handleGoCamera = (e) => {
     e.stopPropagation();
-    if (homeTripInfo?.id) navigate(`/camera/${homeTripInfo.id}`);
+    if (homeTripInfo?.id) {
+        navigate(`/camera/${homeTripInfo.id}`, {
+            state: { tripState: 'active' } 
+        });
+    }
   };
 
+  // 2) 여행 상세 이동
   const handleGoTripDetail = (e) => {
     e.stopPropagation();
-    if (homeTripInfo?.id) navigate(`/trips/${homeTripInfo.id}`);
+    if (homeTripInfo?.id) {
+        navigate(`/trips/detail/${homeTripInfo.id}`, {
+            state: {
+                tripState: 'active',
+                tripId: homeTripInfo.id,
+                title: homeTripInfo.title,  
+                startDate: homeTripInfo.startDate,
+                endDate: homeTripInfo.endDate,
+                members: homeTripInfo.members,
+            }
+        });
+    }
   };
 
+  // 3) 여행 수정 이동
   const handleGoEdit = (e) => {
     e.stopPropagation();
-    if (homeTripInfo?.id) navigate(`/trips/edit/${homeTripInfo.id}`);
+    if (homeTripInfo?.id) {
+        navigate(`/trips/detail/${homeTripInfo.id}/edit`);
+    }
   };
 
   if (isLoading) return <div>불러오는 중...</div>;
@@ -145,9 +170,7 @@ const Home = () => {
                 />
 
                 <div className="hitbox-info" onClick={handleGoTripDetail}></div>
-                
                 <div className="hitbox-camera" onClick={handleGoCamera}></div>
-                
                 <div className="hitbox-edit" onClick={handleGoEdit}></div>
               </div>
             ) : (
