@@ -9,7 +9,9 @@ import default_pic from '../../../assets/default_pic.jpg';
 
 import './Post.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
 const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
   const {
@@ -55,7 +57,7 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
   // 좋아요 토글 API 연동
   const toggleLike = async (e) => {
     e.stopPropagation();
-    if (!token) return alert("로그인이 필요합니다."); // 토큰 확인
+    // if (!token) return alert("로그인이 필요합니다."); // 토큰 확인
 
     const nextIsLiked = !isLiked;
     const nextLikeCount = nextIsLiked ? currentLikeCount + 1 : currentLikeCount - 1;
@@ -67,9 +69,8 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
     try {
       const res = await fetch(`${API_BASE}/posts/${id}/like`, {
         method: 'POST', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token || ''}` }
+
       });
 
       if (!res.ok) {

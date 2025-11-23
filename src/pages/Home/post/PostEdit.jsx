@@ -4,7 +4,9 @@ import { useAuth } from '../../../contexts/AuthContext';
 import Header from '../../../components/Header/Header';
 import './PostEdit.css'; 
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
 const PostEdit = () => {
   const { id } = useParams();
@@ -156,7 +158,7 @@ const PostEdit = () => {
             onClick={handleUpdate} 
             disabled={loading}
         >
-            {loading ? '수정 중...' : '수정하기★'} 
+            {loading ? '수정 중...' : '수정하기'} 
         </button>
 
       </main>

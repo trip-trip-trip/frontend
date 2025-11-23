@@ -4,8 +4,9 @@ import PostItem from '../post/PostItem';
 import './TabAll.css';
 import { useAuth } from '../../../contexts/AuthContext';
 
-// API_BASE 환경 변수 처리
-const API_BASE = (import.meta.env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
 const LS_KEY = 'tripshot_posts'; 
 
@@ -15,19 +16,16 @@ const readLocalPosts = () => {
 };
 
 const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
-  const navigate = useNavigate();
-  const { activeTripId, token, user } = useAuth(); 
+  const { token, user } = useAuth();
   const [posts, setPosts] = useState([]);
   const currentUserName = user?.username || user?.tag || 'me';
   const currentUserId = user?.id;
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState('');
    
   useEffect(() => {
     if (onPostsLoaded) onPostsLoaded(posts);
   }, [posts, onPostsLoaded]);
   
-  const canShoot = useMemo(() => !!activeTrip, [activeTrip]);
 
   // 날짜 처리 → created_at / createdAt 둘 다 지원
   const extractCreatedDate = (p) => {
@@ -65,6 +63,7 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
         const res = await fetch(`${API_BASE}/posts?feed_type=all&limit=200`, {
           signal: ac.signal,
           headers: { 'Authorization': `Bearer ${token || ''}` }
+          
         });
 
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -87,26 +86,17 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
     return () => ac.abort();
   }, [token, user]);
 
-  // const goShoot = () => {
-  //   if (!canShoot) return;
-  //   if (activeTripId) navigate(`/camera/${activeTripId}`);
-  //   else alert("활성 여행 ID를 찾을 수 없습니다.");
-  // };
-
   return (
     <section className="taball">
       <div className="feed-list">
         {loading && <div className="feed-skeleton">불러오는 중…</div>}
-{/* 
+
         {!loading && posts.length === 0 && (
-          <div className="no-posts">게시물이 없습니다. 첫 게시물을 올려보세요!</div>
-        )} */}
-        {!loading && posts.length === 0 && (
-  <div className="no-posts-container">
-    <p className="empty-title">아직 기록된 여행 순간이 없어요</p>
-    <p className="empty-subtitle">첫 번째 사진을 올려 추억을 시작해보세요!</p>
-  </div>
-)}
+          <div className="no-posts-container">
+          <p className="empty-title">아직 기록된 여행 순간이 없어요</p>
+          <p className="empty-subtitle">첫 번째 사진을 올려 추억을 시작해보세요!</p>
+          </div>
+        )}
 
         {!loading && posts.map((p) => (
           <PostItem 

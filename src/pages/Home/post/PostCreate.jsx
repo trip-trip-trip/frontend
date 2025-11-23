@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../../components/Header/Header';
-import './PostCreate.css'; // CSS 파일명 변경 추천
+import './PostCreate.css'; 
 import default_pic from '../../../assets/default_pic.jpg';
 import { useAuth } from '../../../contexts/AuthContext';
 import Navbar from '../../../components/NavBar/NavBar';
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
-
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api'; 
 const MOCK_DATA = [
   {
     trip: {
@@ -48,7 +49,7 @@ const MOCK_DATA = [
 
 export default function PostCreate() {
   const navigate = useNavigate();
-  const token = useAuth(); // 토큰 가져오기
+  const {token} = useAuth(); // 토큰 가져오기
 
   // --- 상태 관리 ---
   const [step, setStep] = useState(1); // 1: 여행선택, 2: 미디어선택, 3: 글작성
@@ -64,25 +65,25 @@ export default function PostCreate() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setMyTripsData(MOCK_DATA);
-  //   const fetchMyTrips = async () => {
-  //     try {
-  //       const res = await fetch(`${API_BASE}/trips`, { // 혹은 보내주신 것처럼 /posts ?? 확인 필요. 보통은 /trips
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-  //       const data = await res.json();
+    // setMyTripsData(MOCK_DATA);
+    const fetchMyTrips = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_BASE}/trips`, { // 혹은 보내주신 것처럼 /posts ?? 확인 필요. 보통은 /trips
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
         
-  //       if (data.isSuccess) {
-  //         // 제공해주신 JSON 구조 그대로 저장 (result 배열)
-  //         setMyTripsData(data.result || []);
-  //       }
-  //     } catch (e) {
-  //       console.error("여행 목록 로드 실패", e);
-  //     }
-  //   };
-  //   fetchMyTrips();
-  // }, [token]);
-}, []);
+        if (data.isSuccess) {
+          // 제공해주신 JSON 구조 그대로 저장 (result 배열)
+          setMyTripsData(data.result || []);
+        }
+      } catch (e) {
+        console.error("여행 목록 로드 실패", e);
+      }
+    };
+    fetchMyTrips();
+  }, [token]);
 
   // --- [Step 1 -> 2] 여행 선택 핸들러 ---
   const handleSelectTrip = (tripItem) => {
@@ -127,61 +128,61 @@ export default function PostCreate() {
   };
 
   // --- [Step 3] 최종 업로드 ---
-  // const handleUpload = async () => {
-  //   if (!content.trim()) return alert("코멘트를 작성해주세요.");
-  //   if (!selectedTripData) return;
-
-  //   setLoading(true);
-
-  //   try {
-  //     const payload = {
-  //       tripId: selectedTripData.trip.id,
-  //       visibility: isPrivate ? 'PRIVATE' : 'FRIENDS',
-  //       caption: content,
-  //       location_text: "", // 필요하다면 추가
-  //       lat: null,
-  //       lng: null,
-  //       media: selectedMedia.map(m => ({
-  //         media_id: m.mediaAssetId,
-  //         // 서버가 기대하는 object_type에 맞춰 매핑
-  //         object_type: m.type === 'SCRAPBOOK' ? 'SCRAPBOOK' : 'MEDIA' 
-  //       }))
-  //     };
-
-  //     const res = await fetch(`${API_BASE}/posts`, {
-  //       method: 'POST',
-  //       headers: {
-  //           'Content-Type': 'application/json',
-  //           Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(payload)
-  //     });
-      
-  //     const data = await res.json();
-  //     if (data.isSuccess) {
-  //       alert("게시물이 등록되었습니다!");
-  //       navigate('/home', { replace: true });
-  //     } else {
-  //       alert(data.message || "업로드 실패");
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //     alert("오류 발생");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleUpload = async () => {
     if (!content.trim()) return alert("코멘트를 작성해주세요.");
-    
-    // 로딩 흉내 1초
+    if (!selectedTripData) return;
+
     setLoading(true);
-    setTimeout(() => {
-        alert("게시물이 등록되었습니다! (더미 테스트)");
+
+    try {
+      const payload = {
+        tripId: selectedTripData.trip.id,
+        visibility: isPrivate ? 'PRIVATE' : 'FRIENDS',
+        caption: content,
+        location_text: "", // 필요하다면 추가
+        lat: null,
+        lng: null,
+        media: selectedMedia.map(m => ({
+          media_id: m.mediaAssetId,
+          // 서버가 기대하는 object_type에 맞춰 매핑
+          object_type: m.type === 'SCRAPBOOK' ? 'SCRAPBOOK' : 'MEDIA' 
+        }))
+      };
+
+      const res = await fetch(`${API_BASE}/posts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      if (data.isSuccess) {
+        alert("게시물이 등록되었습니다!");
         navigate('/home', { replace: true });
-        setLoading(false);
-    }, 1000);
+      } else {
+        alert(data.message || "업로드 실패");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("오류 발생");
+    } finally {
+      setLoading(false);
+    }
   };
+  // const handleUpload = async () => {
+  //   if (!content.trim()) return alert("코멘트를 작성해주세요.");
+    
+  //   // 로딩 흉내 1초
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //       alert("게시물이 등록되었습니다! (더미 테스트)");
+  //       navigate('/home', { replace: true });
+  //       setLoading(false);
+  //   }, 1000);
+  // };
 
   // 헤더 타이틀 동적 변경
   const getTitle = () => {
@@ -190,9 +191,17 @@ export default function PostCreate() {
     return "게시물 작성";
   };
 
+  const handleBackClick = () => {
+      if (step > 1) {
+          setStep(step - 1); // 단계가 진행 중이면 이전 단계로
+      } else {
+          navigate(-1); // 첫 단계면 페이지 뒤로가기
+      }
+  };
+
   return (
     <div className="post-create-container">
-      <Header title={getTitle()}toBack={true} /> {/* Header에 onBackClick 연동 필요 */}
+      <Header title={getTitle()}toBack={true} onBackClick={handleBackClick}/> {/* Header에 onBackClick 연동 필요 */}
 
       <main className="post-body">
         
