@@ -262,7 +262,7 @@ const [sentRequests, setSentRequests] = useState([]);
               {u.id === user?.id ? (
                 <span className="status-badge">나</span>
               ) : u.friend ? (
-                <span className="status-badge">이미 친구</span>
+                null
               ) : u.pendingReceived ? (
                 <span className="status-badge">요청 받음</span>
               ) : isSent ? (
