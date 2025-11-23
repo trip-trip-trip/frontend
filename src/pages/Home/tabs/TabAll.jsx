@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-// 경로에 유의하세요. 파일 구조에 맞춰 ../../../components... 로 설정됨
-import PostItem from '../../../components/post/PostItem'; 
+import PostItem from '../post/PostItem';
 import './TabAll.css';
 import { useAuth } from '../../../contexts/AuthContext';
 
