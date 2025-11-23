@@ -13,10 +13,6 @@ import plus_btn from '/icons/plus_icon.png';
 const TabAll = lazy(() => import('./tabs/TabAll'));
 const TabPlace = lazy(() => import('./tabs/TabPlace'));
 
-// 이미지 경로 에러 방지를 위해 URL 상수로 대체
-const new_trip = "https://placehold.co/200x200?text=New+Trip";
-const plus_btn = "https://placehold.co/50x50?text=+";
-
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
