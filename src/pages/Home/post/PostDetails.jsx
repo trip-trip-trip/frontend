@@ -177,7 +177,15 @@ const handleCommentDelete = async (comment) => {
   }
 };
 
+  const handleKeyDown = (e) => {
+    // 한글 입력 중 조합(composing) 상태일 때 이벤트 중복 방지
+    if (e.nativeEvent.isComposing) return;
 
+    if (e.key === 'Enter') {
+      e.preventDefault(); // 줄바꿈 방지
+      handleCommentSubmit();
+    }
+  };
   /** UI 렌더링 */
   if (loading) return <div className="post-detail-loading">불러오는 중...</div>;
 
@@ -192,77 +200,103 @@ const handleCommentDelete = async (comment) => {
 
   return (
     <div className="post-detail-page">
-      <Header toBack={true}/>  
+      <Header toBack={true} />
+      <div className="scroll-content">
+        <PostItem post={post} isMine={isMine} isDetail={true} />
 
-      <PostItem post={post} isMine={isMine} isDetail={true} />
+        <div className="detail-comments-area">
+          <div className="comments-list-detail">
+            {Array.isArray(comments) && comments.map(c => {
+              // 댓글 작성자 정보 안전하게 추출
+              const commenter = c.commenter || c.user || {};
+              const isCommentMine = Number(commenter.id) === Number(user?.id);
 
-      {/* 댓글 영역 */}
-      <div className="detail-comments-area">
-        <div className="comments-list-detail">
+              return (
+                <div key={c.id} className="comment-item detail-item">
+                  <div className="comment-line">
+                    {/* 댓글 작성자 프사 */}
+                    <span className="comment-avatar-circle">
+                      <img
+                        src={commenter.avatar_url || '/assets/default-avatar.png'}
+                        alt="user"
+                        onError={(e) => e.target.src='/assets/default-avatar.png'}
+                      />
+                    </span>
 
-          {Array.isArray(comments) && comments.map(c => {
-            const commenter = c.commenter || c.user || {}; 
-            const isCommentMine = Number(commenter.id) === Number(user?.id);
+                    <div className="comment-right">
+                      <div className="comment-header">
+                        <div>
+                          <span className="comment-user">{commenter.username || 'Unknown'}</span>
+                          <span className="comment-date">
+                            {new Date(c.createdAt || c.created_at).toLocaleDateString('ko-KR')}
+                          </span>
+                        </div>
 
-            return (
-              <div key={c.id} className="comment-item detail-item">
-                <div className="comment-line">
-                  <span className="comment-avatar-circle">
-                    <img src={commenter.avatar_url || '/assets/default-avatar.png'} alt="" />
-                  </span>
-
-                  <div className="comment-right">
-                    <div className="comment-header">
-                      <div>
-                        <span className="comment-user">{commenter.username || 'Unknown'}</span>
-                        <span className="comment-date">
-                          {new Date(c.createdAt || c.created_at).toLocaleDateString('ko-KR')}
-                        </span>
+                        {/* 내 댓글일 때만 삭제 버튼 표시 */}
+                        {isCommentMine && (
+                          <button
+                            onClick={() => handleCommentDelete(c)}
+                            className="comment-delete-btn"
+                          >
+                            삭제
+                          </button>
+                        )}
                       </div>
 
-                      <button
-                      onClick={() => handleCommentDelete(c)}
-                      className="comment-delete-btn"
-                      > 삭제 </button>
-
+                      <div className="comment-body">
+                        {c.comment || c.content}
+                      </div>
                     </div>
-
-                    <div className="comment-body">
-                      {c.comment || c.content}
-                    </div>
-
                   </div>
                 </div>
+              );
+            })}
+
+            {/* 댓글 없을 때 */}
+            {comments.length === 0 && (
+              <div className="comment-empty" style={{textAlign:'center', padding:'40px 0', color:'#999', fontSize:'14px'}}>
+                아직 댓글이 없습니다.<br/>첫 번째 댓글을 남겨보세요!
               </div>
-            );
-          })}
+            )}
+          </div>
+        </div>
+      </div>
 
-          {comments.length === 0 && (
-            <div className="comment-empty">첫 번째 댓글을 남겨보세요!</div>
-          )}
-
+      <div className="comment-input-area detail-input">
+        
+        {/* 내 프로필 사진 (왼쪽) */}
+        <div className="my-profile-thumb">
+           <img 
+             src={user?.avatar_url || '/assets/default-avatar.png'} 
+             alt="me" 
+             onError={(e) => e.target.src='/assets/default-avatar.png'}
+           />
         </div>
 
-        <div className="comment-input-area detail-input">
-          <input 
-            type="text"
-            placeholder="댓글 달기..." 
-            className="comment-input-field"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-          />
+        {/* 입력 필드 (중앙) */}
+        <input 
+          type="text"
+          placeholder="댓글 달기..." 
+          className="comment-input-field"
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          onKeyDown={handleKeyDown} // 엔터키 입력 시 전송
+          autoComplete="off"
+        />
 
-          <button 
-            className="comment-submit-btn"
-            onClick={handleCommentSubmit}
-            disabled={!newComment.trim()}
-          >
-            게시
-          </button>
-        </div>
+        {/* 게시 버튼 (오른쪽, 텍스트 스타일) */}
+        {/* 내용이 있을 때만 활성화된 색상으로 표시 */}
+        <button 
+          className="comment-submit-btn"
+          onClick={handleCommentSubmit}
+          disabled={!newComment.trim()}
+          style={{ opacity: newComment.trim() ? 1 : 0.5 }}
+        >
+          게시
+        </button>
       </div>
     </div>
   );
-};
+}
 
 export default PostDetail;

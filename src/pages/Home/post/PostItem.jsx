@@ -5,11 +5,11 @@ import { useAuth } from '../../../contexts/AuthContext'; // [추가] 인증 훅
 
 import location_icon from '../../../assets/location_icon.png';
 import edit_icon from '../../../assets/edit_icon.png';
+import default_pic from '../../../assets/default_pic.jpg';
 
 import './Post.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
-
 
 const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
   const {
@@ -110,7 +110,7 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
       <div className="post-header" onClick={goToDetail}>
         <div className="user-info">
           <img
-            src={author_avatar || '/default-avatar.png'}
+            src={author_avatar || default_pic}
             alt={author}
             className="avatar"
           />
