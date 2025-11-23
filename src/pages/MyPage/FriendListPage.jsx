@@ -158,7 +158,7 @@ const fetchData = async () => {
               <span className="section-title">받은 친구 요청</span>
               <span className="section-count">{receivedRequests.length}</span>
             </div>
-            <img src={isReceivedOpen ? toggleUp : toggleDown} className="toggle-icon" alt="toggle" />
+            <img src={isReceivedOpen ? toggleUp : toggleDown} className="toggle-icon-up" alt="toggle" />
           </div>
           {isReceivedOpen && (
             <div className="section-list">

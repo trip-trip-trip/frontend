@@ -205,10 +205,13 @@ const [sentRequests, setSentRequests] = useState([]);
 
       <div className="friend-content">
         
+    <div className="section-header"> 
             <div className="section-title-group">
-             <img src={addUserIconSection} className="section-icon" alt="icon" />
+              <img src={addUserIconSection} className="section-icon" alt="icon" />
               <span className="section-title">친구 추가하기</span>
             </div>
+          
+        </div>
           
  <div className="add-friend-section">
   {/* 검색창 */}
@@ -291,7 +294,7 @@ const [sentRequests, setSentRequests] = useState([]);
             </div>
             <img 
              src={isListOpen ? toggleUp : toggleDown} 
-              className="toggle-icon"
+              className="toggle-icon-up"
               alt="toggle" 
             />
           </div>
