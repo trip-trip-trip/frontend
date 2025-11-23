@@ -87,20 +87,26 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
     return () => ac.abort();
   }, [token, user]);
 
-  const goShoot = () => {
-    if (!canShoot) return;
-    if (activeTripId) navigate(`/camera/${activeTripId}`);
-    else alert("활성 여행 ID를 찾을 수 없습니다.");
-  };
+  // const goShoot = () => {
+  //   if (!canShoot) return;
+  //   if (activeTripId) navigate(`/camera/${activeTripId}`);
+  //   else alert("활성 여행 ID를 찾을 수 없습니다.");
+  // };
 
   return (
     <section className="taball">
       <div className="feed-list">
         {loading && <div className="feed-skeleton">불러오는 중…</div>}
-
+{/* 
         {!loading && posts.length === 0 && (
           <div className="no-posts">게시물이 없습니다. 첫 게시물을 올려보세요!</div>
-        )}
+        )} */}
+        {!loading && posts.length === 0 && (
+  <div className="no-posts-container">
+    <p className="empty-title">아직 기록된 여행 순간이 없어요</p>
+    <p className="empty-subtitle">첫 번째 사진을 올려 추억을 시작해보세요!</p>
+  </div>
+)}
 
         {!loading && posts.map((p) => (
           <PostItem 
