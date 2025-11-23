@@ -39,38 +39,41 @@
 }
 
 /* === Step 1: 여행 리스트 === */
+
 .trip-list {
     display: flex;
     flex-direction: column;
-    /* gap을 없애고 border-bottom으로 간격을 줍니다 */
     gap: 0; 
 }
 
 .trip-item {
-    /* 흰색 배경과 그림자 제거 -> 투명하게 */
     background: transparent;
     box-shadow: none;
     border-radius: 0;
     
-    /* 패딩 조정: 위아래 간격 넓게 */
     padding: 1.5rem 0;
-    
-    /* 하단 점선 추가 */
     border-bottom: 2px dashed #ccc;
     
     display: flex;
     gap: 1.2rem;
     cursor: pointer;
-    align-items: flex-start; /* 상단 정렬 */
 }
+
 .trip-item:active { transform: scale(0.98); }
 
-.trip-cover img {
+.trip-cover {
+    flex-shrink: 0; /* 찌그러짐 방지 */
+}
+
+/* 이미지와 비디오 모두에게 동일한 스타일 적용 */
+.trip-cover img,
+.trip-cover video {
     width: 6.5rem;
     height: 6.5rem;
     border-radius: 0.6rem;
-    object-fit: cover;
+    object-fit: cover; /* 비율 유지하며 꽉 채우기 */
     background: #eee;
+    display: block;    /* 하단 공백 제거 */
 }
 
 .trip-info {
@@ -167,15 +170,32 @@
     aspect-ratio: 1/1;
     cursor: pointer;
     background: #eee;
+    overflow: hidden;
 }
 
-.media-item img {
-    width: 100%; height: 100%; object-fit: cover;
+.media-item img, 
+.media-item video,
+.grid-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
-
-.media-item.selected img {
+/* .media-item.selected img {
     filter: brightness(0.5);
+} */
+
+.media-item.selected {
+    opacity: 0.8;
 }
+.media-item.selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 3px solid #007aff;
+}
+
+
 
 .video-badge {
     position: absolute; top: 0.4rem; left: 0.4rem;
@@ -304,7 +324,6 @@
 }
 
 /* === Step 3: 글 작성 === */
-
 .step-write {
     display: flex;
     flex-direction: column;
@@ -312,29 +331,58 @@
 }
 
 .write-preview-box {
-    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.preview-image-main {
     width: 100%;
+    height: 22rem; 
+    background: #000; /* 영상/사진 비율 빈 공간 검은색 처리 */
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.preview-image-main img {
-    width: 100%; 
-    height: 15rem; 
+
+.preview-image-main img, 
+.preview-image-main video,
+.main-video-preview {
+    width: 100%;
+    height: 100%;
     object-fit: contain; 
-    border-radius: 0.8rem; 
-    margin-bottom: 0.8rem;
-    box-shadow: 0 0.2rem 0.8rem rgba(0,0,0,0.1);
+    display: block;
 }
+
 .preview-thumbnails {
     display: flex;
-    gap: 0.6rem; 
+    gap: 0.8rem;
     overflow-x: auto;
+    padding-bottom: 0.5rem;
 }
-.preview-thumbnails img {
-    width: 4rem; 
-    height: 5rem; 
-    object-fit: cover; border-radius: 0.4rem; opacity: 0.5; transition: 0.2s;
+
+.preview-thumbnails img,
+.preview-thumbnails video,
+.thumb-video {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: block; /* 필수 */
+    flex-shrink: 0;
+    background: #000;
 }
-.preview-thumbnails img.active {
-    opacity: 1; border: 0.2rem solid #525B65;
+
+.preview-thumbnails .active {
+    opacity: 1;
+    border-color: #333;
 }
 
 .privacy-check {
