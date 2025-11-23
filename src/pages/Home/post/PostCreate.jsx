@@ -4,21 +4,17 @@ import Header from '../../../components/Header/Header';
 import './PostCreate.css'; 
 import default_pic from '../../../assets/default_pic.jpg';
 import { useAuth } from '../../../contexts/AuthContext';
-// Navbar는 이 페이지 레이아웃상 필요 없다면 제외, 필요하다면 유지
 import Navbar from '../../../components/NavBar/NavBar';
 
-// 1. HTTPS 주소 적용
-// const API_BASE = import.meta.env.PROD 
-//     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-//     : '/api';
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
-const API_BASE = 'https://tripshot.duckdns.org'
-const test = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzMyIsImlhdCI6MTc2MzkwNjY1MywiZXhwIjoxNzYzOTEwMjUzfQ.V80Ux2rc9eA_gpQrMxbhZ-MW5n28VdCytKDIO48kt3ji5WcAeAabVMczABsz9M4t2Icid_-_0f3wfykQ_MM-qA'
 export default function PostCreate() {
   const navigate = useNavigate();
   
   // 2. useAuth에서 객체 구조 분해로 token 가져오기 (필수)
-  // const { token } = useAuth(); 
+  const { token } = useAuth(); 
 
   // --- 상태 관리 ---
   const [step, setStep] = useState(1); // 1: 여행선택, 2: 미디어선택, 3: 글작성
@@ -34,10 +30,10 @@ export default function PostCreate() {
   // 여행 목록 불러오기
   useEffect(() => {
     const fetchMyTrips = async () => {
-      // if (!token) return;
+      if (!token) return;
       try {
         const res = await fetch(`${API_BASE}/trips`, {
-          headers: { Authorization: `Bearer ${test}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         
@@ -49,7 +45,7 @@ export default function PostCreate() {
       }
     };
     fetchMyTrips();
-  }, [test]);
+  }, [token]);
 
   // --- [Step 1 -> 2] 여행 선택 핸들러 ---
   const handleSelectTrip = (tripItem) => {
@@ -124,7 +120,7 @@ export default function PostCreate() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${test}`,
+            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload)
       });
