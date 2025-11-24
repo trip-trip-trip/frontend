@@ -290,16 +290,17 @@ const handleCommentDelete = async (comment) => {
         <div className="my-profile-thumb">
            <img 
              src={
-                user?.avatar_url || 
-                user?.profile_url || 
-                user?.profileImage || 
-                user?.image || 
-                '/assets/default-avatar.png'
+                user?.avatarUrl ||      // 1순위: ProfilePage에서 쓰는 이름
+                user?.avatar_url ||     // 2순위: API 등에서 쓰는 이름
+                user?.profile_url ||    // 3순위: 혹시 모를 다른 이름
+                '/assets/default-profile.png' // 기본 이미지 (경로 확인 필요)
              } 
              alt="me" 
+             className="my-profile-img"
+             // 이미지가 깨지면 기본 이미지로 대체
              onError={(e) => {
-                e.target.onerror = null; 
-                e.target.src='/assets/default-avatar.png';
+                e.target.onerror = null;
+                e.target.src='/assets/default-profile.png';
              }}
            />
         </div>

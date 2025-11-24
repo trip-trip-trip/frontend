@@ -251,9 +251,12 @@
     color: #444;
 }
 
+
 .comment-date {
     font-size: 12px;
     color: #999;
+    margin-left: 8px; 
+    font-weight: 400; /
 }
 
 .comment-body {
@@ -508,6 +511,7 @@
     color: #333;
 }
 
+
 .compose-header button {
     background: none;
     border: none;
@@ -564,10 +568,7 @@
     font-size: 14px;
     transition: background 0.2s;
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 2eef880 (feat: 게시 수정/삭제 추가, 지도에 게시 표시 수정 #1)
 .delete-btn:hover {
     background-color: #ffe0e0;
 }
@@ -628,6 +629,9 @@
 
 .comment-right {
     flex: 1;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px dashed #ccc; 
     padding-bottom: 14px;
+}
+.comment-item:last-child .comment-right {
+    border-bottom: none;
 }

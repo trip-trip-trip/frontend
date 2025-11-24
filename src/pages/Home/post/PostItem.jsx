@@ -6,7 +6,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 // 이미지 경로들은 사용자 환경에 맞춰 유지
 import location_icon from '../../../assets/location_icon.png';
 import edit_icon from '../../../assets/edit_icon.png';
-import default_pic from '../../../assets/default_pic.jpg';
+import default_pic from "../../../assets/default-profile.png";
 
 import './Post.css';
 
