@@ -1,5 +1,6 @@
 .upcoming-trip-container{
-    height: 22rem;
+    margin-top: 2rem;
+    height: 14rem;
     display: flex;
     flex-direction: column;
     width: 100%;
