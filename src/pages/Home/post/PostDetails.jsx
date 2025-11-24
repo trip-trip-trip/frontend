@@ -90,7 +90,7 @@ const PostDetail = () => {
         const normalized = {
           id: p.id,
           author: p.author?.username || '알 수 없음',
-          author_avatar: p.author?.avatar_url || '/assets/default-avatar.png',
+          author_avatar: p.author?.avatar_url || default_pic,
           authorId: p.author?.id,
           
           // [수정] 가공된 media 데이터를 우선 전달해야 PostItem이 비디오로 인식함
@@ -240,9 +240,9 @@ const handleCommentDelete = async (comment) => {
                     {/* 댓글 작성자 프사 */}
                     <span className="comment-avatar-circle">
                       <img
-                        src={commenter.avatar_url || '/assets/default-avatar.png'}
+                        src={commenter.avatar_url || default_pic}
                         alt="user"
-                        onError={(e) => e.target.src='/assets/default-avatar.png'}
+                        onError={(e) => e.target.src=default_pic}
                       />
                     </span>
 
