@@ -51,7 +51,6 @@ const EditTrip = () => {
   useEffect(() => {
     async function fetchTripInfo(){
       setIsLoading(true);
-
       try {
         const response = await fetch(
           `${API_BASE}/trips/${tripId}`,
@@ -104,11 +103,13 @@ const EditTrip = () => {
       setIsLoading(false);
     }
   }
-  fetchTripInfo();
+  if (token && tripId){
+    fetchTripInfo();
+  }
 },[API_BASE, tripId, token, todayDate])
 
   useEffect(() => {
-    console.log("실행됨");
+    // console.log("실행됨");
     const returned = location.state?.selectedPlace;
     if (returned) {
       setPlaceName(returned.name || '');
