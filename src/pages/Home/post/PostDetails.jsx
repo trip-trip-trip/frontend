@@ -6,7 +6,6 @@ import { useAuth } from '../../../contexts/AuthContext';
 import Header from '../../../components/Header/Header';
 import default_pic from "../../../assets/default-profile.png";
 
-
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
@@ -302,7 +301,7 @@ const handleCommentDelete = async (comment) => {
              // 이미지가 깨지면 기본 이미지로 대체
              onError={(e) => {
                 e.target.onerror = null;
-                e.target.src='/assets/default-profile.png';
+                e.target.src= default_pic;
              }}
            />
         </div>

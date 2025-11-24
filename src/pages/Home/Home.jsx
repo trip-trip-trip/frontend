@@ -140,6 +140,7 @@ const Home = () => {
                     title: trip.title,
                     startDate: trip.startDate,
                     endDate: trip.endDate,
+                    placeName: trip.placeName,
                     members: (trip.inviteesTagList || []).map((tag, index) => ({
                         name: trip.inviteesProfileImgList?.[index] || tag,
                         profile: trip.inviteesNameList?.[index] || '',
