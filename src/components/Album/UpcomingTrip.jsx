@@ -19,13 +19,16 @@ const Upcoming = ({placeName, tripId, tripName, title, startDate, endDate, membe
 
   return (
     <div className='upcoming-trip-container'>
+    <div className="upcoming-trip-title">
+        <h2 className='upcoming-trip-name'>예정된 여행</h2>
+    </div>
       <div className="upcoming-album-box">
         {/* 배경 이미지 */}
         <div className="upcoming-box-img">
           <img src={upcomingTripImg} alt="" className='upcoming-box'/>
         </div>
         <div className="upcoming-ticket-content">
-          <h1 className='upcoming-ticket-title'>Now Traveling</h1>
+          <h1 className='upcoming-ticket-title'>Upcoming Travel</h1>
           <div className="upcoming-info-cont">
             {/* 티켓 왼쪽 */}
             <div className="upcoming-ticket-detail" onClick={()=>navigate(`/trips/detail/${tripId}`, {
@@ -39,7 +42,6 @@ const Upcoming = ({placeName, tripId, tripName, title, startDate, endDate, membe
               }
             })}>
                 <div className="upcoming-info">
-                        
                         <div className="upcoming-album-date">
                         <div className="date-box">DATE</div>
                         <h5 className='left-date'>{startDate.split('-')}</h5>
