@@ -7,9 +7,9 @@ import Navbar from '../../components/NavBar/NavBar';
 import { useAuth } from '../../contexts/AuthContext';
 
 
-// const API_BASE = import.meta.env.PROD 
-//     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-//     : '/api';
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
 const SharePhoto = () => {
     // 상태 정의
@@ -22,10 +22,10 @@ const SharePhoto = () => {
     const [changedMediaIds, setChangedMediaIds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    // const {token} = useAuth();
+    const {token} = useAuth();
 
-    const API_BASE = 'https://tripshot.duckdns.org';
-    const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+    // const API_BASE = 'https://tripshot.duckdns.org';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
 
      //여행 상세정보
     const fetchMedia = async () => {
@@ -82,8 +82,10 @@ const SharePhoto = () => {
     };
 
     useEffect(() => {
+      if (token && tripId) {
         fetchMedia();
-    }, []);
+      }
+    }, [token, tripId]);
 
 
     // 이미지 개별 선택/선택 해제
