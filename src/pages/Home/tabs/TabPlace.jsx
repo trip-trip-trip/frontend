@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './TabPlace.css';
 import homePlace from '../../../assets/home_placeLogo.png';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { useAuth } from '../../../contexts/AuthContext';
 
 // API 키 및 상수 설정
 const MAPS_KEY = 'AIzaSyBxUpz_y5O2nOTivngRz6fVvYHtG91i75M';
@@ -76,6 +77,7 @@ const MAP_STYLES = [
 
 export default function TabPlace({ setTab, activeTrip }) {
     const navigate = useNavigate();
+    const { token } = useAuth();
 
     const mapRef = useRef(null);         // DOM 엘리먼트
     const mapInstanceRef = useRef(null); // Google Map 인스턴스
@@ -141,7 +143,7 @@ export default function TabPlace({ setTab, activeTrip }) {
             try {
                 // (1) 게시물 상세 정보 가져오기
                 const detailRes = await fetch(`${API_BASE}/posts?feed_type=all&limit=200`, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}` }
+                   headers: { Authorization: `Bearer ${token || ""}` }
                 });
                 const detailJson = await detailRes.json();
                 const details = detailJson?.result?.posts ?? [];
@@ -154,7 +156,10 @@ export default function TabPlace({ setTab, activeTrip }) {
                 }));
 
                 // (2) 위치 정보 & 장소 탭 정보 가져오기
-                const locRes = await fetch(`${API_BASE}/posts/locations`);
+                const locRes = await fetch(`${API_BASE}/posts/locations`, {
+                    headers: { Authorization: `Bearer ${token || ""}` }               
+                });
+
                 const locJson = await locRes.json();
                 
                 const locList = locJson?.result?.posts ?? [];
@@ -202,7 +207,7 @@ export default function TabPlace({ setTab, activeTrip }) {
 
         loadData();
         return () => { cancel = true; };
-    }, [isMapLoaded, activeTrip]);
+    }, [isMapLoaded, activeTrip, token]);
 
     /* 4. 마커 및 클러스터링 렌더링 */
     useEffect(() => {

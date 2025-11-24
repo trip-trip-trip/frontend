@@ -124,10 +124,20 @@ const Home = () => {
 
         if (response.ok) {
             const data = await response.json();
-            
             const tripList = data.result || [];
-            
-            const activeData = tripList.find(item => item.trip.status === 'ACTIVE');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+
+            const activeData = tripList.find(item => {
+                // 상태가 ACTIVE인지 확인
+                if (item.trip.status !== 'ACTIVE') return false;
+
+                // 날짜가 지났는지 확인 (종료일이 오늘보다 과거라면 false)
+                const endDate = new Date(item.trip.endDate);
+                
+                // 여행 종료일이 오늘보다 크거나 같아야 함 (아직 안 끝남)
+                return endDate >= today; 
+            });
 
             if (activeData) {
                 const { trip, contents } = activeData;
