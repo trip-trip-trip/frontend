@@ -71,13 +71,33 @@ const PostDetail = () => {
         const p = postData.result;
         const createdTime = p.created_at || p.createdAt;
 
+        const processedMedia = p.media ? p.media.map(m => {
+          let type = m.object_type || 'MEDIA';
+
+          // 파일 주소가 있고, 동영상 확장자라면 강제로 'SHORT_REEL'로 변경
+          if (type === 'MEDIA' && m.url && /\.(mp4|mov|webm|avi|mkv)$/i.test(m.url)) {
+            type = 'SHORT_REEL';
+          }
+
+          return {
+            url: m.url,
+            thumbnail: m.thumbnail_url,
+            type: type
+          };
+        }) : [];
+
         const normalized = {
           id: p.id,
           author: p.author?.username || '알 수 없음',
           author_avatar: p.author?.avatar_url || '/assets/default-avatar.png',
           authorId: p.author?.id,
-          images: p.media ? p.media.map(m => m.url) : [],
-          image: p.media?.[0]?.url || null,
+          
+          // [수정] 가공된 media 데이터를 우선 전달해야 PostItem이 비디오로 인식함
+          media: processedMedia, 
+          
+          images: processedMedia.map(m => m.url), // 단순 URL 배열 호환성 유지
+          image: processedMedia[0]?.thumbnail || processedMedia[0]?.url || null,
+          
           caption: p.caption || '',
           location: p.location || '',
           date: createdTime
@@ -269,9 +289,18 @@ const handleCommentDelete = async (comment) => {
         {/* 내 프로필 사진 (왼쪽) */}
         <div className="my-profile-thumb">
            <img 
-             src={user?.avatar_url || '/assets/default-avatar.png'} 
+             src={
+                user?.avatar_url || 
+                user?.profile_url || 
+                user?.profileImage || 
+                user?.image || 
+                '/assets/default-avatar.png'
+             } 
              alt="me" 
-             onError={(e) => e.target.src='/assets/default-avatar.png'}
+             onError={(e) => {
+                e.target.onerror = null; 
+                e.target.src='/assets/default-avatar.png';
+             }}
            />
         </div>
 

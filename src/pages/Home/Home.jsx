@@ -54,59 +54,112 @@ const Home = () => {
   }, [tab]);
 
   // 여행 상태 조회
+  // useEffect(() => {
+  //   const fetchActiveTripStatus = async () => {
+  //     if (!token) return;
+
+  //     try {
+  //       const response = await fetch(`${API_BASE}/trips/isActiveTrips`, {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-type": "application/json",
+  //           "Authorization": `Bearer ${token}`, 
+  //         },
+  //       });
+
+  //       if (response.ok) {
+  //         const data = await response.json();
+          
+  //         if (data.isSuccess && data.result && data.result.isOngoing) {
+  //            const tripList = Array.isArray(data.result.trip) ? data.result.trip : [];
+  //            const activeData = tripList.find(item => item.status === 'ACTIVE');
+
+  //            if (activeData) {
+  //               const contents = activeData.contents || {};
+  //               const photos = contents.photos || [];
+  //               const videos = contents.reelItems || [];
+
+  //               setHomeTripInfo({
+  //                 id: activeData.id,
+  //                 title: activeData.title,
+  //                 startDate: activeData.startDate,
+  //                 endDate: activeData.endDate,
+  //                 members: (activeData.inviteesTagList || []).map((tag, index) => ({
+  //                   name: activeData.inviteesProfileImgList?.[index] || tag,
+  //                   profile: activeData.inviteesNameList?.[index] || '',
+  //                   tag: tag
+  //                 })),
+  //                 image: photos.map(p => p.media?.url || ''), 
+  //                 film_count: photos.length, 
+  //                 vid_count: videos.length,
+  //               });
+  //            } else {
+  //               setHomeTripInfo(null); 
+  //            }
+  //         } else {
+  //           setHomeTripInfo(null); 
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+    
+  //   fetchActiveTripStatus();
+  // }, [token]); 
+  // 여행 상태 조회 (useEffect로 감싸서 실행)
   useEffect(() => {
     const fetchActiveTripStatus = async () => {
       if (!token) return;
 
       try {
-        const response = await fetch(`${API_BASE}/trips/isActiveTrips`, {
-          method: "GET",
-          headers: {
-            "Content-type": "application/json",
-            "Authorization": `Bearer ${token}`, 
-          },
+        // 1. /trips로 모든 여행 목록을 가져옵니다.
+        const response = await fetch(`${API_BASE}/trips`, { 
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
         });
 
         if (response.ok) {
-          const data = await response.json();
-          
-          if (data.isSuccess && data.result && data.result.isOngoing) {
-             const tripList = Array.isArray(data.result.trip) ? data.result.trip : [];
-             const activeData = tripList.find(item => item.status === 'ACTIVE');
+            const data = await response.json();
+            
+            const tripList = data.result || [];
+            
+            const activeData = tripList.find(item => item.trip.status === 'ACTIVE');
 
-             if (activeData) {
-                const contents = activeData.contents || {};
-                const photos = contents.photos || [];
-                const videos = contents.reelItems || [];
+            if (activeData) {
+                const { trip, contents } = activeData;
+                
+                const photos = contents?.photos || [];
+                const videos = contents?.reelItems || [];
 
                 setHomeTripInfo({
-                  id: activeData.id,
-                  title: activeData.title,
-                  startDate: activeData.startDate,
-                  endDate: activeData.endDate,
-                  members: (activeData.inviteesTagList || []).map((tag, index) => ({
-                    name: activeData.inviteesProfileImgList?.[index] || tag,
-                    profile: activeData.inviteesNameList?.[index] || '',
-                    tag: tag
-                  })),
-                  image: photos.map(p => p.media?.url || ''), 
-                  film_count: photos.length, 
-                  vid_count: videos.length,
+                    id: trip.id,
+                    title: trip.title,
+                    startDate: trip.startDate,
+                    endDate: trip.endDate,
+                    members: (trip.inviteesTagList || []).map((tag, index) => ({
+                        name: trip.inviteesProfileImgList?.[index] || tag,
+                        profile: trip.inviteesNameList?.[index] || '',
+                        tag: tag
+                    })),
+                    image: photos.map(p => p.media?.url || ''),
+                    film_count: photos.length, // 사진 개수 정상 표시
+                    vid_count: videos.length,
                 });
-             } else {
-                setHomeTripInfo(null); 
-             }
-          } else {
-            setHomeTripInfo(null); 
-          }
+            } else {
+                setHomeTripInfo(null);
+            }
         }
       } catch (error) {
         console.error(error);
       }
     };
-    
+
     fetchActiveTripStatus();
-  }, [token]); 
+  }, [token]); // token이 있을 때 실행
 
   // --- 클릭 핸들러 ---
   const handleGoCamera = (e) => {

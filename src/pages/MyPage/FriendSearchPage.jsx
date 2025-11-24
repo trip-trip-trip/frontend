@@ -98,16 +98,24 @@ const [sentRequests, setSentRequests] = useState([]);
       const res = await fetch(`${API_BASE}/users/friendships/search?keyword=${encodeURIComponent(val)}`, {
         headers: getHeaders(),
       });
+
       const data = await res.json();
-      if (data.isSuccess) {
-        setSearchResults(data.result || []);
-      } else {
+      if (data.isSuccess){
+        let foundUsers = data.result || [];
+        const myFriendIds = friends.map(f => f.id); 
+        foundUsers = foundUsers.map(user => ({
+          ...user,
+          friend: user.friend || myFriendIds.includes(user.id)
+        }));
+        setSearchResults(foundUsers);
+      } else{
         setSearchResults([]);
       }
-    } catch (err) {
+    }catch (err) {
       console.error("검색 에러:", err);
     }
   };
+  
 
   // 3. 친구 요청 보내기 (+)
   const sendRequest = async (targetId) => {
