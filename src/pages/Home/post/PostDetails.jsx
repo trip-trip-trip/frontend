@@ -4,6 +4,8 @@ import PostItem from './PostItem';
 import './Post.css';
 import { useAuth } from '../../../contexts/AuthContext'; 
 import Header from '../../../components/Header/Header';
+import default_pic from "../../../assets/default-profile.png";
+
 
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
@@ -293,7 +295,7 @@ const handleCommentDelete = async (comment) => {
                 user?.avatarUrl ||      // 1순위: ProfilePage에서 쓰는 이름
                 user?.avatar_url ||     // 2순위: API 등에서 쓰는 이름
                 user?.profile_url ||    // 3순위: 혹시 모를 다른 이름
-                '/assets/default-profile.png' // 기본 이미지 (경로 확인 필요)
+                default_pic // 기본 이미지 
              } 
              alt="me" 
              className="my-profile-img"
