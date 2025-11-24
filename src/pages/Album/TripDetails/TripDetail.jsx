@@ -13,12 +13,18 @@ import { useState } from 'react';
 import shared_icon from '/icons/shared_icon.png'
 import { useAuth } from '../../../contexts/AuthContext';
 import { useEffect, useMemo } from 'react';
+import default_profile from '/profile-img.png';
+import accept_icon from '/icons/accept.png';
+import reject_icon from '/icons/reject.png';
 
 const TripDetail = () => {
 
   const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
+
+  // const API_BASE = 'https://tripshot.duckdns.org';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
 
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -27,11 +33,13 @@ const TripDetail = () => {
   const todayDate = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const tripId = params.tripId || location.state?.tripId;
-
+  const [isInvited, setIsInvited] = useState(location.state?.invite || false);
   const [currentTripStatus, setCurrentTripStatus] = useState(location.state?.tripState || 'active');
+  const [invitationID, setInvitationId] = useState(location.state?.invitationId || '');
   const [inviteInfo, setInviteInfo] = useState([]);
   // 사진 공유 여부 표시(isShared)
   const [showShared, setShowShared] = useState(false);
+  const [reelState, setReelState] = useState();
   // Fetch 해온 여행 기본 정보 저장
   const [tripInfo, setTripInfo] = useState({ 
     tripId: '',
@@ -95,24 +103,27 @@ const TripDetail = () => {
           startDate: fetchedTripDetail.trip.startDate, 
           endDate: fetchedTripDetail.trip.endDate,  
           members: (fetchedTripDetail.trip.inviteesNameList || []).map((name, index) => ({
-              name: name,
-              profile: fetchedTripDetail.trip.inviteesProfileImgList[index] || '',
-              tag: fetchedTripDetail.trip.inviteesTagList[index] || ''
-          })),
+            name: name,
+            profile: fetchedTripDetail.trip.inviteesProfileImgList[index] || 'none',
+            tag: fetchedTripDetail.trip.inviteesTagList[index] || ''
+        })),
         })
 
           if (tripEndDate < todayDate) {
             setCurrentTripStatus('completed');
-        } else if (tripStartDate < todayDate && todayDate < tripEndDate) {
+        } else if (tripStartDate <= todayDate && todayDate <= tripEndDate) {
             // 종료일이 오늘이거나 미래면 'active'
             setCurrentTripStatus('active');
         } else{
-          setCurrentTripStatus('pending');
+          setCurrentTripStatus('upcoming');
         }
       }
 
     const photoInfo = (fetchedTripDetail?.contents?.photos || []).map( p => ({
       tripId: p.media.tripId,
+      mediaAssetId: p.media.mediaAssetId,
+      contentType: p.media.contentType,
+      mediaKind: p.media.mediaKind,
       comment: p.media.comment || '',
       url: p.media.url || '',
       isShared: p.media.isShared || false,
@@ -121,22 +132,31 @@ const TripDetail = () => {
 
     const scrapInfo = (fetchedTripDetail?.contents?.scrapbooks || []).map( s => ({
       tripId: s.media.tripId,
+      mediaAssetId: s.media.mediaAssetId,
+      contentType: s.media.contentType,
+      mediaKind: s.media.mediaKind,
       comment: s.media.comment || '',
       url: s.media.url || '',
       isShared: s.media.isShared || false,
     }));
     setScrapData(scrapInfo);
-    console.log(scrapInfo);
+    // console.log(scrapInfo);
 
     const videoInfo = {
-      madeVideo : fetchedTripDetail.contents.reel ? {
+      madeVideo : fetchedTripDetail.contents.reel?.media? {
         tripId : fetchedTripDetail.contents.reel.media.tripId,
+        mediaAssetId: fetchedTripDetail.contents.reel.media.mediaAssetId,
+        contentType: fetchedTripDetail.contents.reel.media.contentType,
+        mediaKind: fetchedTripDetail.contents.reel.media.mediaKind,
         url : fetchedTripDetail.contents.reel.media.url,
         comment: fetchedTripDetail.contents.reel.media.comment,
         isShared : fetchedTripDetail.contents.reel.media.isShared,
       } : null,
       videoItems : (fetchedTripDetail.contents.reelItems || []).map(item => ({
         tripId : item.media.tripId,
+        mediaAssetId: item.media.mediaAssetId,
+        contentType: item.media.contentType,
+        mediaKind: item.media.mediaKind,
         url : item.media.url,
         comment: item.media.comment,
         isShared : item.media.isShared,
@@ -150,6 +170,32 @@ const TripDetail = () => {
       setIsLoading(false);
     }
   };
+
+  const fetchReels = async() => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/trips/${tripId}/reel`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+      }
+      const data = await response.json();
+      setReelState(data.result.status);
+    } catch (error) {
+      console.error("Error fetching trip data:", error);
+    } finally{
+      setIsLoading(false);
+    }
+  }
 
   //여행 초대 정보
   const fetchTripInvite = async () => {
@@ -171,8 +217,14 @@ const TripDetail = () => {
       }
       const data = await response.json();
       const fetchedInvitation = data.result;
+      const sentInvitations = [];
 
       if (fetchedInvitation.invitations.length > 0){
+        fetchedInvitation.invitations.forEach((i)=>{
+          if (i.status==="PENDING"){
+            sentInvitations.push(i)
+          }
+        })
         setIsPending(true);
         setInviteInfo(fetchedInvitation.invitations);
       }
@@ -183,17 +235,89 @@ const TripDetail = () => {
       setIsLoading(false);
     }
   };
+  
+  const handleRejectRequest = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/invitations/${invitationID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "X-User-Id": "long"
+          },
+          body: JSON.stringify({
+            "decision": "REJECT"
+          }
+          )
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`초대 거절 실패: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('초대 거절 성공:', data.result);
+
+      alert('여행 초대를 거절했습니다.');
+      navigate(`/trips`); 
+    } catch (error) {
+      console.error("Error editing trip data:", error);
+      alert('여행 초대를 거절할 수 없습니다.');
+    }
+  };
+
+  const handleAcceptRequest = async () => {
+    console.log('accept try');
+    try {
+      const response = await fetch(
+        `${API_BASE}/invitations/${invitationID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "X-User-Id": "long"
+          },
+          body: JSON.stringify({
+            "decision": "ACCEPT"
+          }
+          )
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`초대 거절 실패: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('초대 거절 성공:', data.result);
+
+      alert('여행 초대를 거절했습니다.');
+      navigate(`/trips`); 
+    } catch (error) {
+      console.error("Error editing trip data:", error);
+      alert('여행 초대를 거절할 수 없습니다.');
+    }
+  };
+  
 
   // 컴포넌트 마운트 시 API 호출
   useEffect(() => {
     if (token && tripId) {
       fetchTripDetail();
-      fetchTripInvite();
+      if (!isInvited){
+        fetchTripInvite();
+        fetchReels();
+      }
+      
     }
   }, [token, tripId]); // token 또는 tripId가 변경될 때 다시 호출
 
   const handleInvite = () => {
-    navigate('/trips/create'); //임시..
+    navigate(`/trips/detail/${tripId}/addFriends`); 
   }
 
   if (isLoading) {
@@ -201,7 +325,7 @@ const TripDetail = () => {
       <div className='trip-detail'>
         <Header toBack={true}/>
         <div className='trip-detail-container'>
-          <h1>여행 정보를 불러오는 중...</h1>
+          <div className='ment'>여행 정보를 불러오는 중...</div>
         </div>
         <Navbar/>
       </div>
@@ -270,26 +394,39 @@ const TripDetail = () => {
             {/* video 섹션 */}
             <div className="video_container">
               <img src={album_cont_vid} alt="" className='album-cont-vid' />
-              <div className='section-video-header'>
-                <h2 className='video-cont-title'>3초 영상</h2>
-                <button className='more-video-button' onClick={()=>navigate(`/trips/detail/${tripId}/vid`)}>
-                  <img src={more_btn} alt="" />
-                </button>
-              </div>
-              <div className="video-grid-cont">
-                <div className='video-grid'>
-                  {/* 메인 영상 */}
-                  {vidData?.madeVideo && (
-                      <div className='video-card video-main'>
-                          <video src={vidData.madeVideo.url} controls></video>
-                      </div>
-                  )}
-                  {/* 릴 아이템들 */}
-                  {vidData?.videoItems && vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
-                      <div className='video-card' key={index}>
-                          <video src={video.url} controls></video>
-                      </div>
-                  ))}
+              <div className="section-video-wrap">
+                <div className='section-video-header'>
+                  <h2 className='video-cont-title'>3초 영상</h2>
+                  <button className='more-video-button' onClick={()=>navigate(`/trips/detail/${tripId}/vid`, {state: { vidData : vidData } })}>
+                    <img src={more_btn} alt="" />
+                  </button>
+                </div>
+                <div className="video-grid-cont">
+                  <div className='video-grid'>
+                    {/* 메인 영상 */}
+                    {vidData?.madeVideo && (
+                        <div className='video-card video-main'>
+                          {showShared && vidData?.madeVideo.isShared && (
+                            <div className='shared-link-icon mainvideo'>
+                              <img src={shared_icon} alt="공유됨" />
+                            </div>
+                          )}
+                            <video src={vidData.madeVideo.url} controls/>
+                        </div>
+                    )}
+                    {/* 릴 아이템들 */}
+                    {vidData?.videoItems && vidData.videoItems.slice(0, 4).map((video, index) => ( // 4개만 표시
+                        <div className='video-card' key={index}>
+                          {showShared && video.isShared && (
+                            <div className='shared-link-icon video'>
+                              <img src={shared_icon} alt="공유됨" />
+                            </div>
+                          )}
+                            <video src={video.url} controls />
+                            
+                        </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -301,7 +438,7 @@ const TripDetail = () => {
                 <img src={album_cont} alt="" className='album-cont-img scrapbook' />
                 <div className='section-photo-header scrapbook'>
                   <h2 className='photo-cont-title scrapbook'>스크랩북</h2>
-                  <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : photoData } } )}>
+                  <button className='more-photo-button' onClick={()=>navigate(`/trips/detail/${tripId}/pic`, {state: { picList : scrapData } } )}>
                     <img src={more_btn} alt="" />
                   </button>
                 </div>
@@ -326,6 +463,40 @@ const TripDetail = () => {
         <Navbar/>
       </div>
     );
+  } else if (isInvited){
+    return(
+      <div className='trip-detail'>
+        <Header toBack={true}/>
+          <div className="invitation-cont">
+            <p>여행에 초대되었어요</p>
+            <div className="invitation-btns">
+              <button className='ivitation-btn reject' onClick={handleRejectRequest}>
+                <img src={reject_icon} alt="" className='reject-icon'/>
+                <h6>거절</h6>
+              </button>
+              <button className='ivitation-btn accept' onClick={handleAcceptRequest}>
+                <img src={accept_icon} alt="" className='accept-icon'/>
+                <h6>수락</h6>
+              </button>
+            </div>
+          </div>
+        <div className='trip-detail-container'>
+          <h1>{tripInfo.title}</h1> 
+          <div className="date-and-edit">
+            <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
+            <button className='edit-btn' onClick={()=>navigate(`/trips/detail/${tripId}/edit`)}><img src={edit_btn} alt="" /></button>
+          </div>
+          {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
+          <div className="shared-cont">
+            <div className="shared-friend">
+              <SharedFriends data={tripInfo.members}/>
+            </div>
+          </div>
+          <div className='ment'>사진은 여행이 끝난 후 확인할 수 있어요</div>
+        </div>
+        <Navbar/>
+      </div>
+    )
   } else if ( currentTripStatus === 'active'){
     return (
       <div className='trip-detail'>
@@ -334,7 +505,7 @@ const TripDetail = () => {
           <h1>{tripInfo.title}</h1> 
           <div className="date-and-edit">
             <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
-            <button className='edit-btn'><img src={edit_btn} alt="" /></button>
+            <button className='edit-btn' onClick={()=>navigate(`/trips/detail/${tripId}/edit`)}><img src={edit_btn} alt="" /></button>
           </div>
   
           {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
@@ -343,52 +514,66 @@ const TripDetail = () => {
               <SharedFriends data={tripInfo.members} invite={true} onInviteClick={handleInvite} />
             </div>
             {isPending &&
-            <div className="pending-shared" onClick={()=>navigate(`/trips/${tripInfo.id}/shared`, 
-              {state : {inviteInfo: inviteInfo,
-                        startDate: tripInfo.startDate,
-                        endDate: tripInfo.endDate,
-                        name: tripInfo.title
-              }})}>
-              수락 대기 중 {'>'}
+            <div className="pending-cont">
+              {inviteInfo.map((i, index)=>(
+                <img key={index} src={i.inviteeAvatarUrl || default_profile} alt="" className='pending-profile'/>
+              ))}
+              <div className="pending-shared" onClick={()=>navigate(`/trips/detail/${tripId}/invitedFriends`, 
+                {state : {inviteInfo: inviteInfo,
+                          startDate: tripInfo.startDate,
+                          endDate: tripInfo.endDate,
+                          name: tripInfo.title
+                }})}>
+                {inviteInfo.length}명 수락 대기 중 {'>'}
+              </div>
             </div>
+            
             }
           </div>
-
+          <div className='ment'>사진은 여행이 끝난 후 확인할 수 있어요</div>
         </div>
         <Navbar/>
       </div>
     );
+  } else {
+    return(
+      <div className='trip-detail'>
+        <Header toBack={true}/>
+        <div className='trip-detail-container'>
+          <h1>{tripInfo.title}</h1> 
+          <div className="date-and-edit">
+            <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
+            <button className='edit-btn' onClick={()=>navigate(`/trips/detail/${tripId}/edit`)}><img src={edit_btn} alt="" /></button>
+          </div>
+
+
+          {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
+          <div className="shared-cont">
+            <div className="shared-friend">
+              <SharedFriends data={tripInfo.members} invite={true} onInviteClick={handleInvite} />
+            </div>
+            {isPending &&
+            <div className="pending-cont">
+              {inviteInfo.map((i, index)=>(
+                <img key={index} src={i.inviteeAvatarUrl || default_profile} alt="" className='pending-profile'/>
+              ))}
+              <div className="pending-shared" onClick={()=>navigate(`/trips/detail/${tripId}/invitedFriends`, 
+                {state : {inviteInfo: inviteInfo,
+                          startDate: tripInfo.startDate,
+                          endDate: tripInfo.endDate,
+                          name: tripInfo.title
+                }})}>
+                {inviteInfo.length}명 수락 대기 중 {'>'}
+              </div>
+            </div>
+            }
+          </div>
+          <div className='ment'>아직 여행이 시작되지 않았어요</div>
+        </div>
+        <Navbar/>
+      </div>
+    )
   }
 };
 
 export default TripDetail;
-
-// const sharedList = [
-//     { name: '김멋사',
-//       profile: '/profile-img.png'},
-//     {
-//       name: '김친구',
-//       profile: '/profile-img.png'
-//     },
-//     {
-//       name: '이친구',
-//       profile: '/profile-img.png'
-//     },
-//   ];
-
-// const picList = [
-//   {url: '/trip-img/trip1.jpeg', isShared: true},
-//   {url: '/trip-img/trip2.jpeg', isShared: false},
-//   {url: '/trip-img/trip3.jpeg', isShared: true},
-//   {url: '/trip-img/trip4.jpeg', isShared: false},
-//   {url: '/trip-img/trip5.jpeg', isShared: false},
-//   {url: '/trip-img/trip6.jpeg', isShared: true},
-//   {url: '/trip-img/trip7.jpeg', isShared: false},
-// ];
-
-// const videoList = [
-//   '/sample_video.MOV',
-//   'sample_video.MOV',
-//   'sample_video.MOV',
-//   'sample_video.MOV',
-// ];

@@ -6,9 +6,10 @@ import Header from '../../components/Header/Header';
 import Navbar from '../../components/NavBar/NavBar';
 import { useAuth } from '../../contexts/AuthContext';
 
-const API_BASE = import.meta.env.PROD 
-    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-    : '/api';
+
+// const API_BASE = import.meta.env.PROD 
+//     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+//     : '/api';
 
 const SharePhoto = () => {
     // 상태 정의
@@ -16,12 +17,15 @@ const SharePhoto = () => {
     const navigate = useNavigate();
     
     const [allMedia, setAllMedia] = useState([]);
+    const [prevSelected, setPrevSelected] = useState([]);
     const [selectedMediaIds, setSelectedMediaIds] = useState([]);
+    const [changedMediaIds, setChangedMediaIds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const {token} = useAuth();
+    // const {token} = useAuth();
 
-
+    const API_BASE = 'https://tripshot.duckdns.org';
+    const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
 
      //여행 상세정보
     const fetchMedia = async () => {
@@ -46,9 +50,13 @@ const SharePhoto = () => {
 
         // PHOTO, SCRAPBOOK, REEL 미디어를 하나의 목록으로 통합
         const aggregatedMedia = [
-            ...fetchedMedia.photos.map(p => p.media),
-            ...fetchedMedia.scrapbooks.map(s => s.media).filter(m => m !== null),
-            ...fetchedMedia.reelItems.map(r => r.media).filter(m => m !== null)
+            ...(fetchedMedia.photos||[]).map(p => p.media),
+            ...(fetchedMedia.scrapbooks||[]).map(s => s.media).filter(m => m !== null),
+            ...(fetchedMedia.reelItems||[]).map(r => r.media).filter(m => m !== null),
+            ...(fetchedMedia.reel && fetchedMedia.reel.media !== null ? 
+              [fetchedMedia.reel.media]
+              : 
+              [])
         ].map(media => ({
             mediaAssetId: media.mediaAssetId,
             url: media.url,
@@ -63,6 +71,7 @@ const SharePhoto = () => {
             .filter(media => media.isShared)
             .map(media => media.mediaAssetId);
         
+        setPrevSelected(initiallySharedIds);
         setSelectedMediaIds(initiallySharedIds);
 
         } catch (error) {
@@ -71,8 +80,6 @@ const SharePhoto = () => {
             setIsLoading(false);
         }
     };
-
-
 
     useEffect(() => {
         fetchMedia();
@@ -104,15 +111,31 @@ const SharePhoto = () => {
     };
     
     const handleShare = async () => {
+      const changedMediaList = [];
+
+      selectedMediaIds.forEach((m)=>{
+        const selected = prevSelected.includes(m);
+        if (!selected){
+          changedMediaList.push(m);
+        }
+      })
+
+      prevSelected.forEach((m)=>{
+        const unselected = selectedMediaIds.includes(m);
+        if (!unselected){
+          changedMediaList.push(m);
+        }
+      })
+
         const requestBody = {
-            sharedMediaIds: selectedMediaIds // 선택된 미디어 ID 목록
+            sharedMediaIds: changedMediaList // 선택된 미디어 ID 목록
         };
         
         try {
             const response = await fetch(
                 `${API_BASE}/trips/${tripId}/shared_media/toggle`,
                 {
-                    method: 'POST',
+                    method: 'PATCH',
                     headers: {
                       "Content-type": "application/json",
                       Authorization: `Bearer ${token}`,
@@ -125,7 +148,7 @@ const SharePhoto = () => {
 
             if (response.ok && data.isSuccess) {
                 alert(data.message);
-                navigate(`/trips/${tripId}/detail`); // 성공 후 상세 페이지로 이동
+                navigate(`/trips/detail/${tripId}`); // 성공 후 상세 페이지로 이동
             } else {
                 throw new Error(data.message || `공유 상태 변경에 실패했습니다. (HTTP Status: ${response.status})`);
             }
@@ -171,8 +194,11 @@ const SharePhoto = () => {
                             className={`photo-item ${isSelected ? 'selected' : ''}`}
                             onClick={() => handleSelectShare(mediaItem.mediaAssetId)}
                         >
-                          {/* 미디어가 사진이 아닐 경우 썸네일 처리 로직 필요 */}
-                          <img src={mediaItem.url} alt={`미디어 ${mediaItem.mediaAssetId} (${mediaItem.contentType})`} />
+                          {
+                            mediaItem.contentType === 'VIDEO'
+                            ? <video src={mediaItem.url} alt={`미디어 ${mediaItem.mediaAssetId} (${mediaItem.contentType})`} />
+                            : <img src={mediaItem.url} alt={`미디어 ${mediaItem.mediaAssetId} (${mediaItem.contentType})`} />
+                          }
                           {
                             // 선택했을 때 (공유될 미디어)
                             isSelected && (

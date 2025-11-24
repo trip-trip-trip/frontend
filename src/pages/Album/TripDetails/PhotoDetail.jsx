@@ -9,27 +9,7 @@ import grid_off from '/icons/grid_off.png'
 import slide_on from '/icons/slide_on.png'
 import slide_off from '/icons/slide_off.png'
 import shared_icon from '/icons/shared_icon.png'
-import { useLocation } from 'react-router-dom'
-
-
-const sharedList = [
-  {
-    name: '김멋사',
-    profile: '/profile-img.png'
-  },
-  {
-    name: '김친구',
-    profile: '/profile-img.png'
-  },
-  {
-    name: '이친구',
-    profile: '/profile-img.png'
-  },
-];
-
-// const picList = [
-//   '/trip-img/trip1.jpeg', '/trip-img/trip3.jpeg', '/trip-img/trip4.jpeg', '/trip-img/trip5.jpeg', '/trip-img/trip6.jpeg', '/trip-img/trip7.jpeg', '/trip-img/trip8.jpeg', '/trip-img/trip9.jpeg', '/trip-img/trip10.jpeg', '/trip-img/trip11.jpeg'
-// ];
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const PhotoDetail = () => {
   const [checkGrid, SetCheckGrid] = useState('grid');
@@ -39,10 +19,14 @@ const PhotoDetail = () => {
     setShowShared(e.target.checked);
   };
   const location = useLocation();
+  const navigate = useNavigate();
+  const {tripId} = useParams();
   const { 
     picList = []
 } = location.state || {};
   // 슬라이드 나중에 구현 예정!!
+
+
   return (
     <div className='photo-detail'>
       <Header toBack={true}/>
@@ -54,7 +38,7 @@ const PhotoDetail = () => {
               <div className="choose-grid">
                 <img src={grid_on} alt="" /> <img src={slide_off} alt="" onClick={()=>SetCheckGrid('slide')}/>
               </div>
-              <button className='share-btn'>
+              <button className='share-btn' onClick={() => navigate(`/trips/detail/${tripId}/share`)}>
                 <img src={link_icon} alt="" />
                 <p>공유 사진 관리하기</p>
               </button>
@@ -71,7 +55,12 @@ const PhotoDetail = () => {
             <div className='photo-grid-detail'>
               {picList.map((pics, index)=>(
                 <div className='photo-item-detail' key={index}> 
-                    <img src={pics.url} alt="" />
+                    <img src={pics.url} alt="" onClick={()=> navigate(`/trips/detail/${tripId}/${pics.mediaAssetId}`, 
+                      {state: {
+                        url: pics.url,
+                        comment: pics.comment,
+                        mediaKind: pics.mediaKind
+                      }})}/>
                     {showShared && pics.isShared && (
                       <div className='shared-link-icon'>
                         <img src={shared_icon} alt="공유됨" />

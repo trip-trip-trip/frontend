@@ -1,22 +1,26 @@
 import React from 'react'
 import './friendRequest.css'
+import alert_icon from '/icons/alert.png'
+import next_icon from '/icons/next.png'
+import { useNavigate } from 'react-router-dom'
 
-const FriendRequest = ({img, tripName, userName, onAccept, onReject}) => {
+const FriendRequest = ({data}) => {
+    const navigate = useNavigate();
+    const dateOnly = data.createdAt.split('T')[0];
   return (
     <div className='friend-request'>
-        <h2>여행을 함께 하시겠습니까?</h2>
+        <div className="invitation-alert">
+            <img src={alert_icon} alt="" />
+            <p>여행 초대 알림</p>
+        </div>
         <div className="request-trip-cont">
+            <h3>{dateOnly}</h3>
             <div className="request-trip-info">
-                <img src={img[0]} alt="" className='request-trip-img'/>
-                <div className="request-trip-name">
-                    <h2>{tripName}</h2>
-                    <h3>{userName}</h3>
-                </div>
+                <img src={data.inviterProfileImg} alt="" className='request-trip-img'/>
+                <h3 className='request-trip-text'><span>{data.inviterName}</span>님이 <span>{data.tripName}</span> 여행에 초대했어요</h3>
             </div>
-            <div className="request-btn-cont">
-                <button className='request-btn accept' onClick={onAccept}>수락</button>
-                <button className='request-btn reject' onClick={onReject}>거절</button>
-            </div>
+            <h6 onClick={()=>navigate(`/trips/detail/${data.tripId}`, {state: {invite:true, invitationId: data.invitationId}})}>
+                확인하기<img src={next_icon} alt="" className='check-next'/></h6>
         </div>
     </div>
   )

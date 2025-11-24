@@ -38,6 +38,7 @@ import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
 import PostEdit from './pages/Home/post/PostEdit';
 import EditTrip from './pages/Album/TripDetails/EditTrip';
 import SharedList from './pages/Album/TripDetails/SharedList';
+import ShowMedia from './pages/Album/TripDetails/ShowMedia';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -89,7 +90,11 @@ const App = () => {
         <Route path='/trips/:tripId/shared' element={<SharedList/>}/>
         <Route path='/trips/detail/:tripId/share' element={<SharePhoto/>}/>
         <Route path='/trips/detail/:tripId/vid' element={<VideoDetail/>}/>
+        <Route path='/trips/detail/:tripId/:mediaAssetId' element={<ShowMedia/>}/>
         <Route path='/trips/detail/:tripId/pic' element={<PhotoDetail/>}/>
+        <Route path='/trips/detail/:tripId/invitedFriends' element={<SharedList/>}/>
+        <Route path='/trips/detail/:tripId/addFriends' element={<AddFriend/>}/>
+
         <Route path='/scrapbook/frame' element={<PickFrame/>}/>
         <Route path='/scrapbook/create' element={<SelectPic/>}/>
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>

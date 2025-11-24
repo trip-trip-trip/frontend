@@ -1,9 +1,9 @@
 import React from 'react';
 import './sharedFriends.css';
 import add_icon from '/icons/add_btn.png'
+import profile_img from '/profile-img.png'
 
 const SharedFriends = ({ data, invite, onInviteClick }) => {
-
   const handleInvite = () => {
     if (onInviteClick) {
       onInviteClick();
@@ -13,27 +13,30 @@ const SharedFriends = ({ data, invite, onInviteClick }) => {
     }
   };
 
-  <div className='shared-friends'>
-    <div className='shared-profiles'>
-      {data.map((friend, index) => (
-        <div key={index} className='share-img'>
-          <img src={friend.profile} className='shared-profile-img' alt={friend.name || 'Friend Profile'} />
-        </div>
-      ))}
-    </div>
-    
-    {invite && (
-      <div className='invite-button-wrapper'>
-          <button className='invite-btn' onClick={handleInvite}>
-              <div className="invite-btn-cont">
-                <img src={add_icon} alt="초대" />
-                <p>친구 초대하기</p>
-              </div>
-          </button>
+  return(
+    <div className='shared-friends'>
+      <div className='shared-profiles'>
+        {data.map((friend, index) => (
+          <div key={index} className='share-img'>
+            {friend.profile ==='none' ? 
+              <img src={profile_img} className='shared-profile-img' alt={friend.name || 'Friend Profile'} />
+            :
+              <img src={friend.profile} className='shared-profile-img' alt={friend.name || 'Friend Profile'} />
+            }
+          </div>
+        ))}
       </div>
-    )}
-  </div>
-
+      
+      {invite && (
+        <button className='invite-btn' onClick={handleInvite}>
+            <div className="invite-btn-cont">
+              <img src={add_icon} alt="초대" className='invite-icon' />
+              <p>친구 초대하기</p>
+            </div>
+        </button>
+      )}
+    </div>
+  )
 };
 
 export default SharedFriends;
