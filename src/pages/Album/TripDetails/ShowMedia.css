@@ -1,0 +1,48 @@
+.show-media{
+    background-color: black;
+    height: 100%;
+}
+
+.show-media-cont{
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.show-media-cont img{
+    width: 90%;
+}
+
+.comment-cont{
+    z-index: 10;
+    width: 100%;
+    background: rgba(36, 36, 36, 0.751);
+    height: 20rem;
+    position: absolute;
+    bottom: 0;
+}
+
+.function-cont{
+    z-index: 10;
+    width: 100%;
+    background: rgba(36, 36, 36, 0.751);
+    height: 10rem;
+    position: absolute;
+    top: 0;
+}
+
+.function-cont h1{
+    color: white;
+    margin-top: 5rem;
+    padding: 2rem 2rem;
+    font-weight: 300;
+}
+
+.comment-cont h4{
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 400;
+    padding: 1rem 2rem;
+}

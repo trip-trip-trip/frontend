@@ -19,7 +19,7 @@ const PickFrame = () => {
 
   const location = useLocation();
   const [tripId, setTripId] = useState();
-  
+
   useEffect(() => {
     if (location?.state?.tripId) {
       setTripId(location.state.tripId);
@@ -29,6 +29,9 @@ const PickFrame = () => {
   const API_BASE = import.meta.env.PROD 
       ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
       : '/api';
+  // const API_BASE = 'https://tripshot.duckdns.org';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+
   const [isLoading, setIsLoading] = useState(true); 
 
   const {token} = useAuth();

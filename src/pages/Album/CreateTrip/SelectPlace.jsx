@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import './SelectPlace.css';
 import Header from '../../../components/Header/Header';
 import Navbar from '../../../components/NavBar/NavBar'; // 가정: 하단 네비게이션
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 
@@ -10,19 +10,27 @@ const SelectPlace = () => {
     const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
+    // const API_BASE = 'https://tripshot.duckdns.org';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { token, activeTripId } = useAuth();
     const [isLoading, setIsLoading] = useState();
     const [domesticData, setDomesticData] = useState([]);
     const [overseasData, setOverseasData] = useState([]);
+    const [isEdit, setIsEdit] = useState(location.state?.isEdit || false);
+    const [tripName, setTripName] = useState(location.state?.tripName || '');
+    const [tripStartDate, setTripStartDate] = useState(location.state?.startDate || '');
+    const [tripEndDate, setTripEndDate] = useState(location.state?.endDate || '');
+    const returnPath = location.state?.returnPath || null; 
 
     // 국내/해외 선택
     const [typeSelected, setTypeSelected] = useState('domestic'); 
     // 현재 선택된 국가/지역 카테고리 ID -> 기본 한국 10
     const [selectedCategoryId, setSelectedCategoryId] = useState(10); 
     // 사용자가 선택한 도시 목록
-    const [selectedPlace, setSelectedPlace] = useState(null); 
+    const [selectedPlace, setSelectedPlace] = useState(location.state?.selectedPlace); 
 
     // 국내/해외 선택 -> 데이터 다르게 표시
     const currentData = typeSelected === 'overseas' ? overseasData : domesticData;
@@ -51,16 +59,21 @@ const SelectPlace = () => {
   };
 
     const handleCompleteSelection = () => {
-        if (!selectedPlace) {
-            alert("여행지를 1개 이상 선택해주세요.");
-            return;
-        }
-
-        navigate('/trips/create', { 
-            state: { 
-              selectedPlace: selectedPlace,     
-            } 
-        });
+      if (!selectedPlace) {
+        alert("여행지를 1개 이상 선택해주세요.");
+        return;
+      }
+      if (isEdit && returnPath) {
+        navigate(returnPath, { state: { selectedPlace, tripName, tripStartDate, tripEndDate } });
+        return;
+      }
+      if (isEdit && !returnPath) {
+        // returnPath가 없다면 그냥 뒤로 가기 (state 전달 불가하므로 경고)
+        alert("돌아갈 경로 정보가 없어 자동으로 뒤로갑니다.");
+        navigate(-1);
+        return;
+      }
+      navigate('/trips/create', { state: { selectedPlace } });
     };
 
     // 현재 선택된 도시의 ID를 확인하는 헬퍼 함수
@@ -79,11 +92,13 @@ const SelectPlace = () => {
             return;
           }
 
-          if(activeTripId){
-            alert("이미 생성된 여행이 있습니다. 해당 여행이 끝난 후 새 여행 생성이 가능합니다.");
-            setIsLoading(false);
-            // navigate('/login');
-            return;
+          if (!isEdit){
+            if(activeTripId){
+              alert("이미 생성된 여행이 있습니다. 해당 여행이 끝난 후 새 여행 생성이 가능합니다.");
+              setIsLoading(false);
+              // navigate('/login');
+              return;
+            }
           }
     
           try {

@@ -37,6 +37,10 @@ input::placeholder{
     color: #525B65;
 }
 
+.friend-name{
+  margin: 0;
+}
+
 .friend-list{
     display: flex;
     flex-direction: column;
@@ -61,6 +65,7 @@ input::placeholder{
     display: flex;
     gap: 1.8rem;
     align-items: center;
+    justify-content: center;
 }
 
 .friend-profile p{
@@ -164,6 +169,8 @@ input[type="search"]{
     border-radius: 50%;
     background-color: #E0DDD2; /* 프로필 이미지 플레이스홀더 */
     border: 1px dashed #525B65;
+    margin: 0 0 0 0;
+    padding: 0;
   }
   
   .friend-name {
@@ -198,14 +205,20 @@ input[type="search"]{
     min-width: 6rem;
     cursor: pointer;
   }
+
+  .selected-friend-item img{
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50rem;
+  }
   
-  .profile-circle.selected-profile {
+  .profile-circle.selected {
     position: relative;
     width: 5rem;
     height: 5rem;
-    background-color: #e3dcd1;
     border: none;
     margin-right: 0;
+    background: none;
   }
   
   .remove-icon {

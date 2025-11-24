@@ -53,6 +53,9 @@ const CreateScrap = () => {
     const scrapRef = useRef(null);
     const {token} = useAuth();
     const navigate = useNavigate();
+    // const API_BASE = 'https://tripshot.duckdns.org';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+  
 
     // 선택된 프레임의 위치 정보 가져오기
     const initialFrameData = FRAME_POSITIONS[selectedFrameId] || [];
@@ -75,7 +78,7 @@ const CreateScrap = () => {
       try {
         const dataUrl = await toPng(scrapRef.current, {
           cacheBust: true,
-          pixelRatio: 3,
+          pixelRatio: 2,
         });
         const link = document.createElement('a');
         link.href = dataUrl;
@@ -101,7 +104,7 @@ const CreateScrap = () => {
       try {
           const fileBlob = await toBlob(scrapRef.current, {
               cacheBust: true,
-              pixelRatio: 3,
+              pixelRatio: 2,
               backgroundColor: 'white'
           });
 
@@ -118,7 +121,7 @@ const CreateScrap = () => {
               "media": {
                   "tripId": `${tripId}`,
                   "mediaKind": "PHOTO",
-                  "captureType": "SCRAPBOOK",
+                  "captureType": "NORMAL",
                   "comment": '' 
               },
               "tripId": `${tripId}`,
