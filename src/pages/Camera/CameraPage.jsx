@@ -9,8 +9,8 @@ import {useAuth} from'../../contexts/AuthContext';
 
 
 // 1. 사용할 모든 '재료' 임포트
-import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레임
-import textureAsset from '../../assets/filmeffect.png'; // 님의 고정 텍스처
+import frameAsset from '../../assets/cameralens22.png'; 
+import textureAsset from '../../assets/filmeffect.png'; 
 import switchmode from '../../assets/switchcam.png';
 
 import backIcon from'../../assets/back.png';
@@ -350,7 +350,8 @@ const selectFilter = (index) => setCurrentFilterIndex(index);
         setIsRecording(false); setCountdown(0);
       }
     } else if (mode === 'film') { 
-      if (shotCount >= MAX_TOTAL_SHOTS) {
+      const currentCount = Number(localStorage.getItem(storageKey) || shotCount);
+      if (currentCount >= MAX_TOTAL_SHOTS) {
         alert(`최대 촬영 횟수(${MAX_TOTAL_SHOTS})를 모두 사용했습니다!`);
         return;
       }
