@@ -23,21 +23,15 @@ const FRAME_POSITIONS = {
         { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
         { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
     ],
-    2: [ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
-      { id: 1, initialUrlIndex: 0, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
-      { id: 2, initialUrlIndex: 1, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
-      { id: 3, initialUrlIndex: 2, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
+    2: [ // '/frame2.PNG'에 대한 4장의 사진 위치 설정
+      { id: 1, initialUrlIndex: 0, style: { top: '10.3rem', left: '1.7rem', width: '20.5rem', height: '12.6rem', transform: 'rotate(9.982deg)' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '29.2rem', left: '10rem', width: '12.4rem', height: '9.3rem', transform: 'rotate(-12.581deg)' } },
     ],
-    3:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
-      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
-      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
+    3: [ // '/frame3.PNG'에 대한 4장의 사진 위치 설정
+      { id: 1, initialUrlIndex: 0, style: { top: '13.7rem', left: '19.6rem', width: '11.3rem', height: '11.9rem', transform: 'rotate(2.5deg)' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '26rem', left: '10.2rem', width: '18.7rem', height: '18.1rem', transform: 'rotate(-82deg)' } },
+      { id: 3, initialUrlIndex: 2, style: { top: '10.1rem', left: '5.5rem', width: '14rem', height: '14.8rem', transform: 'rotate(-7.086deg)'} },
     ],
-    4:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
-      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
-      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
-      { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
-      { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
-    ]
 };
 
 const CreateScrap = () => {
@@ -54,7 +48,7 @@ const CreateScrap = () => {
     const {token} = useAuth();
     const navigate = useNavigate();
     // const API_BASE = 'https://tripshot.duckdns.org';
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA2OTE0NSwiZXhwIjoxNzY0MDcyNzQ1fQ.Q0PiL1ZAJm1dpIh9jGrciyrI4NookTKFnnjMbiT0wjIZuPkkI5Nx6bVZO6Md4BaU1fx-L741tUBNmErqPB5k-A';
   
 
     // 선택된 프레임의 위치 정보 가져오기
