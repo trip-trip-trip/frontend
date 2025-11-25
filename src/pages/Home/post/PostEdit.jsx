@@ -107,6 +107,49 @@ const PostEdit = () => {
   };
 
   // 삭제 요청 (DELETE)
+  // const handleDelete = async () => {
+  //   if (!window.confirm("정말로 게시물을 삭제하시겠습니까?")) return;
+
+  //   setLoading(true);
+  //   try {
+  //       const res = await fetch(`${API_BASE}/posts/${id}`, {
+  //           method: 'DELETE',
+  //           headers: { 
+  //               'Authorization': `Bearer ${token}`
+  //           }
+  //       });
+        
+  //       // 응답 텍스트를 먼저 가져옵니다. (JSON 파싱 에러 방지)
+  //       const text = await res.text(); 
+  //       let data = null;
+  //       try {
+  //           data = JSON.parse(text);
+  //       } catch (e) {
+  //           // JSON이 아님 (빈 응답일 수 있음) -> 성공으로 간주
+  //       }
+
+  //       // HTTP 상태 코드가 실패(400, 500 등)인 경우
+  //       if (!res.ok) {
+  //           throw new Error((data && data.message) || "삭제 요청이 실패했습니다.");
+  //       }
+
+  //       // HTTP는 성공(200)이지만, 서버가 논리적 실패(isSuccess: false)를 보낸 경우 ★ [이게 원인일 확률 높음]
+  //       if (data && data.isSuccess === false) {
+  //           throw new Error(data.message || "게시물을 삭제하지 못했습니다.");
+  //       }
+
+  //       // 진짜 성공
+  //       alert("게시물이 삭제되었습니다.");
+  //       navigate('/home', { replace: true }); 
+
+  //   } catch (e) {
+  //       console.error("Delete Error:", e);
+  //       // 사용자에게 진짜 에러 메시지를 보여줍니다.
+  //       alert(e.message || "삭제 중 오류가 발생했습니다.");
+  //   } finally {
+  //       setLoading(false);
+  //   }
+  // };
   const handleDelete = async () => {
     if (!window.confirm("정말로 게시물을 삭제하시겠습니까?")) return;
 
@@ -115,37 +158,24 @@ const PostEdit = () => {
         const res = await fetch(`${API_BASE}/posts/${id}`, {
             method: 'DELETE',
             headers: { 
+                'Content-Type': 'application/json', 
                 'Authorization': `Bearer ${token}`
             }
         });
         
-        // 응답 텍스트를 먼저 가져옵니다. (JSON 파싱 에러 방지)
-        const text = await res.text(); 
-        let data = null;
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            // JSON이 아님 (빈 응답일 수 있음) -> 성공으로 간주
-        }
+        const data = await res.json();
 
-        // HTTP 상태 코드가 실패(400, 500 등)인 경우
-        if (!res.ok) {
-            throw new Error((data && data.message) || "삭제 요청이 실패했습니다.");
+        if (data.isSuccess) {
+            alert("게시물이 삭제되었습니다.");
+            navigate('/home', { replace: true }); 
+        } else {
+            // 실패 시 서버 메시지 출력
+            alert(`삭제 실패: ${data.message}`);
         }
-
-        // HTTP는 성공(200)이지만, 서버가 논리적 실패(isSuccess: false)를 보낸 경우 ★ [이게 원인일 확률 높음]
-        if (data && data.isSuccess === false) {
-            throw new Error(data.message || "게시물을 삭제하지 못했습니다.");
-        }
-
-        // 진짜 성공
-        alert("게시물이 삭제되었습니다.");
-        navigate('/home', { replace: true }); 
 
     } catch (e) {
         console.error("Delete Error:", e);
-        // 사용자에게 진짜 에러 메시지를 보여줍니다.
-        alert(e.message || "삭제 중 오류가 발생했습니다.");
+        alert("삭제 중 오류가 발생했습니다.");
     } finally {
         setLoading(false);
     }
