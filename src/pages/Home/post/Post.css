@@ -53,6 +53,7 @@
 }
 
 .location {
+    padding-bottom: 2px;
     font-size: 13px;
     color: #777;
     display: flex;

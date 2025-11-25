@@ -248,10 +248,12 @@ export default function TabPlace({ setTab, activeTrip }) {
             marker.addListener("click", () => {
                 // HTML 컨텐츠 설정 (ID 부여)
                 const contentString = `
-                    <div id="info-window-${p.id}" style="cursor: pointer; text-align: center;">
-                        <img src="${p.thumbnail_url}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 5px;" />
-                        <div style="font-weight: bold; font-size: 14px; color: #333;">${p.title}</div>
-                        <div style="color: #007AFF; font-size: 12px; margin-top: 4px;">보러가기 &gt;</div>
+                    <div class="info-window" id="info-window-${p.id}">
+                        <img src="${p.thumbnail_url}" class="info-img" />
+                        <div class="info-content">
+                            <div class="info-title">${p.title}</div>
+                            <div class="info-more">보러가기 &gt;</div>
+                        </div>
                     </div>
                 `;
                 

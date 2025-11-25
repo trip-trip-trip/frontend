@@ -28,7 +28,10 @@
 .info-window {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px; /* 간격 조금 더 넓힘 */
+  padding-right: 24px; /* 오른쪽 닫기(X) 버튼 공간 확보! */
+  cursor: pointer;
+  min-width: 180px; /* 너무 좁아지지 않게 최소 너비 설정 */
 }
 
 .info-img {
@@ -36,6 +39,14 @@
   height: 56px;
   border-radius: 8px;
   object-fit: cover;
+  flex-shrink: 0; /* 이미지 찌그러짐 방지 */
+}
+.info-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  overflow: hidden; /* 긴 텍스트 자르기 위해 필요 */
 }
 
 .info-title {
@@ -45,6 +56,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.info-more {
+  font-size: 12px;
+  color: #007AFF;
+  margin-top: 4px;
 }
 
 .place-header-controls {
