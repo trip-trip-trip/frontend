@@ -33,7 +33,7 @@ const ActiveTrip = ({placeName, tripId, tripName, title, startDate, endDate, mem
         </div>
         <div className="active-trip-members">
           {/* 친구 수 + 본인 추가 */}
-          <h5><span>{(members.length)}명</span> | {startDate?.slice(2).split('-').join('.')} ~ {endDate.slice(2).split('-').join('.')}</h5>
+          <h5><span>{(members.length)}명</span> | {startDate?.slice(2).split('-').join('.')} ~ {endDate?.slice(2).split('-').join('.')}</h5>
         </div>
       </div>
 
@@ -57,9 +57,9 @@ const ActiveTrip = ({placeName, tripId, tripName, title, startDate, endDate, mem
               }
             })}>
               <div className="active-album-date">
-                <h5 className='left-date'>{startDate.split('-')}</h5>
+                <h5 className='left-date'>{startDate?.split('-')}</h5>
                 <p>------------</p>
-                <h5 className='right-date'>{endDate.split('-')}</h5>              
+                <h5 className='right-date'>{endDate?.split('-')}</h5>              
               </div>
 
               <div className="active-trip-info">
