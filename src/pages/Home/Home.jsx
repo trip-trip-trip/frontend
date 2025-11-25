@@ -234,7 +234,7 @@ const Home = () => {
                 <div className="hitbox-edit" onClick={handleGoEdit}></div>
               </div>
             ) : (
-              <div className="new-trip-container" onClick={() => navigate('trips/places')}>
+              <div className="new-trip-container" onClick={() => navigate('/trips/places')}>
                 <div className="new-trip-img">
                   <img src={new_trip} alt="new trip" />
                 </div>

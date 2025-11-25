@@ -26,12 +26,17 @@ const toAbsolute = (path) => {
     if (path.startsWith('http')) return path;
     return `${window.location.origin}${path}`;
 };
+const addJitter = (coord) =>{
+    const jitterAmount = 0.0005; 
+    // -0.00025 ~ +0.00025 사이의 랜덤 값 추가
+    return Number(coord) + (Math.random() - 0.5) * jitterAmount;
+}
 
 const mapLocalPostForMap = (p) => ({
     id: p.id,
     post_id: p.id,
-    lat: Number(p.lat),
-    lng: Number(p.lng),
+    lat: addJitter(p.lat), // 로컬 데이터에도 적용
+    lng: addJitter(p.lng),
     title: p.title || p.content || "제목 없음",
     thumbnail_url: toAbsolute(p.images?.[0] || p.image),
     author_avatar: p.author_avatar,
@@ -42,6 +47,8 @@ const mapLocalPostForMap = (p) => ({
 //     { id: 2, post_id: 2, lat: 37.550000, lng: 126.988000, thumbnail_url: 'https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=https://t1.daumcdn.net/brunch/service/user/bUxO/image/CNVUiFf4ZuP8oLPqZr9L83WoopE.jpg', title: '남산 1' },
 //     { id: 3, post_id: 3, lat: 37.550500, lng: 126.988500, thumbnail_url: 'https://media.triple.guide/triple-cms/c_limit,f_auto,h_1024,w_1024/5623e2d7-aee0-4933-85ff-e48db3d31da1.jpeg', title: '남산 2' }
 // ];
+
+
 
 /* 구글 맵 스크립트 로더 (싱글톤 패턴) */
 let mapsLoaderPromise = null;
@@ -151,8 +158,7 @@ export default function TabPlace({ setTab, activeTrip }) {
                 const detailMap = new Map();
                 details.forEach(p => detailMap.set(p.id, {
                     title: p.caption ?? "사진",
-                    thumbnail_url: p.media?.[0]?.thumbnail_url ? toAbsolute(p.media[0].thumbnail_url) : FALLBACK_THUMB,
-                    avatar_url: p.author?.avatar_url,
+                    thumbnail_url: p.media?.[0]?.thumbnail_url ? toAbsolute(p.media[0].thumbnail_url) : null,                    avatar_url: p.author?.avatar_url,
                 }));
 
                 // (2) 위치 정보 & 장소 탭 정보 가져오기
@@ -179,14 +185,17 @@ export default function TabPlace({ setTab, activeTrip }) {
 
                 // (3) 데이터 병합
                 const merged = locList.map(loc => {
-                    const d = detailMap.get(loc.post_id);
-                    if (!d) return null;
+                    const d = detailMap.get(loc.post_id) || {};
+                    // if (!d) return null;
+                    const thump = loc.thumbnail_url
+                    ? toAbsolute(loc.thumbnail_url)
+                    : (d.thumbnail_url || FALLBACK_THUMB);
                     return {
                         id: loc.post_id,
-                        lat: Number(loc.lat),
-                        lng: Number(loc.lng),
-                        title: d.title,
-                        thumbnail_url: d.thumbnail_url,
+                        lat: addJitter(loc.lat),
+                        lng: addJitter(loc.lng),
+                        title: d.title || "게시물",
+                        thumbnail_url: thump,
                         avatar_url: d.avatar_url,
                     };
                 }).filter(Boolean);

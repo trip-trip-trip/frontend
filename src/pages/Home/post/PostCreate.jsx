@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../../components/Header/Header';
 import './PostCreate.css'; 
-import default_pic from '../../../assets/default_pic.jpg';
 import { useAuth } from '../../../contexts/AuthContext';
 import Navbar from '../../../components/NavBar/NavBar';
+import default_pic from "../../../assets/default-profile.png";
+
 
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
@@ -99,9 +100,10 @@ export default function PostCreate() {
         tripId: selectedTripData.trip.id,
         visibility: isPrivate ? 'PRIVATE' : 'FRIENDS',
         caption: content,
-        location_text: "", 
-        lat: null,
-        lng: null,
+        // location_text: "", 
+        location_text: selectedTripData.trip.placeName || "",
+        lat: selectedTripData.trip.lat || null,
+        lng: selectedTripData.trip.lng || null,
         media: selectedMedia.map(m => {
           // ★ 핵심: 프론트엔드 타입을 백엔드 API 스펙(Enum)으로 변환
           let objectType = 'MEDIA'; // 기본값 (PHOTO)
