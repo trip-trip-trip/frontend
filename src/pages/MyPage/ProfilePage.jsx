@@ -152,7 +152,7 @@ return (
            <img 
              src={safeUser.avatarUrl} 
              alt="프로필" 
-             className="profile-img" 
+             className="profile-img-my" 
              onError={(e) => {e.target.src = defaultProfile;}}
            />
          </div>
