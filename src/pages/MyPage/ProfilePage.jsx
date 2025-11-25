@@ -118,33 +118,33 @@ return (
          </button>
        </div>
        {/* [추가] 친구 요청 알림 영역 (요청이 있을 때만 표시) */}
-       {receivedRequests.length > 0 && (
+         {receivedRequests.length > 0 && (
          <div className="friend-request-alert">
-           <div className="alert-top">
-             <img src={reqNotificationIcon} alt="알림" className="req-noti-icon" />
-             <span className="alert-message">
-               {receivedRequests[0].requesterUsername}님 외 {Math.max(0, receivedRequests.length - 1)}명이 친구 요청했어요
-             </span>
-           </div>
-
+           <img src={reqNotificationIcon} alt="알림" className="req-noti-icon" />
+         
+           <span className="alert-message">
+             {receivedRequests[0].requesterUsername}님 외 {Math.max(0, receivedRequests.length - 1)}명이 친구 요청했어요
+           </span>
            <div className="alert-profiles">
-             {/* 최근 3명까지 표시 */}
-             {receivedRequests.slice(0, 3).map((req) => (
+             {receivedRequests.slice(0, 3).reverse().map((req,index) => (
                <img 
                  key={req.id} 
                  src={req.requesterAvatarUrl || defaultProfile} 
                  alt="프사" 
                  className="alert-profile-img" 
+                 style={{ zIndex: index }}
                />
              ))}
            </div>
 
+           {/* 4. 확인하기 버튼 */}
            <button className="check-btn" onClick={() => navigate('/mypage/friends')}>
              확인하기
-             <img src={goIcon} alt="확인하기" className="goIcon"/>
+             <img src={goIcon} alt="go" className="goIcon"/>
            </button>
          </div>
        )}
+
 
        {/* 2. 프로필 정보 박스 */}
        <div className="profile-info-box">
