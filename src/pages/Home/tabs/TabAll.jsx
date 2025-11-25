@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PostItem from '../post/PostItem';
 import './TabAll.css';
 import { useAuth } from '../../../contexts/AuthContext';
+import default_pic from "../../../assets/default-profile.png";
 
 // 1. HTTPS 주소 적용
 const API_BASE = import.meta.env.PROD 
@@ -10,11 +11,15 @@ const API_BASE = import.meta.env.PROD
 
 const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
   const { token, user } = useAuth();
-  const [posts, setPosts] = useState([]);
+  
+  // ★ [수정 1] 원본 데이터와 가공된 데이터를 분리합니다.
+  const [rawPosts, setRawPosts] = useState([]); // API에서 온 원본
+  const [posts, setPosts] = useState([]);       // 화면에 보여질 가공된 데이터
+  
   const currentUserId = user?.id;
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
-   
+    
   useEffect(() => {
     if (onPostsLoaded) onPostsLoaded(posts);
   }, [posts, onPostsLoaded]);
@@ -28,48 +33,9 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
     }).replace(/\./g, '.').trim();
   };
 
-  // API post → 앱용 구조 매핑
-  const mapApiPost = (p) => {
-     const mediaList = p.media ? p.media.map(m => {
-       // 1. 기본적으로 서버에서 준 타입 사용
-       let type = m.object_type || 'MEDIA';
+  // API post → 앱용 구조 매핑 (함수 분리 안 해도 됨, useEffect 안에서 처리)
 
-       // 2. [핵심 수정] 타입이 MEDIA(사진)인데 URL이 비디오 형식이면 SHORT_REEL(영상)로 강제 변환
-       // 이렇게 해야 피드에서 <img> 태그가 아닌 <video> 태그로 렌더링됩니다.
-       if (type === 'MEDIA' && m.url && /\.(mp4|mov|webm|avi|mkv)$/i.test(m.url)) {
-         type = 'SHORT_REEL';
-       }
-
-       return {
-         url: m.url,
-         thumbnail: m.thumbnail_url, 
-         type: type 
-       };
-    }) : [];
-
-    return {
-      id: p.id,
-      author: p.author?.username ?? '알 수 없음',
-      author_avatar: p.author?.avatar_url ?? '/assets/default-avatar.png',
-      caption: p.caption ?? '',
-      
-      images: mediaList.map(m => m.url), 
-      
-      // PostItem에 전달될 핵심 데이터 (타입 정보 포함)
-      media: mediaList, 
-
-      image: mediaList[0]?.thumbnail || mediaList[0]?.url || null, // 커버 이미지
-      location: p.location ?? '',
-      date: extractCreatedDate(p),
-      like_count: p.like_count ?? 0,
-      comment_count: p.comment_count ?? 0,
-      is_liked: !!p.is_liked,
-      is_mine: String(p.author?.id) === String(currentUserId), 
-      lat: p.lat ?? null,
-      lng: p.lng ?? null,
-    };
-  };
-
+  // API 데이터 가져오기
   useEffect(() => {
     const ac = new AbortController();
 
@@ -86,14 +52,14 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
         const data = await res.json();
         if (!data.isSuccess) throw new Error(data.message);
 
-        const apiPosts = data.result.posts.map(mapApiPost);
-        setPosts(apiPosts);
+        // 가공하지 않고 원본 그대로 저장
+        setRawPosts(data.result.posts || []);
 
       } catch (error) {
         if (error.name !== 'AbortError') {
             console.error(error);
             setErr(error.message);
-            setPosts([]);
+            setRawPosts([]);
         }
       } finally {
         setLoading(false);
@@ -102,6 +68,53 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
 
     return () => ac.abort();
   }, [token, user]);
+
+  // rawPosts나 activeTrip이 바뀔 때마다 데이터를 다시 가공 
+  useEffect(() => {
+    const processedPosts = rawPosts.map(p => {
+        const mediaList = p.media ? p.media.map(m => {
+            let type = m.object_type || 'MEDIA';
+            if (type === 'MEDIA' && m.url && /\.(mp4|mov|webm|avi|mkv)$/i.test(m.url)) {
+              type = 'SHORT_REEL';
+            }
+            return {
+              url: m.url,
+              thumbnail: m.thumbnail_url || m.thumbnailUrl, 
+              type: type 
+            };
+        }) : [];
+    
+        let locationName = p.location || '';
+        
+        // 현재 여행 중인 게시물이라면 여행 장소 이름 덮어쓰기
+        if (!locationName && activeTrip && Number(p.trip_id) === Number(activeTrip.id)) {
+            locationName = activeTrip.placeName;
+        }
+    
+        return {
+          id: p.id,
+          author: p.author?.username ?? '알 수 없음',
+          author_avatar: p.author?.avatar_url ?? default_pic,
+          caption: p.caption ?? '',
+          
+          images: mediaList.map(m => m.url), 
+          media: mediaList, 
+    
+          image: mediaList[0]?.thumbnail || mediaList[0]?.url || null,
+          location: locationName || '어딘가', 
+          date: extractCreatedDate(p),
+          like_count: p.like_count ?? 0,
+          comment_count: p.comment_count ?? 0,
+          is_liked: !!p.is_liked,
+          is_mine: String(p.author?.id) === String(currentUserId), 
+          lat: p.lat ?? null,
+          lng: p.lng ?? null,
+        };
+    });
+
+    setPosts(processedPosts);
+
+  }, [rawPosts, activeTrip, currentUserId]); // activeTrip이 변하면 여기도 다시 실행됨!
 
   return (
     <section className="taball">

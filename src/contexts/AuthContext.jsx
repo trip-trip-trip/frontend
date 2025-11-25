@@ -5,6 +5,9 @@ const API_BASE = import.meta.env.PROD
   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org')
   : '/api';
 
+// const API_BASE = 'https://tripshot.duckdns.org';
+// const currentToken = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAwODk3NSwiZXhwIjoxNzY0MDEyNTc1fQ._wdW-QkZcAPMjKY7bAqnPcghb8u1YsGTtpX88zg-YaJFw3A-P31h2YEtuNe-ORPJbME6EwBwy3MAiVb6YdaC_Q';
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -29,12 +32,10 @@ export const AuthProvider = ({ children }) => {
   const fetchActiveTrip = useCallback(async (currentToken) => {
     if (!currentToken) return;
 
-    // TODO: 실제 진행 중인 여행을 확인하는 API 엔드포인트로 변경하세요.
-    const TRIP_STATUS_API_URL = `${API_BASE}/trips/isActiveTrips`; 
-
     try {
-      const res = await fetch(TRIP_STATUS_API_URL, {
+      const res = await fetch(`${API_BASE}/trips/isActiveTrips`, {
         headers: { Authorization: `Bearer ${currentToken}` },
+        // headers: { Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAwODk3NSwiZXhwIjoxNzY0MDEyNTc1fQ._wdW-QkZcAPMjKY7bAqnPcghb8u1YsGTtpX88zg-YaJFw3A-P31h2YEtuNe-ORPJbME6EwBwy3MAiVb6YdaC_Q` }
       });
 
       if (!res.ok) {
@@ -74,6 +75,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await fetch(`${API_BASE}/users/me`, {
         headers: { Authorization: `Bearer ${currentToken}` },
+        // headers: { Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAwODk3NSwiZXhwIjoxNzY0MDEyNTc1fQ._wdW-QkZcAPMjKY7bAqnPcghb8u1YsGTtpX88zg-YaJFw3A-P31h2YEtuNe-ORPJbME6EwBwy3MAiVb6YdaC_Q` }
       });
 
       if (!res.ok) {

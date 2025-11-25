@@ -8,45 +8,28 @@ import wait_icon from '/icons/request_wait.png'
 import shared_icon from '/icons/shared_list.png'
 import cancel_btn from '/icons/cancel_btn.png'
 import dropdown_icon from '/icons/dropdown_icon.png'
-import { useLocation } from 'react-router-dom';
-
-// 📝 API 응답을 가정한 더미 데이터
-const tripData = {
-  tripId: 10,
-  tripTitle: "도쿄 여행", 
-  direction: "SENT",
-  
-  // ⚠️ API 응답에 없는 데이터는 명시적으로 추가
-  startDate: "2025-10-15", // 날짜 정보 추가
-  endDate: "2025-10-30",   // 날짜 정보 추가
-
-  invitations: [
-      { 
-          invitationId: 101, inviterUserId: 1, inviterName: "owner_user", inviteeUserId: 2, 
-          inviteeName: "차분한박하영웅", status: "PENDING", createdAt: "2025-11-21T11:30:00", 
-          respondedAt: null, tag: "gamja_1212", isOwner: false // isOwner 추가 (가정)
-      },
-      { 
-          invitationId: 102, inviterUserId: 1, inviterName: "dkjsflk", inviteeUserId: 3, 
-          inviteeName: "차분한박", status: "PENDING", createdAt: "2025-11-21T11:30:00", 
-          respondedAt: null, tag: "gamja_1213", isOwner: false
-      },
-      { 
-        invitationId: 104, inviterUserId: 1, inviterName: "dkdkjf", inviteeUserId: 9, 
-        inviteeName: "여미사", status: "ACCEPTED", createdAt: "2025-11-21T11:30:00", 
-        respondedAt: null, tag: "gamja_1222", isOwner: true // 오너는 ACCEPTED로 간주 (가정)
-    },
-  ]
-};
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import default_profile from '/profile-img.png';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const DropdownIcon = ({ isOpen }) => (
     <span className={`dropdown-icon ${isOpen ? 'open' : ''}`}>{isOpen ? <img src={dropdown_icon} className='dropdown open' alt="닫기"/> : <img src={dropdown_icon} className='dropdown closed' alt="열기"/>}</span>
 );
 
 const SharedList = () => {
+  const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
+  // const API_BASE = 'https://tripshot.duckdns.org';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+
     const [isPendingOpen, setIsPendingOpen] = useState(true);
     const [isMembersOpen, setIsMembersOpen] = useState(true);
     const location = useLocation();
+    const [isLoading, setIsLoading] = useState(true);
+    const { tripId } = useParams();
+    const navigate = useNavigate();
+    const {token} = useAuth();
 
     const invitationData = location.state?.inviteInfo || [];
     const tripName = location.state?.name || '';
@@ -56,39 +39,118 @@ const SharedList = () => {
     const [confirmedMembers, setConfirmedMembers] = useState([]);
     const [pendingInvitations, setPendingInvitations] = useState([]);
 
+    console.log(pendingInvitations);
 
-    useEffect(() => {
+    const fetchInvitation = async() => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `${API_BASE}/trips/${tripId}/invite`,
+          {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+              "X-User-Id": "long"
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+        }
+        const data = await response.json();
+        const invitationData = data.result.invitations;
+
         const pendingList = [];
         const confirmedList = [];
         
-        invitationData.forEach((i) => { // map 대신 forEach 사용 권장
-            if (i.status === "PENDING"){
-                pendingList.push(i);
-            } else if (i.status === "ACCEPTED") { // 확정 상태 추가
-                confirmedList.push(i)
-            }
-        });
-        
-        setConfirmedMembers(confirmedList);
-        setPendingInvitations(pendingList);
-        
-    }, [invitationData]); // 💡 빈 배열 의존성: 컴포넌트 마운트 시 딱 한 번만 실행
+        invitationData.forEach((i) => {
+          if (i.status === "PENDING"){
+            pendingList.push(i);
+          } else if (i.status === "ACCEPTED") {
+            confirmedList.push(i)
+          }
 
+          setConfirmedMembers(confirmedList);
+          setPendingInvitations(pendingList);
+        });
+
+      } catch (error) {
+        console.error("Error fetching trip data:", error);
+      } finally{
+        setIsLoading(false);
+      }
+    }
+
+    const handleDeleteInvitation = async(data) => {
+      setIsLoading(true);
+      const invitationId = data;
+      try {
+        const response = await fetch(
+          `${API_BASE}/invitations/${invitationId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+              "X-User-Id": "long"
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+        }
+        const data = await response.json();
+
+        alert("초대가 삭제되었습니다.");
+        navigate(`/trips/detail/${tripId}/invitedFriends`, 
+          {state : {startDate: startDate,
+                    endDate: endDate,
+                    name: tripName
+          }})
+        fetchInvitation
+
+      } catch (error) {
+        console.error("Error deleting invitation:", error);
+      } finally{
+        setIsLoading(false);
+      }
+    }
+    
+    useEffect(() => {
+        if (token && tripId) {
+          fetchInvitation();
+        }
+      }, [token, tripId]);
+        
     const handleEditClick = () => {
-        alert("여행 수정 페이지로 이동합니다.");
+      navigate(`/trips/detail/${tripId}/edit`);
     };
+
+    if (isLoading) {
+      return (
+        <div className='album'>
+          <Header/>
+            <div className="album-container">
+              <ment>공유된 미디어를 불러오는 중...</ment>
+            </div>
+          <Navbar/>
+        </div>
+      );
+    }
 
     return (
       <div className='shared-list'>
           <Header toBack={true} />
           <div className="shared-list-container">
             {/* 여행정보 */}
-            <div className='trip-detail-container'>
-              <div className="trip-info-section">
+            <div className='shared-detail-container'>
+              <div className="shared-info-section">
                 <h1>{tripName}</h1> 
                 <div className="date-edit-section">
                   <div className="date-range">
-                    {/* 💡 상태 변수를 사용하거나, tripData 값을 바로 사용 */}
                     <h3>{(startDate || '').split('-').join('.')} - {(endDate || '').split('-').join('.')} </h3>
                   </div>
                   <button className='edit-icon-btn' onClick={handleEditClick}><img src={edit_btn} alt="수정 버튼" /></button>
@@ -109,19 +171,23 @@ const SharedList = () => {
                 
               {isPendingOpen && (
                 <div className="member-list pending-list">
-                  {/* 🚀 tripData.pendingInvitations 대신 가공된 pendingInvitations 상태 사용 */}
                   {pendingInvitations.map((invitee) => (
-                    <div className="member-row" key={invitee.invitationId}> {/* 🔑 Key는 invitationId 사용 */}
+                    <div className="member-row" key={invitee.invitationId}>
                       <div className="profile-info">
-                        <div className="profile-circle"></div>
-                        <div className="name-tag-wrapper">
-                          <p className="member-name">{invitee.inviteeName}</p> {/* 🔑 inviteeName 사용 */}
-                          <p className="member-tag">#{invitee.tag}</p>
-                        </div>
+                        {(invitee.inviteeAvatarUrl)
+                          ?
+                          <img src={invitee.inviteeAvatarUrl} alt="" className='profile-img'/>
+                          :
+                          <img src={default_profile} alt="" className='profile-img'/>  }
+
+                          <div className="name-tag-wrapper">
+                            <p className="member-name">{invitee.inviteeUsername}</p>
+                            <p className="member-tag">#{invitee.inviteeTag}</p>
+                          </div>
                       </div>
                       <div className="status-actions">
                         <span className="status-badge pending">대기중</span>
-                        <img src={cancel_btn} alt="취소 버튼" className='cancel-btn'/>
+                        <img src={cancel_btn} alt="" className='cancel-btn' onClick={()=>handleDeleteInvitation(invitee.invitationId)}/>
                       </div>
                     </div>
                   ))}
@@ -141,7 +207,6 @@ const SharedList = () => {
                 
               {isMembersOpen && (
                 <div className="member-list confirmed-list">
-                  {/* 🚀 tripData.confirmedMembers 대신 가공된 confirmedMembers 상태 사용 */}
                   {confirmedMembers.map((member) => (
                     <div className="member-row" key={member.invitationId}> {/* 🔑 Key는 invitationId 사용 */}
                       <div className="profile-info">

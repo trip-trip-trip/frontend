@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext'; // 1. AuthContext 임포�
 import Header from '../../components/Header/Header';
 import new_trip from '/new_trip.png';
 import plus_btn from '/icons/plus_icon.png'
+import Upcoming from '../../components/Album/UpcomingTrip';
 
 
 const Album = () => {
@@ -22,6 +23,10 @@ const Album = () => {
   const navigate = useNavigate();
   const { token, activeTripId, setActiveTripId } = useAuth();
 
+  // const API_BASE = 'https://tripshot.duckdns.org';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+
+
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
   const [tripData, setTripData] = useState({});
@@ -31,18 +36,19 @@ const Album = () => {
   const [plannedTrips, setPlannedTrips] = useState([]);
   
   // 친구 초대 요청 존재 여부
-  const [hasInviteRequest, setHasInviteRequest]=useState(false);
+  const [hasInviteRequest, setHasInviteRequest] = useState();
 
   // 친구 초대 요청 정보 - 요청받기 위해 일단 더미값 채워둠
-  const [tripRequest, setTripRequest] = useState({
-    title: '제주도 여행',
-    requestor: '김친구',
-    startDate: '2025-11-12',
-    endDate: '2025-12-12',
-    members: ['김친구', '박친구'],
-    image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
-    coverImage: '/trip-img/trip4.jpeg',
-  });
+  const [tripRequest, setTripRequest] = useState();
+  // const [tripRequest, setTripRequest] = useState({
+  //   title: '제주도 여행',
+  //   requestor: '김친구',
+  //   startDate: '2025-11-12',
+  //   endDate: '2025-12-12',
+  //   members: ['김친구', '박친구'],
+  //   image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
+  //   coverImage: '/trip-img/trip4.jpeg',
+  // });
 
   // setTripRequest({
   //   title: '제주도 여행',
@@ -73,7 +79,39 @@ const Album = () => {
  
 ////-----------
 
-  useEffect(() => {
+  //여행 초대 정보
+  const fetchInvitations = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/invitations`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+      }
+      const data = await response.json();
+      const fetchedInvitation = data.result;
+
+      if (fetchedInvitation?.length > 0){
+        setHasInviteRequest(true);
+        setTripRequest(fetchedInvitation[0]);
+        console.log(fetchedInvitation);
+      }
+
+    } catch (error) {
+      console.error("Error fetching invitation data:", error);
+    }
+  };
+
+
     async function fetchTrips() {
       setIsLoading(true);
       
@@ -113,12 +151,13 @@ const Album = () => {
           
           const tripData = {
             id: trip.id,
+            placeName: trip.placeName,
             title: trip.title,
             startDate: trip.startDate,
             endDate: trip.endDate,
             members: (trip.inviteesNameList || []).map((name, index) => ({
                 name: name,
-                profile: trip.inviteesProfileImgList[index] || '',
+                profile: trip.inviteesProfileImgList[index] || 'none',
                 tag: trip.inviteesTagList[index] || ''
             })),
             film_count: contents.photos.length,
@@ -126,6 +165,7 @@ const Album = () => {
             image: contents.photos.map(p => p.media.url),
             coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
           };
+
 
           if (trip.endDate < todayDate) {
             completedList.push(tripData);
@@ -158,26 +198,30 @@ const Album = () => {
 
       } catch (error) {
         console.error("Error fetching trips:", error);
-      }finally{
-        setIsLoading(false);
       }
     }
-    fetchTrips();
-  }, [token, activeTripId]);
+  
+    useEffect(() => {
+      async function initialDataFetch() {
+        setIsLoading(true);
+        try {
+          await Promise.all([
+            fetchTrips(), // 내부에서 setIsLoading(false)를 호출하지 않도록 수정 필요
+            fetchInvitations() // 내부에서 setIsLoading(false)를 호출하지 않도록 수정 필요
+          ]);
+        } catch (error) {
+          console.error("Initial data fetch failed:", error);
+        } finally {
+          setIsLoading(false); // 마지막에 한 번만 해제
+        }
+      }
+      if (token) {
+        initialDataFetch();
+      }
+    // ...
+    }, [token, activeTripId]);
 
-  if (isLoading) {
-    return (
-      <div className='album'>
-        <Header/>
-          <div className="album-container">
-            <h1>여행 정보를 불러오는 중...</h1>
-          </div>
-        <Navbar/>
-      </div>
-    );
-  }
-
-
+  
   // 친구 초대 요청에서 <거절> 클릭 시 동작
   const handleRejectRequest = () => {
     setHasInviteRequest(false);
@@ -220,34 +264,46 @@ const Album = () => {
       // console.log(activeTripInfo);
     }
   }
+
+  if (isLoading) {
+    return (
+      <div className='album'>
+        <Header/>
+          <div className="album-container">
+            <div className="ment">여행 정보를 불러오는 중...</div>
+          </div>
+        <Navbar/>
+      </div>
+    );
+  }
   
 return(
     <div className='album'>
       <Header/>
         {/* <button className='add-trip-btn' onClick={handleCreateBtn}>+</button> */}
         <div className="album-container">
-        {/* 친구 초대 요청이 있으면 요청 표시 */}
+        <div className={`request-cont ${activeTripId ? 'active' : 'nonactive'}`}>
+          {/* 친구 초대 요청이 있으면 요청 표시 */}
         { hasInviteRequest
           ? <FriendRequest 
-              img={tripRequest.image}
-              tripName={tripRequest.title}
-              userName={tripRequest.requestor}
-              onAccept={handleAcceptRequest}
-              onReject={handleRejectRequest}/> 
+              data={tripRequest}/> 
           : <></>}
+        </div>
+        
         {/* 활성화된 여행 있으면 표시 */}
         <div className="album-active-cont">
           {activeTripId
             ? <ActiveTrip tripName={activeTripInfo?.title}
+                          placeName={activeTripInfo?.placeName}
                           tripId = {activeTripId}
                           members={activeTripInfo?.members || []}
                           img={activeTripInfo?.image || []}
-                          filmCount={activeTripInfo.film_count || 0}
-                          vidCount={activeTripInfo.vid_count || 0}
+                          filmCount={activeTripInfo?.film_count || 0}
+                          vidCount={activeTripInfo?.vid_count || 0}
                           startDate={activeTripInfo?.startDate}
                           endDate={activeTripInfo?.endDate}
                           />
-            : <div className="new-trip-container" onClick={()=>navigate('/trips/create')}>
+            : <div className="new-trip-container" onClick={()=>navigate('/trips/places')}>
                 <div className="new-trip-img">
                   <img src={new_trip} alt="" />
                 </div>
@@ -255,8 +311,36 @@ return(
                   <img src={plus_btn} alt="" />
                   <h1>새로운 여행 만들기</h1>
                 </div>
-            </div> }
+            </div> 
+            }
         </div>
+
+        {/* --- 예정된 여행 섹션 --- */}
+        {
+          (plannedTrips.length > 0) &&
+          <div className="completed-album">
+          <div className="upcoming-trips-list">
+            {plannedTrips.map((trip, index) => (
+              <div 
+                key = {index}
+                className="upcoming-trip-item">
+                <Upcoming
+                  tripId = {trip.id}
+                  placeName={trip.placeName}
+                  title={trip.title}
+                  startDate={trip.startDate}
+                  endDate={trip.endDate}
+                  members={trip.members}
+                  coverImage={trip.coverImage}
+                  images={trip.image}
+                />
+              </div>
+            ))}
+          </div> 
+        </div>
+        }
+        
+
         {/* --- 완료된 여행 섹션 --- */}
         <div className="completed-album">
           <h2 className="section-title">지난 여행 기록</h2>
@@ -268,6 +352,7 @@ return(
                 className="completed-trip-item">
                 <EndedTripItem
                   tripId = {trip.id}
+                  placeName={trip.placeName}
                   title={trip.title}
                   startDate={trip.startDate}
                   endDate={trip.endDate}

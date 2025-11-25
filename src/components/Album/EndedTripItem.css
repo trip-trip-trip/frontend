@@ -1,7 +1,6 @@
 .EndedTripItem{
     color: #17171B;
     border-radius: 20px;
-    background: #F1F6EF;   
     /* padding: 2rem; */
     display: flex;
     flex-direction: column;
@@ -11,7 +10,6 @@
 }
 
 .EndedTripItem:hover{
-    background: #dbe1d7;
     cursor: pointer;
     transition: ease-in-out 0.2s;
 }
@@ -161,4 +159,8 @@
     height: 100%;
     object-fit: cover;
     border-radius: 0.3rem;
+  }
+
+  .shared-list{
+    z-index: 999;
   }

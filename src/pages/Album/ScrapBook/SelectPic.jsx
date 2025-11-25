@@ -20,6 +20,8 @@ const SelectPic = () => {
     const [isLoading, setIsLoading] = useState(true); 
   
     const {token} = useAuth();
+    // const API_BASE = 'https://tripshot.duckdns.org';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
 
     const selectedPicNum = location.state?.selectedPicNum;
     const selectedFrameUrl = location.state?.selectedFrameUrl;

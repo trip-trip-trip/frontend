@@ -1,56 +1,19 @@
-.active-trip-container{
-    height: 22rem;
-    padding: 2rem 2rem;
+.upcoming-trip-container{
+    margin-top: 2rem;
+    height: 14rem;
     display: flex;
     flex-direction: column;
-    background-color: #E0DDD2;
+    width: 100%;
 }
 
-.active-trip-container h5{
+.upcoming-trip-container h5{
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
     padding: 0;
 }
 
-.active-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.active-trip-members h5{
-    margin: 0;
-    padding: 0;
-    color: #525B65;
-    font-weight: 400;
-    font-size: 1.6rem;
-}
-
-.active-trip-title span{
-    font-weight: 700;
-}
-
-.active-trip-name{
-    font-weight: 300;
-}
-
-.active-trip-title h2{
-    font-weight: 300;
-    margin: 1.6rem 0;
-    padding: 0;
-    color: #525B65;
-    font-family: Pretendard;
-    font-size: 1.8rem;
-    font-style: normal;
-    line-height: normal;
-}
-
-.active-trip-members span{
-    font-weight: 700;    
-}
-
-.active-album-box{
+.upcoming-album-box{
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -58,7 +21,7 @@
     position: relative; 
 }
 
-.active-box-img{
+.upcoming-box-img{
     position: absolute;
     top: 0;
     left: 0;
@@ -67,12 +30,12 @@
     z-index: 0;
 }
 
-.active-box-img img{
+.upcoming-box-img img{
     height: 12.6rem;
     width: 100%;
 }
 
-.ticket-content{
+.upcoming-ticket-content{
     position: absolute;
     top: 0;
     left: 0;
@@ -83,8 +46,8 @@
     flex-direction: column;
 }
 
-.ticket-content h1{
-    color: #F6F6F5;
+.upcoming-ticket-content h1{
+    color: #525B65;
     font-family: "Fredericka the Great";
     font-size: 1.1rem;
     font-weight: 300;
@@ -92,7 +55,13 @@
     padding-left: 1rem;
 }
 
-.active-info-cont{
+.upcoming-info{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.upcoming-info-cont{
     width: 100%;
     z-index: 2;
     color: #525B65;
@@ -100,7 +69,7 @@
     justify-content: center;
 }
 
-.active-ticket-detail{
+.upcoming-ticket-detail{
     display: flex;
     flex-direction: column;
     width: 71%;
@@ -109,9 +78,15 @@
 }
 
 
-.active-box{
+.upcoming-box{
     left: 0;
     top: 0;
+}
+
+.upcoming-title-cont h2{
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
 }
 
 /* .active-album-head{
@@ -120,7 +95,27 @@
     gap: 0.5rem;
 } */
 
-.active-album-date{
+
+.date-box{
+    display: flex;
+    padding: 0 0.6rem;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    background: #E0DDD2;
+    height: 1.5rem;
+    margin-left: 1rem ;
+}
+
+.upcoming-title-cont{
+    display: flex;
+    justify-content: left;
+    width: 100%;
+    gap: 1rem;
+}
+
+.upcoming-album-date{
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -129,7 +124,7 @@
     width: 100%;
 }
 
-.active-album-date h5{
+.upcoming-album-date h5{
     font-size:1rem;
     font-style: normal;
     font-weight: 400;
@@ -137,21 +132,22 @@
     margin: 0;
 }
 
-.active-trip-info{
+.upcoming-trip-info{
     display: flex;
     flex-direction: column;
     top: 30%;
-    gap: 1rem;
+    gap: 1.3rem;
 }
 
-.active-line{
+.upcoming-line{
     display: flex;
     width: 100%;
     justify-content: space-between;
     gap: 1.5rem;
+    margin-top: 1.1rem;
 }
 
-.active-item{
+.upcoming-item{
     display: flex;
     align-items: center;
     border-bottom: 0.1rem solid #525B65;
@@ -159,7 +155,11 @@
     width: 10rem;
 }
 
-.info-box{
+h5.right-date{
+    margin-right: 1rem ;
+}
+
+.upcoming-box{
     width: auto;
     text-align: right;
     color: #525B65;
@@ -185,16 +185,12 @@
     font-weight: 400;
 }
 
-h5.left-date{
-    margin-left: 1.5rem;
-}
-
-.goto-camera-btn{
+.goto-edit-btn{
     width: 100%;
     cursor: pointer;
 }
 
-.goto-camera{
+.goto-edit{
     width: 26%;
     margin: 0.2rem 0.8rem;
     position: relative;
@@ -202,61 +198,37 @@ h5.left-date{
     justify-content: center;
 }
 
-.goto-camera-btn{
+.goto-edit-btn{
     position: absolute;
     height: 9.2rem;
     width: 100%;
     z-index: -1;
 }
 
-.goto-camera-cont{
+.goto-edit-cont{
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     cursor: pointer;
     gap: 0.2rem;
 }
 
-.goto-camera-cont img{
+.goto-edit-cont img{
     width: 4.2rem;
     height: 4.2rem;
     align-self: center;
     margin-top: 0.6rem;
 }
 
-.goto-camera-cont h6{
+.goto-edit-cont h6{
     font-size: 1.6rem;
     font-weight: 700;
-    margin: 0;
+    margin: 0.2rem 0 0 0;
 }
 
 .left-pic-num{
     font-size: 0.9rem;
     font-weight: 400;
     text-align: center;
-}
-
-.main-edit-btn{
-    display: flex;
-    justify-content: end;
-    gap: 0.7rem;
-    align-items: center;
-    cursor: pointer;
-}
-
-.main-edit-btn{
-    background: none;
-    cursor: pointer;
-}
-
-.main-edit-btn img{
-    width: 1.35rem;
-    height: 1.35rem;
-}
-
-.main-edit-btn p{
-    font-size: 1.2rem;
-    font-weight: 400;
-    border-bottom: 0.1rem solid #525B65;
 }

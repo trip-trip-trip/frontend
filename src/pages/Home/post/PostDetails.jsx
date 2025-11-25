@@ -4,6 +4,7 @@ import PostItem from './PostItem';
 import './Post.css';
 import { useAuth } from '../../../contexts/AuthContext'; 
 import Header from '../../../components/Header/Header';
+import default_pic from "../../../assets/default-profile.png";
 
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
@@ -71,13 +72,33 @@ const PostDetail = () => {
         const p = postData.result;
         const createdTime = p.created_at || p.createdAt;
 
+        const processedMedia = p.media ? p.media.map(m => {
+          let type = m.object_type || 'MEDIA';
+
+          // 파일 주소가 있고, 동영상 확장자라면 강제로 'SHORT_REEL'로 변경
+          if (type === 'MEDIA' && m.url && /\.(mp4|mov|webm|avi|mkv)$/i.test(m.url)) {
+            type = 'SHORT_REEL';
+          }
+
+          return {
+            url: m.url,
+            thumbnail: m.thumbnail_url,
+            type: type
+          };
+        }) : [];
+
         const normalized = {
           id: p.id,
           author: p.author?.username || '알 수 없음',
-          author_avatar: p.author?.avatar_url || '/assets/default-avatar.png',
+          author_avatar: p.author?.avatar_url || default_pic,
           authorId: p.author?.id,
-          images: p.media ? p.media.map(m => m.url) : [],
-          image: p.media?.[0]?.url || null,
+          
+          // [수정] 가공된 media 데이터를 우선 전달해야 PostItem이 비디오로 인식함
+          media: processedMedia, 
+          
+          images: processedMedia.map(m => m.url), // 단순 URL 배열 호환성 유지
+          image: processedMedia[0]?.thumbnail || processedMedia[0]?.url || null,
+          
           caption: p.caption || '',
           location: p.location || '',
           date: createdTime
@@ -219,9 +240,9 @@ const handleCommentDelete = async (comment) => {
                     {/* 댓글 작성자 프사 */}
                     <span className="comment-avatar-circle">
                       <img
-                        src={commenter.avatar_url || '/assets/default-avatar.png'}
+                        src={commenter.avatar_url || default_pic}
                         alt="user"
-                        onError={(e) => e.target.src='/assets/default-avatar.png'}
+                        onError={(e) => e.target.src=default_pic}
                       />
                     </span>
 
@@ -269,9 +290,19 @@ const handleCommentDelete = async (comment) => {
         {/* 내 프로필 사진 (왼쪽) */}
         <div className="my-profile-thumb">
            <img 
-             src={user?.avatar_url || '/assets/default-avatar.png'} 
+             src={
+                user?.avatarUrl ||      // 1순위: ProfilePage에서 쓰는 이름
+                user?.avatar_url ||     // 2순위: API 등에서 쓰는 이름
+                user?.profile_url ||    // 3순위: 혹시 모를 다른 이름
+                default_pic // 기본 이미지 
+             } 
              alt="me" 
-             onError={(e) => e.target.src='/assets/default-avatar.png'}
+             className="my-profile-img"
+             // 이미지가 깨지면 기본 이미지로 대체
+             onError={(e) => {
+                e.target.onerror = null;
+                e.target.src= default_pic;
+             }}
            />
         </div>
 

@@ -106,8 +106,7 @@ const PostEdit = () => {
   return (
     <div className="post-edit-container">
       {/* 헤더: 뒤로가기 버튼 연결 */}
-      <Header title="" goBack={true} />
-
+      <Header toBack={true} />
       <main className="post-body">
         <h2 className="page-title">포스트 수정하기</h2>
 
