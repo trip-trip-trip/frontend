@@ -57,6 +57,7 @@
     font-size: 13px;
     color: #777;
     display: flex;
+    margin-top: 5px;
     align-items: center;
     gap: 4px;
 }
