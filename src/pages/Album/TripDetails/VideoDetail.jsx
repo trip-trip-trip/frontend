@@ -126,8 +126,8 @@ const VideoDetail = () => {
               <img src={grid_off} alt="Grid View" onClick={()=>SetCheckGrid('grid')}/> 
               <img src={slide_on} alt="Slide View" />
             </div>
-            <button className='share-btn'>
-              <img src={link_icon} alt="" />
+            <button className='share-btn' onClick={() => navigate(`/trips/detail/${tripId}/share`)}>
+            <img src={link_icon} alt="" />
               <p>공유 사진 관리하기</p>
             </button>
           </div>

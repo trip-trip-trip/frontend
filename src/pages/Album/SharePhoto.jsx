@@ -25,7 +25,7 @@ const SharePhoto = () => {
     const {token} = useAuth();
 
     // const API_BASE = 'https://tripshot.duckdns.org';
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA4NDk1NSwiZXhwIjoxNzY0MDg4NTU1fQ.Az8aDvqOtN7r4ynhDhCc8sf8lNx6nCop1AjeLKoasLuQjAa_l2GgU2o9VCrGinFPBGuwja_xKzWsklbN4ABYlQ';
 
      //여행 상세정보
     const fetchMedia = async () => {
@@ -163,10 +163,24 @@ const SharePhoto = () => {
 
     // 로딩 및 에러 처리
     if (isLoading) {
-        return <div>미디어를 불러오는 중입니다...</div>;
+      return(
+        <div className='share-photo'>
+          <Header/>
+            <div className="ment">
+              미디어를 불러오는 중입니다...
+            </div>
+          <Navbar/>
+        </div>
+      )
     }
     if (error) {
-        return <div>오류: {error}</div>;
+      return(
+        <div className='share-photo'>
+          <div className="ment">
+            오류가 발생했습니다. 다시 시도해주세요.
+          </div>
+        </div>
+      )
     }
     
     const isAllSelected = allMedia.length > 0 && selectedMediaIds.length === allMedia.length;

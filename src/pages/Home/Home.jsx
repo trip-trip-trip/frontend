@@ -217,8 +217,16 @@ const Home = () => {
     }
   };
 
-  if (isLoading) return <div>불러오는 중...</div>;
-
+  if (isLoading) {
+    <div className="home">
+      <Header/>
+        <div className="ment">
+          불러오는 중...
+        </div>
+      <Navbar/>
+    </div>
+  }
+    
   return (
     <div className="home">
       {tab !== 'place' && <Header setTab={setTab} currentTab={tab} />}

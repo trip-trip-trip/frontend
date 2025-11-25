@@ -24,7 +24,7 @@ const Album = () => {
   const { token, activeTripId, setActiveTripId } = useAuth();
 
   // const API_BASE = 'https://tripshot.duckdns.org';
-  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA4NDk1NSwiZXhwIjoxNzY0MDg4NTU1fQ.Az8aDvqOtN7r4ynhDhCc8sf8lNx6nCop1AjeLKoasLuQjAa_l2GgU2o9VCrGinFPBGuwja_xKzWsklbN4ABYlQ';
 
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
@@ -148,14 +148,22 @@ const Album = () => {
             coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
           };
 
-
-          if (trip.endDate < todayDate) {
-            completedList.push(tripData);
-          } else if (trip.startDate > todayDate) {
+          if (trip.startDate > todayDate) {
             plannedTrip.push(tripData);
-          } else {
+          } else if (activeTripId && trip.startDate <= todayDate && trip.endDate >= todayDate){
             activeTrips.push(tripData);
+          } else{
+            completedList.push(tripData);
           }
+
+
+          // if (trip.endDate < todayDate) {
+          //   completedList.push(tripData);
+          // } else if (trip.startDate > todayDate) {
+          //   plannedTrip.push(tripData);
+          // } else {
+          //   activeTrips.push(tripData);
+          // }
         });
 
         activeTrips.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
