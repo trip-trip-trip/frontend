@@ -84,7 +84,7 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
             };
         }) : [];
     
-        let locationName = p.location || '';
+        let locationName = p.place || '';
         
         // 현재 여행 중인 게시물이라면 여행 장소 이름 덮어쓰기
         if (!locationName && activeTrip && Number(p.trip_id) === Number(activeTrip.id)) {
@@ -101,7 +101,7 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
           media: mediaList, 
     
           image: mediaList[0]?.thumbnail || mediaList[0]?.url || null,
-          location: locationName || '어딘가', 
+          location: locationName || null, 
           date: extractCreatedDate(p),
           like_count: p.like_count ?? 0,
           comment_count: p.comment_count ?? 0,
