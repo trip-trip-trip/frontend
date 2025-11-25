@@ -114,10 +114,10 @@ const PostEdit = () => {
     try {
         const res = await fetch(`${API_BASE}/posts/${id}`, {
             method: 'DELETE',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+           headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
         });
         
         // 204 No Content 대응
