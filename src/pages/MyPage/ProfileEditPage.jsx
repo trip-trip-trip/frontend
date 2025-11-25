@@ -127,7 +127,7 @@ export default function ProfileEditPage() {
          </div>
             <section className="edit-image-section">
                <div className="image-wrapper">
-                   <img src={profileImage} alt="프로필" className="profile-img" onError={(e)=>e.target.src=defaultProfile}/>
+                   <img src={profileImage} alt="프로필" className="profile-img-my" onError={(e)=>e.target.src=defaultProfile}/>
                </div>
                {/* 피그마처럼 텍스트 버튼으로 변경 */}
                <div className="change-image-text" onClick={() => setMenuOpen(true)}>
