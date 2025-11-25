@@ -17,11 +17,15 @@
     width: 90%;
 }
 
+.show-media-cont video{
+    width: 90%;
+}
+
 .comment-cont{
     z-index: 10;
     width: 100%;
     background: rgba(36, 36, 36, 0.751);
-    height: 20rem;
+    height: 13rem;
     position: absolute;
     bottom: 0;
 }
@@ -30,15 +34,15 @@
     z-index: 10;
     width: 100%;
     background: rgba(36, 36, 36, 0.751);
-    height: 10rem;
+    height: 5rem;
     position: absolute;
     top: 0;
 }
 
 .function-cont h1{
     color: white;
-    margin-top: 5rem;
-    padding: 2rem 2rem;
+    margin-top: 0;
+    padding: 1rem 2rem;
     font-weight: 300;
 }
 

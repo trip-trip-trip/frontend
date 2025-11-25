@@ -1,7 +1,11 @@
 .share-photo{
-    color: #17171B;
+    position: relative;
     flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
     overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+    padding: 20rem 0;
+    margin: 5rem 0;
+    display: flex;
+    justify-content: center;
 }
 
 .share-photo-cont{
@@ -13,6 +17,7 @@
     gap: 1.2rem;
     color: #525B65;
     height: 100%;
+    margin: 1rem 0 10rem 0;
 }
 
 .share-photo-cont h1{
@@ -64,8 +69,19 @@
     transition: ease-in-out 0.2s;
 }
 
+.share-media-btn-cont{
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F6F6F5;
+    height: 8rem;
+    max-width: 43rem;
+}
+
 .share-media-btn{
-    margin-top: 1.6rem;
     display: flex;
     padding: 1.2rem 6.2rem;
     justify-content: center;
@@ -78,6 +94,7 @@
     text-align: center;
     font-size: 1.6rem;
     font-weight: 700;
+    width: 88%;
 }
 
 .share-selected-overlay{
@@ -111,3 +128,7 @@
     object-fit: cover;
     border-radius: 0.3rem;
   }
+
+  /* .photo-grid-detail {
+    margin-bottom: 10rem;
+  } */

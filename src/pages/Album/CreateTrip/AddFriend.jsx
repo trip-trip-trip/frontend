@@ -14,7 +14,7 @@ const AddFriend = () => {
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
   // const API_BASE = 'https://tripshot.duckdns.org';
-  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
 
   const [searchFriend, setSearchFriend] = useState("");
   const [friendList, setFriendList] = useState([]);
@@ -170,7 +170,8 @@ const AddFriend = () => {
             </div>
           ))}
         </div>
-        {
+      </div>
+      {
           selectedFriends.length>0 &&
           <div className="selected-friends-bottom">
             <div className="selected-friends-list">
@@ -198,8 +199,6 @@ const AddFriend = () => {
           </div>
         </div>
         }              
-      
-      </div>
     </div>
   )
 }

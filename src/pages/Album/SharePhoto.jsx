@@ -25,7 +25,7 @@ const SharePhoto = () => {
     const {token} = useAuth();
 
     // const API_BASE = 'https://tripshot.duckdns.org';
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
 
      //여행 상세정보
     const fetchMedia = async () => {
@@ -189,44 +189,46 @@ const SharePhoto = () => {
                 
                 <div className='photo-grid-detail'>
                 {allMedia.map((mediaItem) => {
-                      const isSelected = selectedMediaIds.includes(mediaItem.mediaAssetId);
-                      return (
-                        <div 
-                            key={mediaItem.mediaAssetId} 
-                            className={`photo-item ${isSelected ? 'selected' : ''}`}
-                            onClick={() => handleSelectShare(mediaItem.mediaAssetId)}
-                        >
-                          {
-                            mediaItem.contentType === 'VIDEO'
-                            ? <video src={mediaItem.url} alt={`미디어 ${mediaItem.mediaAssetId} (${mediaItem.contentType})`} />
-                            : <img src={mediaItem.url} alt={`미디어 ${mediaItem.mediaAssetId} (${mediaItem.contentType})`} />
-                          }
-                          {
-                            // 선택했을 때 (공유될 미디어)
-                            isSelected && (
-                              <div className="share-selected-overlay">
-                                <div className='shared-link-icon'>
-                                    <img src={shared_icon} alt="공유됨" />
-                                </div>
+                    const isSelected = selectedMediaIds.includes(mediaItem.mediaAssetId);
+                    return (
+                      <div 
+                          key={mediaItem.mediaAssetId} 
+                          className={`photo-item ${isSelected ? 'selected' : ''}`}
+                          onClick={() => handleSelectShare(mediaItem.mediaAssetId)}
+                      >
+                        {
+                          mediaItem.contentType === 'VIDEO'
+                          ? <video src={mediaItem.url} alt={`미디어 ${mediaItem.mediaAssetId} (${mediaItem.contentType})`} />
+                          : <img src={mediaItem.url} alt={`미디어 ${mediaItem.mediaAssetId} (${mediaItem.contentType})`} />
+                        }
+                        {
+                          // 선택했을 때 (공유될 미디어)
+                          isSelected && (
+                            <div className="share-selected-overlay">
+                              <div className='shared-link-icon'>
+                                  <img src={shared_icon} alt="공유됨" />
                               </div>
-                            )
-                          }
-                        </div>
-                      );
+                            </div>
+                          )
+                        }
+                      </div>
+                    );
                     })}
                 </div>
                 
-                {
-                  selectedMediaIds.length > 0 &&
-                  <button 
-                    className='share-media-btn' 
-                    onClick={handleShare}
-                  >
-                    {`선택된 미디어 ${selectedMediaIds.length}개 공유하기`}
-                  </button>
-                }
             </div>
-            <Navbar/>
+            {
+              selectedMediaIds.length > 0 &&
+              <div className="share-media-btn-cont">
+                <button 
+                  className='share-media-btn' 
+                  onClick={handleShare}
+                >
+                  {`선택된 미디어 ${selectedMediaIds.length}개 공유하기`}
+                </button>
+              </div>
+            }
+            {/* <Navbar/> */}
         </div>
     );
 }

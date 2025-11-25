@@ -19,9 +19,6 @@ const Upcoming = ({placeName, tripId, tripName, title, startDate, endDate, membe
 
   return (
     <div className='upcoming-trip-container'>
-    <div className="upcoming-trip-title">
-        <h2 className='upcoming-trip-name'>예정된 여행</h2>
-    </div>
       <div className="upcoming-album-box">
         {/* 배경 이미지 */}
         <div className="upcoming-box-img">

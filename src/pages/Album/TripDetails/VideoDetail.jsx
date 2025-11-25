@@ -81,7 +81,7 @@ const VideoDetail = () => {
                             <img src={shared_icon} alt="공유됨" />
                           </div>
                         )}
-                          <video src={vidData.madeVideo.url} controls onClick={()=> navigate(`/trips/detail/${tripId}/${vidData.madeVideo.mediaAssetId}`, 
+                          <video src={vidData.madeVideo.url} muted controls onClick={()=> navigate(`/trips/detail/${tripId}/${vidData.madeVideo.mediaAssetId}`, 
                           {state: {
                             url: vidData.madeVideo.url,
                             comment: vidData.madeVideo.comment,

@@ -26,12 +26,14 @@
 }
 
 .completed-album h2{
-    font-size: 1.9rem;
+    font-size: 1.8rem;
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     margin: 1.6rem 0;
     padding: 0;
+    color: #525B65;
 }
+
 
 .album-active-cont{
 }
