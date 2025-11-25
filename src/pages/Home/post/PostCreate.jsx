@@ -6,15 +6,12 @@ import { useAuth } from '../../../contexts/AuthContext';
 import Navbar from '../../../components/NavBar/NavBar';
 import default_pic from "../../../assets/default-profile.png";
 
-
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
 
 export default function PostCreate() {
   const navigate = useNavigate();
-  
-  // 2. useAuth에서 객체 구조 분해로 token 가져오기 (필수)
   const { token } = useAuth(); 
 
   // --- 상태 관리 ---
@@ -55,7 +52,6 @@ export default function PostCreate() {
     setStep(2);
   };
   
-
   // --- [Step 2] 미디어 필터링 및 평탄화 ---
   const filteredMedia = useMemo(() => {
     if (!selectedTripData || !selectedTripData.contents) return [];
@@ -67,7 +63,6 @@ export default function PostCreate() {
         list = [...list, ...contents.photos.map(item => ({ ...item.media, type: 'PHOTO' }))];
     }
     if (contents.reelItems) {
-        // 프론트에서는 편의상 'VIDEO'라고 부르고, 업로드 할 때 'SHORT_REEL'로 바꿈
         list = [...list, ...contents.reelItems.map(item => ({ ...item.media, type: 'VIDEO' }))];
     }
     if (contents.scrapbooks) {
@@ -101,13 +96,11 @@ export default function PostCreate() {
         tripId: selectedTripData.trip.id,
         visibility: isPrivate ? 'PRIVATE' : 'FRIENDS',
         caption: content,
-        // location_text: "", 
         location_text: selectedTripData.trip.placeName || "",
         lat: selectedTripData.trip.lat || null,
         lng: selectedTripData.trip.lng || null,
         media: selectedMedia.map(m => {
-          // ★ 핵심: 프론트엔드 타입을 백엔드 API 스펙(Enum)으로 변환
-          let objectType = 'MEDIA'; // 기본값 (PHOTO)
+          let objectType = 'MEDIA'; 
 
           if (m.type === 'VIDEO') objectType = 'SHORT_REEL';
           else if (m.type === 'SCRAPBOOK') objectType = 'SCRAPBOOK';
@@ -158,10 +151,21 @@ export default function PostCreate() {
       }
   };
 
-  {myTripsData.map((item) => {
+  // ★ [수정] map 코드가 return 문 안으로 들어와야 합니다!
+  return (
+    <div className="post-create-container">
+      <Header title={getTitle()} toBack={true} onBackClick={handleBackClick} /> 
+
+      <main className="post-body">
+        
+        {/* === STEP 1: 여행 선택 === */}
+        {step === 1 && (
+          <div className="step-trip-list">
+            <h2 className="step-title">포스트를 게시할 여행을 선택해주세요</h2>
+            <div className="trip-list">
+              {myTripsData.map((item) => {
                 const t = item.trip;
                 const coverImg = item.contents?.photos?.[0]?.media?.url || default_pic;
-                
                 const members = t.inviteesProfileImgList || []; 
 
                 return (
@@ -176,7 +180,6 @@ export default function PostCreate() {
                         </div>
                         <div className="trip-title">{t.title}</div>
                         
-                        {/* 친구 프사 영역 */}
                         <div className="trip-members">
                           {members.length > 0 && members.slice(0, 3).map((url, i) => (
                             <img 
@@ -184,10 +187,7 @@ export default function PostCreate() {
                                 src={url || default_pic} 
                                 alt="member" 
                                 className="member-avatar"
-                                onError={(e) => {
-                                    e.target.style.display = 'none'; 
-                                    // e.target.src = default_pic;
-                                }}
+                                onError={(e) => { e.target.style.display = 'none'; }}
                             />
                           ))}
                           {members.length > 3 && <span className="member-more">+{members.length-3}</span>}
@@ -196,6 +196,10 @@ export default function PostCreate() {
                     </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
         {/* === STEP 2: 미디어 선택 === */}
         {step === 2 && (
           <div className="step-media-select">
@@ -205,7 +209,7 @@ export default function PostCreate() {
             <div className="filter-tabs">
                 {['ALL', 'PHOTO', 'VIDEO', 'SCRAPBOOK'].map(type => (
                     <button 
-                        key={type}
+                        key={type} 
                         className={filterType === type ? 'active' : ''} 
                         onClick={()=>setFilterType(type)}
                     >
@@ -222,7 +226,6 @@ export default function PostCreate() {
                         const isSelected = selectedMedia.find(sel => sel.mediaAssetId === m.mediaAssetId);
                         return (
                             <div key={m.mediaAssetId} className={`media-item ${isSelected ? 'selected' : ''}`} onClick={()=>toggleMedia(m)}>
-                                {/* 영상이면 video 태그 (muted), 아니면 img */}
                                 {m.type === 'VIDEO' ? (
                                     <video src={m.url} className="grid-video" muted />
                                 ) : (
@@ -236,7 +239,6 @@ export default function PostCreate() {
                 )}
             </div>
 
-            {/* 하단 선택 완료 시트 */}
             {selectedMedia.length > 0 && (
                 <div className="bottom-sheet">
                     <div className="sheet-header">
@@ -269,31 +271,30 @@ export default function PostCreate() {
             <div className="write-preview-box">
                {selectedMedia.length > 0 && (
                    <div className="preview-image-main">
-                        {/* 메인 프리뷰: 영상이면 컨트롤러 포함하여 재생 가능하게 */}
-                        {selectedMedia[0].type === 'VIDEO' ? (
-                             <video src={selectedMedia[0].url} controls autoPlay muted className="main-video-preview" />
-                        ) : (
-                             <img src={selectedMedia[0].url} alt="main" />
-                        )}
+                       {selectedMedia[0].type === 'VIDEO' ? (
+                            <video src={selectedMedia[0].url} controls autoPlay muted className="main-video-preview" />
+                       ) : (
+                            <img src={selectedMedia[0].url} alt="main" />
+                       )}
                    </div>
                )}
                <div className="preview-thumbnails">
                    {selectedMedia.map(m => (
-                        m.type === 'VIDEO' ? (
-                            <video 
-                                key={m.mediaAssetId} 
-                                src={m.url} 
-                                className={`thumb-video ${m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}`}
-                                muted
-                            />
-                        ) : (
-                            <img 
-                                key={m.mediaAssetId} 
-                                src={m.url} 
-                                alt="" 
-                                className={m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}
-                            />
-                        )
+                       m.type === 'VIDEO' ? (
+                           <video 
+                               key={m.mediaAssetId} 
+                               src={m.url} 
+                               className={`thumb-video ${m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}`}
+                               muted
+                           />
+                       ) : (
+                           <img 
+                               key={m.mediaAssetId} 
+                               src={m.url} 
+                               alt="" 
+                               className={m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}
+                           />
+                       )
                    ))}
                </div>
             </div>
@@ -320,5 +321,4 @@ export default function PostCreate() {
       </main>
     </div>
   );
-
 }
