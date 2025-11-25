@@ -119,15 +119,15 @@
     /* 수정하기 버튼 전용 스타일이 필요하다면 추가 */
     box-shadow: 0 0.4rem 1rem rgba(0,0,0,0.15);
 }
-.delete-post-btn{
-    margin-top: '12px';
-    width: '100%';
-    padding: '14px';
-    border-radius: '8px';
-    border: 'none';
-    background-color: '#fff5f5';
-    color: '#d32f2f';
-    font-weight: '600';
-    font-size: '16px';
-    cursor: 'pointer';
+.delete-postbtn{
+    margin-top: 12px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: #fff5f5;
+    color: #e28484;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
 }

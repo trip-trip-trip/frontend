@@ -151,22 +151,12 @@ export default function PostCreate() {
       }
   };
 
-  // ★ [수정] map 코드가 return 문 안으로 들어와야 합니다!
-  return (
-    <div className="post-create-container">
-      <Header title={getTitle()} toBack={true} onBackClick={handleBackClick} /> 
-
-      <main className="post-body">
-        
-        {/* === STEP 1: 여행 선택 === */}
-        {step === 1 && (
-          <div className="step-trip-list">
-            <h2 className="step-title">포스트를 게시할 여행을 선택해주세요</h2>
-            <div className="trip-list">
-              {myTripsData.map((item) => {
+     {myTripsData.map((item) => {
                 const t = item.trip;
                 const coverImg = item.contents?.photos?.[0]?.media?.url || default_pic;
-                const members = t.inviteesProfileImgList || []; 
+                
+                // ★ [핵심 수정] 빈 값(null, "")은 아예 배열에서 제거!
+                const members = (t.inviteesProfileImgList || []).filter(url => url && url.trim() !== "");
 
                 return (
                     <div key={t.id} className="trip-item" onClick={() => handleSelectTrip(item)}>
@@ -180,26 +170,25 @@ export default function PostCreate() {
                         </div>
                         <div className="trip-title">{t.title}</div>
                         
-                        <div className="trip-members">
-                          {members.length > 0 && members.slice(0, 3).map((url, i) => (
-                            <img 
-                                key={i} 
-                                src={url || default_pic} 
-                                alt="member" 
-                                className="member-avatar"
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                          ))}
-                          {members.length > 3 && <span className="member-more">+{members.length-3}</span>}
-                        </div>
+                        {/* 친구 프사 영역: members가 진짜 있을 때만 렌더링 */}
+                        {members.length > 0 && (
+                            <div className="trip-members">
+                              {members.slice(0, 3).map((url, i) => (
+                                <img 
+                                    key={i} 
+                                    src={url} 
+                                    alt="member" 
+                                    className="member-avatar"
+                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                              ))}
+                              {members.length > 3 && <span className="member-more">+{members.length-3}</span>}
+                            </div>
+                        )}
                     </div>
                     </div>
                 );
               })}
-            </div>
-          </div>
-        )}
-
         {/* === STEP 2: 미디어 선택 === */}
         {step === 2 && (
           <div className="step-media-select">
