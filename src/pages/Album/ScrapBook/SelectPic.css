@@ -1,6 +1,5 @@
 .select-pic{
     padding: 10rem 0;
-    color: #17171B;
     flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
     overflow-y: auto; /* 이 영역에만 스크롤 적용 */
     position: relative;

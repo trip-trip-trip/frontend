@@ -48,7 +48,7 @@ const CreateScrap = () => {
     const {token} = useAuth();
     const navigate = useNavigate();
     // const API_BASE = 'https://tripshot.duckdns.org';
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA2OTE0NSwiZXhwIjoxNzY0MDcyNzQ1fQ.Q0PiL1ZAJm1dpIh9jGrciyrI4NookTKFnnjMbiT0wjIZuPkkI5Nx6bVZO6Md4BaU1fx-L741tUBNmErqPB5k-A';
+    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
   
 
     // 선택된 프레임의 위치 정보 가져오기

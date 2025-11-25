@@ -9,10 +9,8 @@ const ShowMedia = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [url, setUrl] = useState(location?.state?.url);
-    const [comments, setComments] = useState(location?.state?.comments);
+    const [comment, setComment] = useState(location?.state?.comment || " ");
     const [mediaKind, setMediaKind] = useState(location?.state?.mediaKind);
-
-
     // const handleDownload = () => {
     //     if (!url) {
     //         alert('다운로드할 미디어가 없습니다.');
@@ -39,7 +37,7 @@ const ShowMedia = () => {
 
   return (
     <div className='show-media'>
-        <Header toBack={true}/>
+        {/* <Header toBack={true}/> */}
             <div className="show-media-cont">
                 <div className="function-cont">
                     <h1 onClick={()=>navigate(-1)}>ⅹ</h1>
@@ -51,10 +49,10 @@ const ShowMedia = () => {
                     : <img src={url} alt="" />
                 }
                 <div className="comment-cont">
-                    <h4>{comments || '코멘트가 없습니다.'}</h4>
+                    <h4>{ (comment === " ") ? '코멘트가 없습니다.' : comment}</h4>
                 </div>
             </div>
-        <Navbar/>
+        {/* <Navbar/> */}
     </div>
           
   )

@@ -134,7 +134,7 @@ const SharedList = () => {
         <div className='album'>
           <Header/>
             <div className="album-container">
-              <ment>공유된 미디어를 불러오는 중...</ment>
+              <div className="ment">공유된 미디어를 불러오는 중...</div>
             </div>
           <Navbar/>
         </div>

@@ -24,7 +24,7 @@ const TripDetail = () => {
     : '/api';
 
   // const API_BASE = 'https://tripshot.duckdns.org';
-  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
 
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -59,6 +59,8 @@ const TripDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
 
+  // 초대 정보 표시
+  const [sentInvitations, setSentInvitations] = useState([]);
 
   const handleToggleShared = (e) => {
     setShowShared(e.target.checked);
@@ -170,7 +172,7 @@ const TripDetail = () => {
       setIsLoading(false);
     }
   };
-
+// 릴스 생성
   const fetchReels = async() => {
     setIsLoading(true);
     try {
@@ -217,14 +219,19 @@ const TripDetail = () => {
       }
       const data = await response.json();
       const fetchedInvitation = data.result;
-      const sentInvitations = [];
+      const currentInvitations = [];
 
       if (fetchedInvitation.invitations.length > 0){
         fetchedInvitation.invitations.forEach((i)=>{
           if (i.status==="PENDING"){
-            sentInvitations.push(i)
+            currentInvitations.push(i)
           }
         })
+      }
+
+      setSentInvitations(currentInvitations);
+
+      if (currentInvitations.length > 0){
         setIsPending(true);
         setInviteInfo(fetchedInvitation.invitations);
       }
@@ -514,16 +521,16 @@ const TripDetail = () => {
             </div>
             {isPending &&
             <div className="pending-cont">
-              {inviteInfo.map((i, index)=>(
+              {sentInvitations.map((i, index)=>(
                 <img key={index} src={i.inviteeAvatarUrl || default_profile} alt="" className='pending-profile'/>
               ))}
               <div className="pending-shared" onClick={()=>navigate(`/trips/detail/${tripId}/invitedFriends`, 
-                {state : {inviteInfo: inviteInfo,
+                {state : {sentInvitations: sentInvitations,
                           startDate: tripInfo.startDate,
                           endDate: tripInfo.endDate,
                           name: tripInfo.title
                 }})}>
-                {inviteInfo.length}명 수락 대기 중 {'>'}
+                {sentInvitations.length}명 수락 대기 중 {'>'}
               </div>
             </div>
             
@@ -553,16 +560,16 @@ const TripDetail = () => {
             </div>
             {isPending &&
             <div className="pending-cont">
-              {inviteInfo.map((i, index)=>(
+              {sentInvitations.map((i, index)=>(
                 <img key={index} src={i.inviteeAvatarUrl || default_profile} alt="" className='pending-profile'/>
               ))}
               <div className="pending-shared" onClick={()=>navigate(`/trips/detail/${tripId}/invitedFriends`, 
-                {state : {inviteInfo: inviteInfo,
+                {state : {sentInvitations: sentInvitations,
                           startDate: tripInfo.startDate,
                           endDate: tripInfo.endDate,
                           name: tripInfo.title
                 }})}>
-                {inviteInfo.length}명 수락 대기 중 {'>'}
+                {sentInvitations.length}명 수락 대기 중 {'>'}
               </div>
             </div>
             }

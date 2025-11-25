@@ -17,7 +17,7 @@ const EditTrip = () => {
     : '/api';
 
   // const API_BASE = 'https://tripshot.duckdns.org';
-  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA2OTE0NSwiZXhwIjoxNzY0MDcyNzQ1fQ.Q0PiL1ZAJm1dpIh9jGrciyrI4NookTKFnnjMbiT0wjIZuPkkI5Nx6bVZO6Md4BaU1fx-L741tUBNmErqPB5k-A';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
 
   // **Original Data**를 저장하기 위한 Ref: 이것이 변경 여부를 판단하는 기준이 됩니다.
   const originalTripRef = useRef(null); 

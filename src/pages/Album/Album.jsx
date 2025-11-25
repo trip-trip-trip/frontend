@@ -24,7 +24,7 @@ const Album = () => {
   const { token, activeTripId, setActiveTripId } = useAuth();
 
   // const API_BASE = 'https://tripshot.duckdns.org';
-  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA2OTE0NSwiZXhwIjoxNzY0MDcyNzQ1fQ.Q0PiL1ZAJm1dpIh9jGrciyrI4NookTKFnnjMbiT0wjIZuPkkI5Nx6bVZO6Md4BaU1fx-L741tUBNmErqPB5k-A';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
 
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
@@ -199,6 +199,9 @@ const Album = () => {
       }
       if (token) {
         initialDataFetch();
+      } else {
+        setIsLoading(false);
+        navigate('/login');
       }
     // ...
     }, [token, activeTripId]);
@@ -301,6 +304,7 @@ return(
         {
           (plannedTrips.length > 0) &&
           <div className="completed-album">
+            <h2 className="section-title">예정된 여행</h2>
           <div className="upcoming-trips-list">
             {plannedTrips.map((trip, index) => (
               <div 
