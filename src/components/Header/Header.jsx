@@ -55,7 +55,13 @@ const Header = ({ title, setTab, currentTab, toBack }) => {
                     {(isHome || isAlbum) && (
                         <button
                             className="header-icon-btn" // CSS에서 이미지 크기를 제어할 클래스 사용
-                            onClick={() => setTab('place')} 
+                            onClick={() => {
+                                        if (setTab) {
+                                            setTab('place');
+                                        } else {
+                                            navigate('/home?tab=place');
+                                        }
+                                    }}
                             aria-label="지도 가기"
                         >
                             <img 

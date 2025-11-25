@@ -54,6 +54,7 @@ export default function PostCreate() {
     setSelectedMedia([]); 
     setStep(2);
   };
+  
 
   // --- [Step 2] 미디어 필터링 및 평탄화 ---
   const filteredMedia = useMemo(() => {
@@ -157,21 +158,11 @@ export default function PostCreate() {
       }
   };
 
-  return (
-    <div className="post-create-container">
-      <Header title={getTitle()} toBack={true} onBackClick={handleBackClick} /> 
-
-      <main className="post-body">
-        
-        {/* === STEP 1: 여행 선택 === */}
-        {step === 1 && (
-          <div className="step-trip-list">
-            <h2 className="step-title">포스트를 게시할 여행을 선택해주세요</h2>
-            <div className="trip-list">
-              {myTripsData.map((item) => {
+  {myTripsData.map((item) => {
                 const t = item.trip;
                 const coverImg = item.contents?.photos?.[0]?.media?.url || default_pic;
-                const members = t.inviteesNameList || [];
+                
+                const members = t.inviteesProfileImgList || []; 
 
                 return (
                     <div key={t.id} className="trip-item" onClick={() => handleSelectTrip(item)}>
@@ -180,24 +171,31 @@ export default function PostCreate() {
                     </div>
                     <div className="trip-info">
                         <div className="trip-top-row">
-                            <span className="trip-location">{t.title.split(' ')[1] || '여행'}</span> 
+                            <span className="trip-location">{t.placeName || '여행'}</span> 
                             <span className="trip-date">{t.startDate} ~ {t.endDate}</span>
                         </div>
                         <div className="trip-title">{t.title}</div>
+                        
+                        {/* 친구 프사 영역 */}
                         <div className="trip-members">
-                        {members.slice(0, 3).map((url, i) => (
-                            <img key={i} src={url} alt="member" className="member-avatar"/>
-                        ))}
-                        {members.length > 3 && <span className="member-more">+{members.length-3}</span>}
+                          {members.length > 0 && members.slice(0, 3).map((url, i) => (
+                            <img 
+                                key={i} 
+                                src={url || default_pic} 
+                                alt="member" 
+                                className="member-avatar"
+                                onError={(e) => {
+                                    e.target.style.display = 'none'; 
+                                    // e.target.src = default_pic;
+                                }}
+                            />
+                          ))}
+                          {members.length > 3 && <span className="member-more">+{members.length-3}</span>}
                         </div>
                     </div>
                     </div>
                 );
               })}
-            </div>
-          </div>
-        )}
-
         {/* === STEP 2: 미디어 선택 === */}
         {step === 2 && (
           <div className="step-media-select">
