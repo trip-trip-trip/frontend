@@ -199,3 +199,73 @@
   color: #fff;
   font-weight: 300;
 }
+
+
+
+
+/*추가 for 친구 알림 */
+.friend-request-alert {
+  width: 100%;
+  background-color: #F6F6F5; 
+  padding: 15px 24px;
+  border-bottom: 1px dashed #ccc; /* 점선 구분선 */
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.req-noti-icon {
+  width: 24px; 
+  height: 24px;
+  object-fit: contain;
+}
+
+.alert-message {
+  font-size: 1.3rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 프로필 사진 겹치기 */
+.alert-profiles {
+  display: flex;
+  align-items: center;
+  margin-left: 32px; /* 아이콘 너비만큼 들여쓰기 */
+  margin-bottom: 4px;
+}
+
+.alert-profile-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #F6F6F5; /* 배경색 테두리로 겹침 효과 */
+  margin-right: -8px; /* 겹치게 하기 */
+}
+
+/* 확인하기 버튼 */
+.check-btn {
+  align-self: flex-end; /* 오른쪽 정렬 */
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  display: flex;
+  padding: 0;
+}
+.goIcon{
+  width: 10px;
+  height: 10px;
+  
+}
