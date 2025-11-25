@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react"; // 👈 useState, useEffect 추가
+import React, { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
 import defaultProfile from "../../assets/default-profile.png";
 
  import logoTop from '../../assets/logoTop.png';
 import editIcon from "../../assets/ep_edit.png";
 import settingIcon from '../../assets/setting.png';
+import reqNotificationIcon from '../../assets/reqnotification.png';
+import goIcon from '../../assets/goIcon.png';
 
 import NavBar from "../../components/NavBar/NavBar";
 import "./ProfilePage.css";
@@ -22,6 +24,8 @@ export default function ProfilePage() {
    const [tripCount, setTripCount] = useState(0); 
    const [friendCount, setFriendCount] = useState(0); 
    const [myPosts, setMyPosts] = useState([]); 
+
+   const [receivedRequests, setReceivedRequests] = useState([]);//for 친구요청
 
    useEffect(() => {
      if (!token || !user) return;
@@ -73,6 +77,16 @@ export default function ProfilePage() {
                 localStorage.setItem("user", JSON.stringify(profileData.result));
             }
          }
+         //  [추가] 받은 친구 요청 조회
+         const reqRes = await fetch(`${API_BASE}/friendships/requests?type=received`, { 
+            headers: { Authorization: `Bearer ${token}` },
+         });
+         if (reqRes.ok) {
+            const reqData = await reqRes.json();
+            if (reqData.isSuccess) {
+                setReceivedRequests(reqData.result || []);
+            }
+         }
        } catch (err) {
          console.error("데이터 로드 실패:", err);
        }
@@ -103,6 +117,34 @@ return (
            <img src={settingIcon} alt="설정" className="settings-icon" />
          </button>
        </div>
+       {/* [추가] 친구 요청 알림 영역 (요청이 있을 때만 표시) */}
+       {receivedRequests.length > 0 && (
+         <div className="friend-request-alert">
+           <div className="alert-top">
+             <img src={reqNotificationIcon} alt="알림" className="req-noti-icon" />
+             <span className="alert-message">
+               {receivedRequests[0].requesterUsername}님 외 {Math.max(0, receivedRequests.length - 1)}명이 친구 요청했어요
+             </span>
+           </div>
+
+           <div className="alert-profiles">
+             {/* 최근 3명까지 표시 */}
+             {receivedRequests.slice(0, 3).map((req) => (
+               <img 
+                 key={req.id} 
+                 src={req.requesterAvatarUrl || defaultProfile} 
+                 alt="프사" 
+                 className="alert-profile-img" 
+               />
+             ))}
+           </div>
+
+           <button className="check-btn" onClick={() => navigate('/mypage/friends')}>
+             확인하기
+             <img src={goIcon} alt="확인하기" className="goIcon"/>
+           </button>
+         </div>
+       )}
 
        {/* 2. 프로필 정보 박스 */}
        <div className="profile-info-box">
@@ -110,7 +152,7 @@ return (
            <img 
              src={safeUser.avatarUrl} 
              alt="프로필" 
-             className="profile-img-my" 
+             className="profile-img" 
              onError={(e) => {e.target.src = defaultProfile;}}
            />
          </div>
