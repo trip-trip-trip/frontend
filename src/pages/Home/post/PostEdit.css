@@ -123,11 +123,11 @@
     margin-top: 12px;
     width: 100%;
     padding: 14px;
-    border-radius: 8px;
-    border: none;
-    background-color: #fff5f5;
-    color: #e28484;
+    border-radius: 2rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    font-size: 16px;
+    border: none;
+    background-color: #f1d4d4;
+    color: #fff;
     cursor: pointer;
 }
