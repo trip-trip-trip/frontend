@@ -201,6 +201,7 @@
 }
 
 
+
 /*추가 for 친구 알림 */
 .friend-request-alert {
   width: 100%;
@@ -210,29 +211,30 @@
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+
   gap: 8px;
 }
 
 .req-noti-icon {
-  width: 90px; 
-  height: 30px;
+  width: 80px; 
+  height: 25px;
   object-fit: contain;
+  display:block;
 }
 
-.alert-message {
-  font-size: 1.3rem;
-  color: #525B65;
-  font-weight: 600;
+
+.alert-middle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 사진과 글씨 사이 간격 */
+  width: 100%;
 }
 
 /* 프로필 사진 겹치기 */
 .alert-profiles {
   display: flex;
   align-items: center;
-  margin-left: 0px; /* 아이콘 너비만큼 들여쓰기 */
-  margin-bottom: 4px;
-  margin-top: 4px;
+ 
 }
 
 .alert-profile-img {
@@ -243,10 +245,27 @@
   border: 2px solid #F6F6F5; /* 배경색 테두리로 겹침 효과 */
   margin-right: -10px; /* 겹치게 하기 */
 }
+.alert-text-group {
+  font-size: 1.3rem;
+  color: #525B65;
+  line-height: 1.3;
+}
+
+/* "OOO님" (볼드체) */
+.alert-name {
+  font-weight: 700; 
+  color: #525B65;
+}
+
+/* "외 N명이..." (일반체) */
+.alert-desc {
+  font-weight: 400; 
+  color: #525B65;
+}
 
 /* 확인하기 버튼 */
 .check-btn {
-  align-self: flex-start; 
+  align-self: flex-end; 
   background: none;
   border: none;
   font-size: 1.2rem;
@@ -257,6 +276,7 @@
   gap: 4px;
   display: flex;
   padding: 0;
+  margin-top: -4px;
 }
 .goIcon{
   width: 10px;
