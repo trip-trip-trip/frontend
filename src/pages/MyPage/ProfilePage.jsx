@@ -117,24 +117,35 @@ return (
            <img src={settingIcon} alt="설정" className="settings-icon" />
          </button>
        </div>
-       {/* [추가] 친구 요청 알림 영역 (요청이 있을 때만 표시) */}
-         {receivedRequests.length > 0 && (
+         {/* [추가] 친구 요청 알림 영역 (요청이 있을 때만 표시) */}
+       {receivedRequests.length > 0 && (
          <div className="friend-request-alert">
            <img src={reqNotificationIcon} alt="알림" className="req-noti-icon" />
-         
-           <span className="alert-message">
-             {receivedRequests[0].requesterUsername}님 외 {Math.max(0, receivedRequests.length - 1)}명이 친구 요청했어요
-           </span>
-           <div className="alert-profiles">
-             {receivedRequests.slice(0, 3).reverse().map((req,index) => (
-               <img 
-                 key={req.id} 
-                 src={req.requesterAvatarUrl || defaultProfile} 
-                 alt="프사" 
-                 className="alert-profile-img" 
-                 style={{ zIndex: index }}
-               />
-             ))}
+         <div className="alert-middle-row">
+             
+             {/* 프로필 사진들 (최신순 3명 역순 배치) */}
+             <div className="alert-profiles">
+               {[...receivedRequests].slice(0, 3).reverse().map((req, index) => (
+                 <img 
+                   key={req.id} 
+                   src={req.requesterAvatarUrl || defaultProfile} 
+                   alt="프사" 
+                   className="alert-profile-img"
+                   style={{ zIndex: index }} 
+                 />
+               ))}
+             </div>
+             <div className="alert-text-group">
+               <span className="alert-name">
+                 {receivedRequests[0].requesterUsername}님
+               </span>
+               <span className="alert-desc">
+                 {receivedRequests.length > 1 
+                   ? ` 외 ${receivedRequests.length - 1}명이 친구 요청했어요`
+                   : `이 친구 요청했어요`}
+               </span>
+             </div>
+
            </div>
 
            {/* 4. 확인하기 버튼 */}
@@ -145,14 +156,13 @@ return (
          </div>
        )}
 
-
        {/* 2. 프로필 정보 박스 */}
        <div className="profile-info-box">
          <div className="profile-image-wrapper">
            <img 
              src={safeUser.avatarUrl} 
              alt="프로필" 
-             className="profile-img-my" 
+             className="profile-img" 
              onError={(e) => {e.target.src = defaultProfile;}}
            />
          </div>
