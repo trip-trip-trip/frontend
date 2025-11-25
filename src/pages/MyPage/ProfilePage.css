@@ -201,8 +201,6 @@
 }
 
 
-
-
 /*추가 for 친구 알림 */
 .friend-request-alert {
   width: 100%;
@@ -212,24 +210,19 @@
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.alert-top {
-  display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
 }
 
 .req-noti-icon {
-  width: 24px; 
-  height: 24px;
+  width: 90px; 
+  height: 30px;
   object-fit: contain;
 }
 
 .alert-message {
   font-size: 1.3rem;
-  color: #333;
+  color: #525B65;
   font-weight: 600;
 }
 
@@ -237,8 +230,9 @@
 .alert-profiles {
   display: flex;
   align-items: center;
-  margin-left: 32px; /* 아이콘 너비만큼 들여쓰기 */
+  margin-left: 0px; /* 아이콘 너비만큼 들여쓰기 */
   margin-bottom: 4px;
+  margin-top: 4px;
 }
 
 .alert-profile-img {
@@ -247,16 +241,16 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #F6F6F5; /* 배경색 테두리로 겹침 효과 */
-  margin-right: -8px; /* 겹치게 하기 */
+  margin-right: -10px; /* 겹치게 하기 */
 }
 
 /* 확인하기 버튼 */
 .check-btn {
-  align-self: flex-end; /* 오른쪽 정렬 */
+  align-self: flex-start; 
   background: none;
   border: none;
   font-size: 1.2rem;
-  color: #888;
+  color: #525B65;
   cursor: pointer;
   display: flex;
   align-items: center;
