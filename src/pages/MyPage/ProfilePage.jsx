@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react"; // 👈 useState, useEffect 추가
 import { useNavigate } from "react-router-dom";
 import defaultProfile from "../../assets/default-profile.png";
 
@@ -117,7 +117,7 @@ return (
            <img src={settingIcon} alt="설정" className="settings-icon" />
          </button>
        </div>
-         {/* [추가] 친구 요청 알림 영역 (요청이 있을 때만 표시) */}
+       {/* [추가] 친구 요청 알림 영역 (요청이 있을 때만 표시) */}
        {receivedRequests.length > 0 && (
          <div className="friend-request-alert">
            <img src={reqNotificationIcon} alt="알림" className="req-noti-icon" />
@@ -162,7 +162,7 @@ return (
            <img 
              src={safeUser.avatarUrl} 
              alt="프로필" 
-             className="profile-img" 
+             className="mypage-profile-img" 
              onError={(e) => {e.target.src = defaultProfile;}}
            />
          </div>
