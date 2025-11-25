@@ -114,34 +114,37 @@ const PostEdit = () => {
     try {
         const res = await fetch(`${API_BASE}/posts/${id}`, {
             method: 'DELETE',
-           headers: { 
-                'Content-Type': 'application/json',
+            headers: { 
                 'Authorization': `Bearer ${token}`
-            },
+            }
         });
         
-        // 204 No Content 대응
-        if (res.status === 204) {
+        if (res.ok) {
+             try {
+                 const data = await res.json();
+                 if (data && data.isSuccess === false) {
+                     throw new Error(data.message || "삭제 실패");
+                 }
+             } catch (jsonError) {
+                 console.log("Non-JSON response but OK status");
+             }
+
              alert("게시물이 삭제되었습니다.");
-             navigate('/home', { replace: true });
+             navigate('/home', { replace: true }); 
              return;
         }
 
-        const data = await res.json();
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `삭제 실패 (Status: ${res.status})`);
 
-        if (data.isSuccess) {
-            alert("게시물이 삭제되었습니다.");
-            navigate('/home', { replace: true }); 
-        } else {
-            alert("삭제 완료 (테스트 모드)"); // 실제 API 실패 시에도 테스트용 메시지
-        }
     } catch (e) {
         console.error("Delete Error:", e);
-        alert("삭제 중 오류가 발생했습니다.");
+        alert(e.message || "삭제 중 오류가 발생했습니다.");
     } finally {
         setLoading(false);
     }
   };
+  
   return (
     <div className="post-edit-container">
       <Header toBack={true} />
