@@ -18,7 +18,8 @@ const Album = () => {
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
   const [isLoading, setIsLoading] = useState(true); 
-  const todayDate = new Date().toISOString().split('T')[0];
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0); // 로컬 시간대의 오늘 자정
   
   const navigate = useNavigate();
   const { token, activeTripId, setActiveTripId } = useAuth();
@@ -130,6 +131,11 @@ const Album = () => {
         fetchedTrips.forEach(item => {
           const trip = item.trip;
           const contents = item.contents;
+          const startDateObj = new Date(trip.startDate);
+          startDateObj.setHours(0, 0, 0, 0);
+          
+          const endDateObj = new Date(trip.endDate);
+          endDateObj.setHours(0, 0, 0, 0); // (매우 중요) 종료일도 자정으로 통일
           
           const tripData = {
             id: trip.id,
@@ -148,9 +154,9 @@ const Album = () => {
             coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
           };
 
-          if (trip.startDate > todayDate) {
+          if (startDateObj > todayDate) {
             plannedTrip.push(tripData);
-          } else if (activeTripId && trip.startDate <= todayDate && trip.endDate >= todayDate){
+          } else if (endDateObj >= todayDate){
             activeTrips.push(tripData);
           } else{
             completedList.push(tripData);
