@@ -1,6 +1,6 @@
 import React, { useState, lazy, Suspense, useEffect } from 'react'
 import { useAuth } from "../../contexts/AuthContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 
 import './Home.css'
 import Navbar from '../../components/NavBar/NavBar'
@@ -21,6 +21,7 @@ const Home = () => {
   const { user, login, setUser, isLoading, activeTripId, token } = useAuth();
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [homeTripInfo, setHomeTripInfo] = useState(null);
 
@@ -52,6 +53,15 @@ const Home = () => {
     url.searchParams.set('tab', tab);
     window.history.replaceState({}, '', url);
   }, [tab]);
+
+  useEffect(() => {
+    // Navbar에서 보낸 { activeTab: 'feed' } 신호가 있는지 확인
+    if (location.state?.activeTab === 'feed') {
+        setTab('all'); // 'all'이 피드 탭이므로 변경
+        
+        window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // 여행 상태 조회
   // useEffect(() => {

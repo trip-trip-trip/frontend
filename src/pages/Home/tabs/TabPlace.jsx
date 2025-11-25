@@ -150,7 +150,7 @@ export default function TabPlace({ setTab, activeTrip }) {
             try {
                 // (1) 게시물 상세 정보 가져오기
                 const detailRes = await fetch(`${API_BASE}/posts?feed_type=all&limit=200`, {
-                //    headers: { Authorization: `Bearer ${token || ""}` }
+                   headers: { Authorization: `Bearer ${token || ""}` }
                 });
                 const detailJson = await detailRes.json();
                 const details = detailJson?.result?.posts ?? [];
@@ -163,7 +163,7 @@ export default function TabPlace({ setTab, activeTrip }) {
 
                 // (2) 위치 정보 & 장소 탭 정보 가져오기
                 const locRes = await fetch(`${API_BASE}/posts/locations`, {
-                    // headers: { Authorization: `Bearer ${token || ""}` }               
+                    headers: { Authorization: `Bearer ${token || ""}` }               
                 });
 
                 const locJson = await locRes.json();
