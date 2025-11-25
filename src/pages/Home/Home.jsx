@@ -221,6 +221,7 @@ const Home = () => {
               <div className="active-trip-wrapper">
                 <ActiveTrip 
                   tripName={homeTripInfo.title}
+                  placeName={homeTripInfo.placeName}
                   members={homeTripInfo.members || []}
                   img={homeTripInfo.image || []}
                   filmCount={homeTripInfo.film_count || 0}
