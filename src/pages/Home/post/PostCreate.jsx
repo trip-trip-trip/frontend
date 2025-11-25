@@ -7,8 +7,8 @@ import Navbar from '../../../components/NavBar/NavBar';
 import default_pic from "../../../assets/default-profile.png";
 
 const API_BASE = import.meta.env.PROD 
-  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-  : '/api';
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
 export default function PostCreate() {
   const navigate = useNavigate();
@@ -60,22 +60,13 @@ export default function PostCreate() {
     let list = [];
 
     if (contents.photos) {
-      list = [
-        ...list,
-        ...contents.photos.map(item => ({ ...item.media, type: 'PHOTO' })),
-      ];
+        list = [...list, ...contents.photos.map(item => ({ ...item.media, type: 'PHOTO' }))];
     }
     if (contents.reelItems) {
-      list = [
-        ...list,
-        ...contents.reelItems.map(item => ({ ...item.media, type: 'VIDEO' })),
-      ];
+        list = [...list, ...contents.reelItems.map(item => ({ ...item.media, type: 'VIDEO' }))];
     }
     if (contents.scrapbooks) {
-      list = [
-        ...list,
-        ...contents.scrapbooks.map(item => ({ ...item.media, type: 'SCRAPBOOK' })),
-      ];
+        list = [...list, ...contents.scrapbooks.map(item => ({ ...item.media, type: 'SCRAPBOOK' }))];
     }
 
     if (filterType === 'ALL') return list;
@@ -115,19 +106,19 @@ export default function PostCreate() {
           else if (m.type === 'SCRAPBOOK') objectType = 'SCRAPBOOK';
 
           return {
-            media_id: m.mediaAssetId,
-            object_type: objectType,
-          };
-        }),
+             media_id: m.mediaAssetId,
+             object_type: objectType 
+          }
+        })
       };
 
       const res = await fetch(`${API_BASE}/posts`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
       
       const data = await res.json();
@@ -147,278 +138,192 @@ export default function PostCreate() {
 
   // 헤더 타이틀 & 뒤로가기
   const getTitle = () => {
-    if (step === 1) return "여행 선택";
-    if (step === 2) return "미디어 선택";
+    if(step === 1) return "여행 선택";
+    if(step === 2) return "미디어 선택";
     return "게시물 작성";
   };
 
   const handleBackClick = () => {
-    if (step > 1) {
-      setStep(step - 1); 
-    } else {
-      navigate(-1); 
-    }
+      if (step > 1) {
+          setStep(step - 1); 
+      } else {
+          navigate(-1); 
+      }
   };
 
-  // 여기부터는 return 한 번만!
   return (
-    <div className="post-create-wrapper">
-      <Header title={getTitle()} onBack={handleBackClick} />
-      <Navbar />
-      <main>
+    <div className="post-create-container">
+      <Header title={getTitle()} toBack={true} onBackClick={handleBackClick} /> 
 
+      <main className="post-body">
+        
         {/* === STEP 1: 여행 선택 === */}
         {step === 1 && (
-          <div className="step-trip-select">
-            {myTripsData.map((item) => {
-              const t = item.trip;
-              const coverImg = item.contents?.photos?.[0]?.media?.url || default_pic;
-              // 빈 값(null, "") 제거
-              const members = (t.inviteesProfileImgList || []).filter(
-                url => url && url.trim() !== ""
-              );
+          <div className="step-trip-list">
+            <h2 className="step-title">포스트를 게시할 여행을 선택해주세요</h2>
+            <div className="trip-list">
+              {/* ▼ map 함수가 여기로 들어왔습니다 ▼ */}
+              {myTripsData.map((item) => {
+                const t = item.trip;
+                const coverImg = item.contents?.photos?.[0]?.media?.url || default_pic;
+                
+                // 빈 값(null, "")은 아예 배열에서 제거!
+                const members = (t.inviteesProfileImgList || []).filter(url => url && url.trim() !== "");
 
-              return (
-                <div
-                  key={t.id}
-                  className="trip-item"
-                  onClick={() => handleSelectTrip(item)}
-                >
-                  <div className="trip-cover">
-                    <img
-                      src={coverImg}
-                      alt="cover"
-                      onError={(e) => { e.target.src = default_pic; }}
-                    />
-                  </div>
-
-                  <div className="trip-info">
-                    <div className="trip-top-row">
-                      <span className="trip-location">{t.placeName || '여행'}</span>
-                      <span className="trip-date">
-                        {t.startDate} ~ {t.endDate}
-                      </span>
+                return (
+                    <div key={t.id} className="trip-item" onClick={() => handleSelectTrip(item)}>
+                        <div className="trip-cover">
+                            <img src={coverImg} alt="cover" onError={(e)=>e.target.src=default_pic} />
+                        </div>
+                        <div className="trip-info">
+                            <div className="trip-top-row">
+                                <span className="trip-location">{t.placeName || '여행'}</span> 
+                                <span className="trip-date">{t.startDate} ~ {t.endDate}</span>
+                            </div>
+                            <div className="trip-title">{t.title}</div>
+                            
+                            {/* 친구 프사 영역: members가 진짜 있을 때만 렌더링 */}
+                            {members.length > 0 && (
+                                <div className="trip-members">
+                                  {members.slice(0, 3).map((url, i) => (
+                                    <img 
+                                        key={i} 
+                                        src={url} 
+                                        alt="member" 
+                                        className="member-avatar"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
+                                  ))}
+                                  {members.length > 3 && <span className="member-more">+{members.length-3}</span>}
+                                </div>
+                            )}
+                        </div>
                     </div>
-
-                    <div className="trip-title">{t.title}</div>
-
-                    {members.length > 0 && (
-                      <div className="trip-members">
-                        {members.slice(0, 3).map((url, i) => (
-                          <img
-                            key={i}
-                            src={url}
-                            alt="member"
-                            className="member-avatar"
-                            onError={(e) => { e.target.style.display = 'none'; }}
-                          />
-                        ))}
-                        {members.length > 3 && (
-                          <span className="member-more">
-                            +{members.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+              {/* ▲ map 함수 끝 ▲ */}
+            </div>
           </div>
         )}
 
         {/* === STEP 2: 미디어 선택 === */}
         {step === 2 && (
           <div className="step-media-select">
-            <h2 className="step-title">
-              포스트를 게시할 사진, 영상, 스크랩북을 선택해주세요
-            </h2>
-            <p className="step-subtitle">
-              필터를 사용하여 원하는 미디어 목록을 볼 수 있어요.
-            </p>
-
+            <h2 className="step-title">포스트를 게시할 사진, 영상, 스크랩북을 선택해주세요</h2>
+            <p className="step-subtitle">필터를 사용하여 원하는 미디어 목록을 볼 수 있어요.</p>
+            
             <div className="filter-tabs">
-              {['ALL', 'PHOTO', 'VIDEO', 'SCRAPBOOK'].map(type => (
-                <button
-                  key={type}
-                  className={filterType === type ? 'active' : ''}
-                  onClick={() => setFilterType(type)}
-                >
-                  {type === 'ALL'
-                    ? '≡ 전체'
-                    : type === 'PHOTO'
-                    ? '사진'
-                    : type === 'VIDEO'
-                    ? '영상'
-                    : '스크랩북'}
-                </button>
-              ))}
+                {['ALL', 'PHOTO', 'VIDEO', 'SCRAPBOOK'].map(type => (
+                    <button 
+                        key={type} 
+                        className={filterType === type ? 'active' : ''} 
+                        onClick={()=>setFilterType(type)}
+                    >
+                        {type === 'ALL' ? '≡ 전체' : type === 'PHOTO' ? '사진' : type === 'VIDEO' ? '영상' : '스크랩북'}
+                    </button>
+                ))}
             </div>
 
             <div className="media-grid">
-              {filteredMedia.length === 0 ? (
-                <div className="no-media-msg">선택 가능한 미디어가 없습니다.</div>
-              ) : (
-                filteredMedia.map(m => {
-                  const isSelected = selectedMedia.find(
-                    sel => sel.mediaAssetId === m.mediaAssetId
-                  );
-                  return (
-                    <div
-                      key={m.mediaAssetId}
-                      className={`media-item ${isSelected ? 'selected' : ''}`}
-                      onClick={() => toggleMedia(m)}
-                    >
-                      {m.type === 'VIDEO' ? (
-                        <video src={m.url} className="grid-video" muted />
-                      ) : (
-                        <img src={m.url} alt="media" />
-                      )}
-                      {m.type === 'VIDEO' && (
-                        <span className="video-badge">▶</span>
-                      )}
-                      {isSelected && (
-                        <div className="check-overlay">✔</div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
+                {filteredMedia.length === 0 ? (
+                    <div className="no-media-msg">선택 가능한 미디어가 없습니다.</div>
+                ) : (
+                    filteredMedia.map(m => {
+                        const isSelected = selectedMedia.find(sel => sel.mediaAssetId === m.mediaAssetId);
+                        return (
+                            <div key={m.mediaAssetId} className={`media-item ${isSelected ? 'selected' : ''}`} onClick={()=>toggleMedia(m)}>
+                                {m.type === 'VIDEO' ? (
+                                    <video src={m.url} className="grid-video" muted />
+                                ) : (
+                                    <img src={m.url} alt="media" />
+                                )}
+                                {m.type === 'VIDEO' && <span className="video-badge">▶</span>}
+                                {isSelected && <div className="check-overlay">✔</div>}
+                            </div>
+                        )
+                    })
+                )}
             </div>
 
             {selectedMedia.length > 0 && (
-              <div className="bottom-sheet">
-                <div className="sheet-header">
-                  <span>{selectedMedia.length}장 선택됨</span>
-                </div>
-
-                <div className="sheet-preview-list">
-                  {selectedMedia.map(m => (
-                    <div
-                      key={m.mediaAssetId}
-                      className="mini-preview-wrap"
-                    >
-                      {m.type === 'VIDEO' ? (
-                        <video
-                          src={m.url}
-                          className="mini-preview"
-                          muted
-                        />
-                      ) : (
-                        <img
-                          src={m.url}
-                          className="mini-preview"
-                          alt=""
-                        />
-                      )}
-                      <button
-                        className="mini-delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleMedia(m);
-                        }}
-                      >
-                        ×
-                      </button>
+                <div className="bottom-sheet">
+                    <div className="sheet-header">
+                        <span>{selectedMedia.length}장 선택됨</span>
                     </div>
-                  ))}
+                    <div className="sheet-preview-list">
+                        {selectedMedia.map(m => (
+                            <div key={m.mediaAssetId} className="mini-preview-wrap">
+                                {m.type === 'VIDEO' ? (
+                                    <video src={m.url} className="mini-preview" muted />
+                                ) : (
+                                    <img src={m.url} alt="" className="mini-preview"/>
+                                )}
+                                <button className="mini-delete" onClick={(e)=>{e.stopPropagation(); toggleMedia(m);}}>×</button>
+                            </div>
+                        ))}
+                    </div>
+                    <button className="next-btn" onClick={() => setStep(3)}>선택 완료</button>
                 </div>
-
-                <button
-                  className="next-btn"
-                  onClick={() => setStep(3)}
-                >
-                  선택 완료
-                </button>
-              </div>
             )}
           </div>
         )}
 
-        {/* === STEP 3: 게시물 작성 === */}
+        {/* === STEP 3: 글 작성 === */}
         {step === 3 && (
           <div className="step-write">
+            
             <h2 className="step-title">코멘트를 작성해주세요</h2>
-
+            
             <div className="write-preview-box">
-              {selectedMedia.length > 0 && (
-                <div className="preview-image-main">
-                  {selectedMedia[0].type === 'VIDEO' ? (
-                    <video
-                      src={selectedMedia[0].url}
-                      controls
-                      autoPlay
-                      muted
-                      className="main-video-preview"
-                    />
-                  ) : (
-                    <img
-                      src={selectedMedia[0].url}
-                      alt="main"
-                    />
-                  )}
-                </div>
-              )}
-
-              <div className="preview-thumbnails">
-                {selectedMedia.map(m =>
-                  m.type === 'VIDEO' ? (
-                    <video
-                      key={m.mediaAssetId}
-                      src={m.url}
-                      className={`thumb-video ${
-                        m.mediaAssetId === selectedMedia[0].mediaAssetId
-                          ? 'active'
-                          : ''
-                      }`}
-                      muted
-                    />
-                  ) : (
-                    <img
-                      key={m.mediaAssetId}
-                      src={m.url}
-                      alt=""
-                      className={
-                        m.mediaAssetId === selectedMedia[0].mediaAssetId
-                          ? 'active'
-                          : ''
-                      }
-                    />
-                  )
-                )}
-              </div>
+               {selectedMedia.length > 0 && (
+                   <div className="preview-image-main">
+                       {selectedMedia[0].type === 'VIDEO' ? (
+                            <video src={selectedMedia[0].url} controls autoPlay muted className="main-video-preview" />
+                       ) : (
+                            <img src={selectedMedia[0].url} alt="main" />
+                       )}
+                   </div>
+               )}
+               <div className="preview-thumbnails">
+                   {selectedMedia.map(m => (
+                       m.type === 'VIDEO' ? (
+                           <video 
+                               key={m.mediaAssetId} 
+                               src={m.url} 
+                               className={`thumb-video ${m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}`}
+                               muted
+                           />
+                       ) : (
+                           <img 
+                               key={m.mediaAssetId} 
+                               src={m.url} 
+                               alt="" 
+                               className={m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}
+                           />
+                       )
+                   ))}
+               </div>
             </div>
 
             <div className="privacy-check">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={isPrivate}
-                  onChange={(e) =>
-                    setIsPrivate(e.target.checked)
-                  }
-                />
-                비공개 포스트로 올리기
-              </label>
+                <label>
+                    <input type="checkbox" checked={isPrivate} onChange={(e)=>setIsPrivate(e.target.checked)} />
+                    비공개 포스트로 올리기
+                </label>
             </div>
-
-            <textarea
-              className="comment-box"
-              placeholder="내용을 입력해주세요"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+            
+            <textarea 
+                className="comment-box" 
+                placeholder="내용을 입력해주세요"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
             ></textarea>
-
-            <button
-              className="submit-btn"
-              onClick={handleUpload}
-              disabled={loading}
-            >
-              {loading ? '게시 중...' : '게시하기!'}
+            
+            <button className="submit-btn" onClick={handleUpload} disabled={loading}>
+                {loading ? '게시 중...' : '게시하기!'}
             </button>
           </div>
         )}
-
       </main>
     </div>
   );
