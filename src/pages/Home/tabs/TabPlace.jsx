@@ -162,7 +162,7 @@ export default function TabPlace({ setTab, activeTrip }) {
                 }));
 
                 // (2) 위치 정보 & 장소 탭 정보 가져오기
-                const locRes = await fetch(`${API_BASE}/posts/locations`, {
+                const locRes = await fetch(`${API_BASE}/posts/locations?feed_type=all`, {
                     headers: { Authorization: `Bearer ${token || ""}` }               
                 });
 

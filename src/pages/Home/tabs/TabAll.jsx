@@ -42,10 +42,16 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
 
        return {
          url: m.url,
-         thumbnail: m.thumbnail_url, 
+         thumbnail: m.thumbnail_url || m.thumbnailUrl, 
          type: type 
        };
     }) : [];
+
+    let locationName = p.location || '';
+    
+    if (!locationName && activeTrip && Number(p.trip_id) === Number(activeTrip.id)) {
+        locationName = activeTrip.placeName;
+    }
 
     return {
       id: p.id,
@@ -59,7 +65,7 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
       media: mediaList, 
 
       image: mediaList[0]?.thumbnail || mediaList[0]?.url || null, // 커버 이미지
-      location: p.location ?? '',
+      location: locationName || '어딘가', 
       date: extractCreatedDate(p),
       like_count: p.like_count ?? 0,
       comment_count: p.comment_count ?? 0,
