@@ -17,7 +17,7 @@ const EditTrip = () => {
     : '/api';
 
   // const API_BASE = 'https://tripshot.duckdns.org';
-  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
+  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA2OTE0NSwiZXhwIjoxNzY0MDcyNzQ1fQ.Q0PiL1ZAJm1dpIh9jGrciyrI4NookTKFnnjMbiT0wjIZuPkkI5Nx6bVZO6Md4BaU1fx-L741tUBNmErqPB5k-A';
 
   // **Original Data**를 저장하기 위한 Ref: 이것이 변경 여부를 판단하는 기준이 됩니다.
   const originalTripRef = useRef(null); 
@@ -133,11 +133,13 @@ const EditTrip = () => {
     if (startDate !== original.startDate) {
       // API 요청 형식에 맞춰 T12:00 추가
       changes.startDate = `${startDate}T12:00`; 
+      changes.endDate = `${endDate}T12:00`; 
     }
     
     // 3. 종료일 비교
     if (endDate !== original.endDate) {
       // API 요청 형식에 맞춰 T12:00 추가
+      changes.startDate = `${startDate}T12:00`; 
       changes.endDate = `${endDate}T12:00`; 
     }
     
@@ -213,10 +215,12 @@ const EditTrip = () => {
     
   if (isLoading) {
     return (
-      <div className='album'>
+      <div className='edit-trips'>
         <Header/>
-          <div className="album-container">
-            <ment>여행 정보를 불러오는 중...</ment>
+          <div className="edit-trip-cont">
+            <div className="ment">
+              여행 정보를 불러오는 중...
+            </div>
           </div>
         <Navbar/>
       </div>
@@ -294,14 +298,13 @@ const EditTrip = () => {
             </div>
             </div>
           </form>
-          
-          {
+        </div>
+        {
             name && startDate && endDate && placeName && !isLoading &&
             <div className="edit-trip-btn-cont">
               <button className='edit-trip-btn' onClick={handleEditBtn}>여행 수정하기</button>
             </div>
           }
-        </div>
         <Navbar/>
     </div>
   )
