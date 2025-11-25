@@ -94,14 +94,14 @@ const TabAll = ({ activeTrip = null , onPostsLoaded=()=>{} }) => {
         return {
           id: p.id,
           author: p.author?.username ?? '알 수 없음',
-          author_avatar: p.author?.avatar_url ?? '/assets/default-avatar.png',
+          author_avatar: p.author?.avatar_url ?? default_pic,
           caption: p.caption ?? '',
           
           images: mediaList.map(m => m.url), 
           media: mediaList, 
     
           image: mediaList[0]?.thumbnail || mediaList[0]?.url || null,
-          location: locationName||default_pic, 
+          location: locationName || '어딘가', 
           date: extractCreatedDate(p),
           like_count: p.like_count ?? 0,
           comment_count: p.comment_count ?? 0,

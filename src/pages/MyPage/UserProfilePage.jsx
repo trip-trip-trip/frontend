@@ -185,7 +185,7 @@ const sendRequest = async () => {
            <img 
              src={userInfo.avatarUrl || defaultProfile} 
              alt="프로필" 
-             className="profile-img"
+             className="profile-img-my"
              onError={(e) => {e.target.src = defaultProfile;}}
            />
         </div>
