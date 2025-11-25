@@ -26,37 +26,19 @@ const Album = () => {
   // const API_BASE = 'https://tripshot.duckdns.org';
   // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAxNjU3MiwiZXhwIjoxNzY0MDIwMTcyfQ._4xjrwuzZCFw3X2t6KZyKr9P4UP1AtdH9YCSJHOvyJZomUh4E4KYho7M3gxSoQ-te7DtbsWvSmDR_AQwmFTSNw';
 
-
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
   const [tripData, setTripData] = useState({});
-
+  // 날짜에 따라 여행 -> 시작/완료/대기중 구분
   const [activeTripInfo, setActiveTripInfo] = useState(null);
   const [completedTrips, setCompletedTrips] = useState([]);
   const [plannedTrips, setPlannedTrips] = useState([]);
   
   // 친구 초대 요청 존재 여부
   const [hasInviteRequest, setHasInviteRequest] = useState();
-
-  // 친구 초대 요청 정보 - 요청받기 위해 일단 더미값 채워둠
+  // 친구 초대 요청 저장
   const [tripRequest, setTripRequest] = useState();
-  // const [tripRequest, setTripRequest] = useState({
-  //   title: '제주도 여행',
-  //   requestor: '김친구',
-  //   startDate: '2025-11-12',
-  //   endDate: '2025-12-12',
-  //   members: ['김친구', '박친구'],
-  //   image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
-  //   coverImage: '/trip-img/trip4.jpeg',
-  // });
 
-  // setTripRequest({
-  //   title: '제주도 여행',
-  //   requestor: '김친구',
-  //   dateRange : '2025.11.18-22',
-  //   members: ['김친구', '박친구'],
-  //   image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
-  // });
 
   useEffect(() => {    
     if (activeTripId) {
@@ -206,8 +188,8 @@ const Album = () => {
         setIsLoading(true);
         try {
           await Promise.all([
-            fetchTrips(), // 내부에서 setIsLoading(false)를 호출하지 않도록 수정 필요
-            fetchInvitations() // 내부에서 setIsLoading(false)를 호출하지 않도록 수정 필요
+            fetchTrips(),
+            fetchInvitations()
           ]);
         } catch (error) {
           console.error("Initial data fetch failed:", error);
@@ -222,48 +204,48 @@ const Album = () => {
     }, [token, activeTripId]);
 
   
-  // 친구 초대 요청에서 <거절> 클릭 시 동작
-  const handleRejectRequest = () => {
-    setHasInviteRequest(false);
-    alert("친구의 요청을 거절했어요.");
-  }
+  // // 친구 초대 요청에서 <거절> 클릭 시 동작
+  // const handleRejectRequest = () => {
+  //   setHasInviteRequest(false);
+  //   alert("친구의 요청을 거절했어요.");
+  // }
 
   // 친구 초대 요청에서 <수락> 클릭 시 동작
-  const handleAcceptRequest = () => {
-    setHasInviteRequest(false);
-    if (!activeTripId){
-      const newTripId = `${tripRequest.title.replace(/\s/g, '-')}-${new Date().getTime()}`;
-      const newTripInfo = {
-        id: newTripId,
-        title : tripRequest.title,
-        startDate : tripRequest.startDate,
-        vid_count: 0,
-        film_count: 0,
-        endDate : tripRequest.endDate,
-        members : tripRequest.members,
-        coverImage : tripRequest.coverImage || '',
-        image: [],
-      }
+  // const handleAcceptRequest = () => {
+  //   setHasInviteRequest(false);
+  //   if (!activeTripId){
+  //     const newTripId = `${tripRequest.title.replace(/\s/g, '-')}-${new Date().getTime()}`;
+  //     const newTripInfo = {
+  //       id: newTripId,
+  //       title : tripRequest.title,
+  //       startDate : tripRequest.startDate,
+  //       vid_count: 0,
+  //       film_count: 0,
+  //       endDate : tripRequest.endDate,
+  //       members : tripRequest.members,
+  //       coverImage : tripRequest.coverImage || '',
+  //       image: [],
+  //     }
 
-      localStorage.setItem(`tripInfo_${newTripId}`, JSON.stringify(newTripInfo));
-      const ids = JSON.parse(localStorage.getItem('tripIds') || '[]');
-      localStorage.setItem('tripIds', JSON.stringify([...new Set([...ids, newTripId])]));
-      // setActiveTrip(newTripInfo);
-      setActiveTripId(newTripId);
-      setHasInviteRequest(false);
+  //     localStorage.setItem(`tripInfo_${newTripId}`, JSON.stringify(newTripInfo));
+  //     const ids = JSON.parse(localStorage.getItem('tripIds') || '[]');
+  //     localStorage.setItem('tripIds', JSON.stringify([...new Set([...ids, newTripId])]));
+  //     // setActiveTrip(newTripInfo);
+  //     setActiveTripId(newTripId);
+  //     setHasInviteRequest(false);
       
-      // setActiveTripInfo({
-      //   title : tripRequest.title,
-      //   startDate : tripRequest.startDate,
-      //   endDate : tripRequest.endDate,
-      //   members : tripRequest.members,
-      //   image : tripRequest.image,
-      // })
-      // setHasActiveTrip(true);
-      alert("새 여행이 생성되었습니다.");
-      // console.log(activeTripInfo);
-    }
-  }
+  //     // setActiveTripInfo({
+  //     //   title : tripRequest.title,
+  //     //   startDate : tripRequest.startDate,
+  //     //   endDate : tripRequest.endDate,
+  //     //   members : tripRequest.members,
+  //     //   image : tripRequest.image,
+  //     // })
+  //     // setHasActiveTrip(true);
+  //     alert("새 여행이 생성되었습니다.");
+  //     // console.log(activeTripInfo);
+  //   }
+  // }
 
   if (isLoading) {
     return (

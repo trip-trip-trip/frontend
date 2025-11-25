@@ -265,12 +265,11 @@ const TripDetail = () => {
       navigate(`/trips`); 
     } catch (error) {
       console.error("Error editing trip data:", error);
-      alert('여행 초대를 거절할 수 없습니다.');
+      alert('초대 거절 실패 중 문제가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
   const handleAcceptRequest = async () => {
-    console.log('accept try');
     try {
       const response = await fetch(
         `${API_BASE}/invitations/${invitationID}`,
@@ -289,17 +288,17 @@ const TripDetail = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`초대 거절 실패: ${response.status}`);
+        throw new Error(`초대 수락 실패: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('초대 거절 성공:', data.result);
+      console.log('초대 수락 성공:', data.result);
 
-      alert('여행 초대를 거절했습니다.');
+      alert('여행 초대를 수락했습니다.');
       navigate(`/trips`); 
     } catch (error) {
       console.error("Error editing trip data:", error);
-      alert('여행 초대를 거절할 수 없습니다.');
+      alert('초대 수락 중 문제가 발생했습니다. 다시 시도해주세요.');
     }
   };
   
@@ -312,7 +311,6 @@ const TripDetail = () => {
         fetchTripInvite();
         fetchReels();
       }
-      
     }
   }, [token, tripId]); // token 또는 tripId가 변경될 때 다시 호출
 
@@ -332,7 +330,42 @@ const TripDetail = () => {
     );
   }
 
-  if (currentTripStatus === 'completed') {
+
+  if (isInvited){
+    return(
+      <div className='trip-detail'>
+        <Header toBack={true}/>
+          <div className="invitation-cont">
+            <p>여행에 초대되었어요</p>
+            <div className="invitation-btns">
+              <button className='ivitation-btn reject' onClick={handleRejectRequest}>
+                <img src={reject_icon} alt="" className='reject-icon'/>
+                <h6>거절</h6>
+              </button>
+              <button className='ivitation-btn accept' onClick={handleAcceptRequest}>
+                <img src={accept_icon} alt="" className='accept-icon'/>
+                <h6>수락</h6>
+              </button>
+            </div>
+          </div>
+        <div className='trip-detail-container'>
+          <h1>{tripInfo.title}</h1> 
+          <div className="date-and-edit">
+            <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
+            <button className='edit-btn' onClick={()=>navigate(`/trips/detail/${tripId}/edit`)}><img src={edit_btn} alt="" /></button>
+          </div>
+          {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
+          <div className="shared-cont">
+            <div className="shared-friend">
+              <SharedFriends data={tripInfo.members}/>
+            </div>
+          </div>
+          <div className='ment'>사진은 여행이 끝난 후 확인할 수 있어요</div>
+        </div>
+        <Navbar/>
+      </div>
+    )
+  } else if (currentTripStatus === 'completed') {
     return (
       <div className='trip-detail'>
         <Header toBack={true}/>
@@ -463,40 +496,6 @@ const TripDetail = () => {
         <Navbar/>
       </div>
     );
-  } else if (isInvited){
-    return(
-      <div className='trip-detail'>
-        <Header toBack={true}/>
-          <div className="invitation-cont">
-            <p>여행에 초대되었어요</p>
-            <div className="invitation-btns">
-              <button className='ivitation-btn reject' onClick={handleRejectRequest}>
-                <img src={reject_icon} alt="" className='reject-icon'/>
-                <h6>거절</h6>
-              </button>
-              <button className='ivitation-btn accept' onClick={handleAcceptRequest}>
-                <img src={accept_icon} alt="" className='accept-icon'/>
-                <h6>수락</h6>
-              </button>
-            </div>
-          </div>
-        <div className='trip-detail-container'>
-          <h1>{tripInfo.title}</h1> 
-          <div className="date-and-edit">
-            <h3>{(tripInfo.startDate || '').split('-').join('.')} - {(tripInfo.endDate || '').split('-').join('.')}</h3>
-            <button className='edit-btn' onClick={()=>navigate(`/trips/detail/${tripId}/edit`)}><img src={edit_btn} alt="" /></button>
-          </div>
-          {/* 공유된 친구 정보 & 공유 사진 관리 버튼*/}
-          <div className="shared-cont">
-            <div className="shared-friend">
-              <SharedFriends data={tripInfo.members}/>
-            </div>
-          </div>
-          <div className='ment'>사진은 여행이 끝난 후 확인할 수 있어요</div>
-        </div>
-        <Navbar/>
-      </div>
-    )
   } else if ( currentTripStatus === 'active'){
     return (
       <div className='trip-detail'>
