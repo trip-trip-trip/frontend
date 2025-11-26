@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useRef} from 'react';
 import { useLocation, useNavigate,useParams } from 'react-router-dom';
 import './CaptureCompletePage.css'; // CSS 파일 생성
 import { useAuth } from '../../contexts/AuthContext';
