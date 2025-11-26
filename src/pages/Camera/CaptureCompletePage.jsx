@@ -40,6 +40,8 @@ navigate('/trips');
   const handleSave = async () => {
    
     if (!effectiveTripId || Number.isNaN(effectiveTripId)) {
+      if (isLoading) return;
+    setIsLoading(true);
      alert("유효하지 않은 여행입니다. (tripId 없음 / 숫자 아님)");
     console.error("잘못된 tripId:", { tripIdParam, activeTripId, effectiveTripId });
      return;
