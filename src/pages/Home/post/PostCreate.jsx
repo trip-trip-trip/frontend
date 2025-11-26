@@ -30,7 +30,7 @@ export default function PostCreate() {
     const fetchMyTrips = async () => {
       if (!token) return;
       try {
-        const res = await fetch(`${API_BASE}/trips`, {
+        const res = await fetch(`${API_BASE}/trips?completedOnly=true`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -162,12 +162,11 @@ export default function PostCreate() {
           <div className="step-trip-list">
             <h2 className="step-title">포스트를 게시할 여행을 선택해주세요</h2>
             <div className="trip-list">
-              {/* ▼ map 함수가 여기로 들어왔습니다 ▼ */}
               {myTripsData.map((item) => {
                 const t = item.trip;
                 const coverImg = item.contents?.photos?.[0]?.media?.url || default_pic;
                 
-                // 빈 값(null, "")은 아예 배열에서 제거!
+                // 빈 값 제거 및 친구가 있는 경우만 표시하기 위한 로직
                 const members = (t.inviteesProfileImgList || []).filter(url => url && url.trim() !== "");
 
                 return (
@@ -182,7 +181,7 @@ export default function PostCreate() {
                             </div>
                             <div className="trip-title">{t.title}</div>
                             
-                            {/* 친구 프사 영역: members가 진짜 있을 때만 렌더링 */}
+                            {/* 친구 프사 영역: members가 있을 때만 렌더링 */}
                             {members.length > 0 && (
                                 <div className="trip-members">
                                   {members.slice(0, 3).map((url, i) => (
@@ -201,8 +200,12 @@ export default function PostCreate() {
                     </div>
                 );
               })}
-              {/* ▲ map 함수 끝 ▲ */}
             </div>
+            {myTripsData.length === 0 && (
+                <div style={{textAlign: 'center', marginTop: '50px', color: '#999'}}>
+                    작성 가능한(완료된) 여행이 없습니다.
+                </div>
+            )}
           </div>
         )}
 
