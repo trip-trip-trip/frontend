@@ -65,6 +65,10 @@ export default function PostCreate() {
     if (contents.reelItems) {
         list = [...list, ...contents.reelItems.map(item => ({ ...item.media, type: 'VIDEO' }))];
     }
+    ///////
+    if(contents.reel){
+      list.push({...contents.reel, type: 'VIDEO'});
+    }
     if (contents.scrapbooks) {
         list = [...list, ...contents.scrapbooks.map(item => ({ ...item.media, type: 'SCRAPBOOK' }))];
     }
