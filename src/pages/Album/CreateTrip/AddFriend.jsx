@@ -117,6 +117,12 @@ const AddFriend = () => {
             },)
           }
         );
+
+        if (response.status === 400) {
+          alert("이 여행에 대한 초대 권한이 없습니다.");
+          navigate(`/trips/detail/${tripId}`, { replace: true });
+          return;
+        }
   
         if (!response.ok) {
           throw new Error(`여행 친구 추가 실패: ${response.status}`);
