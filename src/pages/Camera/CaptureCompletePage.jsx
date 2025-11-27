@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useRef} from 'react';
 import { useLocation, useNavigate,useParams } from 'react-router-dom';
 import './CaptureCompletePage.css'; // CSS 파일 생성
 import { useAuth } from '../../contexts/AuthContext';
@@ -22,6 +22,7 @@ const CaptureCompletePage = () => {
   const { media, type, blob } = location.state || {}; // CameraPage에서 넘긴 state
   const [comment, setComment] = useState('');
 const [isLoading, setIsLoading] = useState(false);
+  const isSavingRef=useRef(false);
 
   if (!media) {
 navigate('/trips');
@@ -38,9 +39,16 @@ navigate('/trips');
 
              "effectiveTripId:", effectiveTripId);
   const handleSave = async () => {
-   
+
+    if (isSavingRef.current) return;
+    isSavingRef.current = true;
+    setIsLoading(true);
+    
     if (!effectiveTripId || Number.isNaN(effectiveTripId)) {
+      if (isLoading) return;
+    setIsLoading(true);
      alert("유효하지 않은 여행입니다. (tripId 없음 / 숫자 아님)");
+      isSavingRef.current = false;
     console.error("잘못된 tripId:", { tripIdParam, activeTripId, effectiveTripId });
      return;
    }
@@ -136,6 +144,7 @@ formData.append("file", photoBlob);
     navigate("/trips");
      } catch (err) {
     console.error("업로드 실패:", err);
+     isSavingRef.current = false;
     alert("업로드에 실패했습니다.");
   }
 };

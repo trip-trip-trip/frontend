@@ -195,7 +195,7 @@ const fetchData = async () => {
               <span className="section-title">보낸 친구 요청</span>
               <span className="section-count">{sentRequests.length}</span>
             </div>
-            <img src={isSentOpen ? toggleUp : toggleDown} className="toggle-icon" alt="toggle" />
+            <img src={isSentOpen ? toggleUp : toggleDown} className="toggle-icon-up" alt="toggle" />
           </div>
           {isSentOpen && (
             <div className="section-list">
@@ -233,7 +233,7 @@ const fetchData = async () => {
               <span className="section-title">친구 목록</span>
               <span className="section-count">{friends.length}</span>
             </div>
-            <img src={isFriendOpen ? toggleUp : toggleDown} className="toggle-icon" alt="toggle" />
+            <img src={isFriendOpen ? toggleUp : toggleDown} className="toggle-icon-up" alt="toggle" />
           </div>
           {isFriendOpen && (
             <div className="section-list">

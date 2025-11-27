@@ -136,7 +136,7 @@ const Home = () => {
             const data = await response.json();
             const tripList = data.result || [];
             const today = new Date();
-            today.setHours(0, 0, 0, 0); 
+            // today.setHours(0, 0, 0, 0); 
 
             const activeData = tripList.find(item => {
                 // 상태가 ACTIVE인지 확인

@@ -39,6 +39,7 @@ import PostEdit from './pages/Home/post/PostEdit';
 import EditTrip from './pages/Album/TripDetails/EditTrip';
 import SharedList from './pages/Album/TripDetails/SharedList';
 import ShowMedia from './pages/Album/TripDetails/ShowMedia';
+import LoginGuard from './contexts/LoginGuard';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -46,6 +47,11 @@ const App = () => {
       let dvh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--dvh', `${dvh}px`);
    }
+
+  const ProtectedHome = LoginGuard(Home);
+  const ProtectedCamera = LoginGuard(CameraPage);
+  const ProtecetedProfilePage = LoginGuard(ProfilePage);
+  const ProtectedAlbum = LoginGuard(Album);
 
   useEffect(() => {
       setScreenSize();

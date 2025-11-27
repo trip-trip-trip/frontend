@@ -23,10 +23,7 @@ const SharePhoto = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const {token} = useAuth();
-
-    // const API_BASE = 'https://tripshot.duckdns.org';
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA4NDk1NSwiZXhwIjoxNzY0MDg4NTU1fQ.Az8aDvqOtN7r4ynhDhCc8sf8lNx6nCop1AjeLKoasLuQjAa_l2GgU2o9VCrGinFPBGuwja_xKzWsklbN4ABYlQ';
-
+    
      //여행 상세정보
     const fetchMedia = async () => {
         setIsLoading(true);

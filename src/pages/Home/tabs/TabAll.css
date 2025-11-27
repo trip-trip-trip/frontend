@@ -1,8 +1,9 @@
 
 .taball {
   width: 100%;
-  min-height: 100vh;
-  background-color: #f6f6f5; /* Image 1의 밝은 배경색 */
+  min-height: 100%; 
+  background-color: #f6f6f5;
+  overflow-x: hidden;
 }
 
 .feed-list {

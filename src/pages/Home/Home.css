@@ -1,13 +1,21 @@
 .home {
-    height: 100vh; /* 또는 var(--dvh)를 사용한 100dvh */
-    display: flex;
-    flex-direction: column; /* 세로로 자식 요소 배치 */
+   height: 100dvh; 
+   display: flex;
+   flex-direction: column;
+   width: 100%;
+   overflow-x: hidden; /* 가로 스크롤 아예 차단 */
+   position: relative; /* 자식 요소 위치 기준 */
 }
 
 .home-body {
-    flex-grow: 1; 
-    overflow-y: auto; 
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden; /* 가로 스크롤 차단 */
+    
     -webkit-overflow-scrolling: touch; 
+    
+    overscroll-behavior-y: contain; 
+    position: relative; 
 }
 
 .tabs-bar{
