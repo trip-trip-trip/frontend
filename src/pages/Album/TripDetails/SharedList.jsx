@@ -208,15 +208,21 @@ const SharedList = () => {
                   {confirmedMembers.map((member) => (
                     <div className="member-row" key={member.invitationId}> {/* 🔑 Key는 invitationId 사용 */}
                       <div className="profile-info">
-                        <div className="profile-circle"></div>
-                        <div className="name-tag-wrapper">
-                          <div className="name-title">  
+                          {(member.inviteeAvatarUrl)
+                            ?
+                            <img src={member.inviteeAvatarUrl} alt="" className='profile-img'/>
+                            :
+                            <img src={default_profile} alt="" className='profile-img'/>  }
+
+                            <div className="name-tag-wrapper">
+                              <p className="member-name">{member.inviteeUsername}</p>
+                              {/* <div className="name-title">  
                             <p className="member-name">{member.inviteeName}</p>
                             {member.isOwner && <span className="owner-badge">나</span>}
-                          </div>
-                          <p className="member-tag">#{member.tag}</p>
+                          </div> */}
+                              <p className="member-tag">#{member.inviteeTag}</p>
+                            </div>
                         </div>
-                      </div>
                     </div>
                   ))}
                 </div>

@@ -134,9 +134,8 @@ const Home = () => {
         if (response.ok) {
             const data = await response.json();
             const tripList = data.result || [];
-            
-            // 오늘 날짜 (YYYY-MM-DD 문자열)
-            const today = new Date().toISOString().split('T')[0]; 
+            const today = new Date().toISOString().split('T')[0];
+            // today.setHours(0, 0, 0, 0); 
 
             const activeData = tripList.find(item => {
                 if (item.trip.startDate > today) return false;

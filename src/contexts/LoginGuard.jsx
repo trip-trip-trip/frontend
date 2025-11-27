@@ -22,9 +22,10 @@ const LoginGuard = (_WrappedComponent) => {
             navigate("/login", { replace: true });
             setIsLoggedIn(false);
           } else{
+            hasAlerted.current = false;
             setIsLoggedIn(true);
           }
-    },[]);
+    },[token, navigate]);
 
     if (!token){
         return null;
