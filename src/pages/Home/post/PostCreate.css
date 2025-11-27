@@ -3,15 +3,21 @@
     background-color: #F8F7F2;
     font-family: 'Pretendard', sans-serif;
     padding-top: 6rem;
-    
-    /* 가로 스크롤 아예 막기 */
     overflow-x: hidden; 
     overflow-y: scroll;
-    
-    /* 패딩 포함 크기 계산 */
     box-sizing: border-box;
     width: 100%;
-} 
+
+    /* 데스크탑용 카드 레이아웃 */
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+
+    position: relative;   /* (선택) 기준만 잡아둠 */
+}
+
 
 
 
@@ -224,24 +230,24 @@
 .bottom-sheet {
     position: fixed;
     bottom: 0;
-    left: 50%;                /* 화면 가운데 기준 */
-    transform: translate(-50%, 0);  /* 가운데 정렬 */
 
-    width: 100%;
-    max-width: 480px;         /* 앱 너비와 동일하게 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;               /* 모바일에선 꽉 차게 */
+    max-width: 480px;           /* 데스크탑에선 480px로 제한 */
 
     background: #fff;
     border-top-left-radius: 1.5rem;
     border-top-right-radius: 1.5rem;
-    padding: 1.5rem 1.5rem 2.5rem 1.5rem; 
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);    
+    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
     z-index: 100;
     animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp {
     from { transform: translate(-50%, 100%); }
-    to { transform: translate(-50%, 0); }
+    to   { transform: translate(-50%, 0); }
 }
 
 .sheet-header {
