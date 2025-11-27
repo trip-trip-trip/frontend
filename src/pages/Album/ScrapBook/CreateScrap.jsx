@@ -9,6 +9,7 @@ import { useRef } from 'react';
 import save_btn from '/icons/save_btn.png'
 import { toBlob } from 'html-to-image';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useState } from 'react';
 
 
 const API_BASE = import.meta.env.PROD 
@@ -47,9 +48,7 @@ const CreateScrap = () => {
     const scrapRef = useRef(null);
     const {token} = useAuth();
     const navigate = useNavigate();
-    // const API_BASE = 'https://tripshot.duckdns.org';
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA3NzQ5NiwiZXhwIjoxNzY0MDgxMDk2fQ.b70ozL6GYsKoloCckVwKaDUmOS_Hvr8xzK8wkBrgL-pkdDHXFn3E0NduhT-TczPFRh3wJqmnx2ku15pflWeLTQ';
-  
+    const [loading, setLoading] = useState(false);
 
     // 선택된 프레임의 위치 정보 가져오기
     const initialFrameData = FRAME_POSITIONS[selectedFrameId] || [];
@@ -90,10 +89,17 @@ const CreateScrap = () => {
 // API ------------------------------------------
     const handleSaveToAlbum = async () => {
 
+      if(loading){
+        console.log("저장 작업이 이미 진행 중입니다.");
+        return;
+      }
+
       if (!scrapRef.current) {
           alert("스크랩북 제작 중 오류가 발생했습니다. 다시 시도해주세요.");
           return;
       }
+
+      setLoading(true);
 
       try {
           const fileBlob = await toBlob(scrapRef.current, {
@@ -145,6 +151,8 @@ const CreateScrap = () => {
       } catch (error) {
           console.error('스크랩북 앨범 저장 중 오류 발생:', error);
           alert('스크랩북을 앨범에 저장하는 중 네트워크 오류가 발생했습니다.');
+      } finally{
+        setLoading(false);
       }
   };
 
@@ -172,8 +180,8 @@ const CreateScrap = () => {
                   </button>
                 </div>
                 <p><span>[앨범에 저장하기]</span>를 눌러서 여행 앨범에 스크랩북을 저장할 수 있어요.</p>
-                <button className='save-scrap-button album' onClick={handleSaveToAlbum}>
-                  앨범에 저장하기
+                <button className='save-scrap-button album' onClick={handleSaveToAlbum} disabled={loading}>
+                  {loading? '저장 중...' : '앨범에 저장하기'}
                 </button>
                 <button className='save-scrap-button retry' onClick={()=>navigate(-2)}>
                   다시 만들기

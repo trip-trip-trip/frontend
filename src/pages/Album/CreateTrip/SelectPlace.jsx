@@ -10,9 +10,6 @@ const SelectPlace = () => {
     const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
-    // const API_BASE = 'https://tripshot.duckdns.org';
-    // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA2OTE0NSwiZXhwIjoxNzY0MDcyNzQ1fQ.Q0PiL1ZAJm1dpIh9jGrciyrI4NookTKFnnjMbiT0wjIZuPkkI5Nx6bVZO6Md4BaU1fx-L741tUBNmErqPB5k-A';
-
     const navigate = useNavigate();
     const location = useLocation();
     const { token, activeTripId } = useAuth();
@@ -88,7 +85,7 @@ const SelectPlace = () => {
           if (!token) {
             console.error("인증 토큰(accessToken)이 로컬 스토리지에 없습니다. 로그인 상태를 확인하세요.");
             setIsLoading(false);
-            // navigate('/login');
+            navigate('/login');
             return;
           }
 
@@ -166,7 +163,7 @@ const SelectPlace = () => {
           <div className='album'>
             <Header/>
               <div className="album-container">
-                <h1>여행 정보를 불러오는 중...</h1>
+                <div className="ment">여행 정보를 불러오는 중...</div>
               </div>
             <Navbar/>
           </div>

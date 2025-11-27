@@ -19,13 +19,10 @@ const Album = () => {
     : '/api';
   const [isLoading, setIsLoading] = useState(true); 
   const todayDate = new Date();
-  todayDate.setHours(0, 0, 0, 0); // 로컬 시간대의 오늘 자정
+  // todayDate.setHours(0, 0, 0, 0); // 로컬 시간대의 오늘 자정
   
   const navigate = useNavigate();
   const { token, activeTripId, setActiveTripId } = useAuth();
-
-  // const API_BASE = 'https://tripshot.duckdns.org';
-  // const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDA4NDk1NSwiZXhwIjoxNzY0MDg4NTU1fQ.Az8aDvqOtN7r4ynhDhCc8sf8lNx6nCop1AjeLKoasLuQjAa_l2GgU2o9VCrGinFPBGuwja_xKzWsklbN4ABYlQ';
 
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
@@ -131,11 +128,11 @@ const Album = () => {
         fetchedTrips.forEach(item => {
           const trip = item.trip;
           const contents = item.contents;
-          const startDateObj = new Date(trip.startDate);
-          startDateObj.setHours(0, 0, 0, 0);
+          // const startDateObj = new Date(trip.startDate);
+          // startDateObj.setHours(0, 0, 0, 0);
           
-          const endDateObj = new Date(trip.endDate);
-          endDateObj.setHours(0, 0, 0, 0); // (매우 중요) 종료일도 자정으로 통일
+          // const endDateObj = new Date(trip.endDate);
+          // endDateObj.setHours(0, 0, 0, 0); // (매우 중요) 종료일도 자정으로 통일
           
           const tripData = {
             id: trip.id,
@@ -154,9 +151,9 @@ const Album = () => {
             coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
           };
 
-          if (startDateObj > todayDate) {
+          if (trip.startDate > todayDate) {
             plannedTrip.push(tripData);
-          } else if (endDateObj >= todayDate){
+          } else if (trip.endDateDate >= todayDate){
             activeTrips.push(tripData);
           } else{
             completedList.push(tripData);
@@ -312,6 +309,7 @@ return(
                 </div>
             </div> 
             }
+            <h4>*날짜 정보는 UTC를 기준으로 계산됩니다.</h4>
         </div>
 
         {/* --- 예정된 여행 섹션 --- */}
