@@ -1,65 +1,15 @@
 
-.live-card{ 
-  background:#DCF7CF; 
-  border-radius:1.6rem; 
-  padding:2.5rem 1.4rem; 
-  margin:0 0 1.6rem; 
-}
-.live-head{ 
-  display:flex; 
-  align-items:flex-start; 
-  justify-content:space-between; 
-  gap:1rem; margin-bottom:0.8rem; 
-}
-.live-title{ 
-  margin:0; 
-  font-size:1.4rem; 
-  font-weight:700; 
-}
-.live-sub{ 
-  margin:.2rem 0 0; 
-  font-size:1.2rem; 
-  color:#6B6B6B; 
-}
-.live-badge{ 
-  font-size:1.1rem; 
-  font-weight:700; 
-  color:#111; 
-}
-.live-cta{
-  width:100%; 
-  height:4.4rem; 
-  border:0; 
-  border-radius:1.2rem;
-  background:#fff; 
-  display:flex; 
-  align-items:center; 
-  justify-content:center; 
-  gap:.8rem;
-  font-size:1.4rem; 
-  font-weight:700; 
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
-}
-.rec-dot{ 
-  width:1.2rem; 
-  height:1.2rem; 
-  border-radius:50%; 
-  background:#ff3b30;
-  box-shadow:0 0 0 3px #fff, 0 0 0 6px rgba(255,59,48,.18);
-}
-
-
 .taball {
   width: 100%;
-  min-height: 100vh;
-  padding-top: 20px; /* 상단 여백 추가 */
-  background-color: #f6f6f5; /* Image 1의 밝은 배경색 */
+  min-height: 100%; 
+  background-color: #f6f6f5;
+  overflow-x: hidden;
 }
 
 .feed-list {
   display: flex;
   flex-direction: column;
-  padding: 20px 0; /* 상하 패딩 추가 */
+  padding: 0 0 20px 0; 
 }
 
 .feed-skeleton, .feed-error {
@@ -133,4 +83,29 @@
 .post-caption .text{ 
   font-size:1.35rem; 
   color:#2b2b2b; 
+}
+.no-posts-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  padding-top: 6rem; 
+  padding-bottom: 4rem;
+  
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #525B65; 
+  margin: 0 0 0.6rem 0; 
+}
+
+.empty-subtitle {
+  font-size: 1.4rem;
+  color: #9CA3AF;
+  font-weight: 400;
+  margin: 0;
 }

@@ -24,10 +24,10 @@ const SelectPic = () => {
     const selectedPicNum = location.state?.selectedPicNum;
     const selectedFrameUrl = location.state?.selectedFrameUrl;
     const selectedFrameId = location.state?.selectedFrameId;
-    const picList = location.state?.picList || [];
 
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedTripTitle, setSelectedTripTitle] = useState('클릭하여 여행 선택');
+    const [currentTripId, setCurrentTripId] = useState();
     const [currentPicList, setCurrentPicList] = useState([]);
     const initialTripId = location.state?.tripId || null;
 
@@ -44,7 +44,7 @@ const SelectPic = () => {
       if (!token) {
         console.error("인증 토큰(accessToken)이 로컬 스토리지에 없습니다. 로그인 상태를 확인하세요.");
         setIsLoading(false);
-        // navigate('/login');
+        navigate('/login');
         return;
       }
 
@@ -77,7 +77,7 @@ const SelectPic = () => {
           const tripData = {
             id: trip.id,
             title: trip.title,
-            image: contents.photos.map(p => p.media.url),
+            image: contents.photos.map( p => p.media.url ),
             endDate: trip.endDate,
           };
 
@@ -88,7 +88,6 @@ const SelectPic = () => {
 
         setCompletedTrips(completedList);
 
-        // **초기 사진 목록 설정 로직**
         let initialTrip;
 
         if (initialTripId) {
@@ -102,6 +101,7 @@ const SelectPic = () => {
         if (initialTrip) {
             setSelectedTripTitle(initialTrip.title);
             setCurrentPicList(initialTrip.image);
+            setCurrentTripId(initialTrip.id);
         }
 
       } catch (error) {
@@ -126,6 +126,7 @@ const SelectPic = () => {
           // 선택 추가: 4장 미만일 때만 추가
           if (selectedPics.length < selectedPicNum) {
               setSelectedPics(prev => [...prev, picUrl]);
+              console.log(currentPicList);
           } else {
               alert(`최대 ${selectedPicNum}장까지만 선택할 수 있습니다!`);
           }
@@ -136,6 +137,7 @@ const SelectPic = () => {
     const handleTripSelect = (trip) => {
       setSelectedTripTitle(trip.title);
       setCurrentPicList(trip.image);
+      setCurrentTripId(trip.id);
       setSelectedPics([]); // 여행이 바뀌면 선택된 사진 초기화
       setShowDropdown(false);
   }
@@ -185,7 +187,8 @@ const SelectPic = () => {
                           selectedPics: selectedPics,
                           selectedFrameId: selectedFrameId || 1, 
                           selectedPicNum: selectedPicNum || 4, // 프레임 ID가 없을 경우 임시 값 사용
-                          selectedFrameUrl: selectedFrameUrl || '/frame1.PNG' // 프레임 URL이 없을 경우 임시 값 사용
+                          selectedFrameUrl: selectedFrameUrl || '/frame1.PNG', // 프레임 URL이 없을 경우 임시 값 사용,
+                          tripId: currentTripId
                         } 
                       });
                     }
@@ -198,7 +201,7 @@ const SelectPic = () => {
 
               <div className='photo-grid'>
                 {currentPicList.map((media, index) => {
-                  const picUrl = media.url;
+                  const picUrl = media;
                   const isSelected = selectedPics.includes(picUrl);
                   return (
                     <div 

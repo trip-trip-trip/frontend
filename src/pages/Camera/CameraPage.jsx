@@ -8,8 +8,8 @@ import {useAuth} from'../../contexts/AuthContext';
 
 
 // 1. 사용할 모든 '재료' 임포트
-import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레임
-import textureAsset from '../../assets/filmeffect.png'; // 님의 고정 텍스처
+import frameAsset from '../../assets/cameralens22.png'; 
+import textureAsset from '../../assets/filmeffect.png'; 
 import switchmode from '../../assets/switchcam.png';
 
 import backIcon from'../../assets/back.png';
@@ -22,79 +22,79 @@ import switchModeIcon from '../../assets/switch.png';
 // (프레임: null = 없음, 텍스처: null = 없음, cssFilter: 'none' = 없음)
 const FILTERS = [
   { 
-    name: '코닥 (풀)', 
+    name: 'KodakFrame', 
     frame: frameAsset,    // 프레임 O
     texture: textureAsset,  // 텍스처 O
-    cssFilter: 'sepia(15%) contrast(85%) brightness(100%) saturate(80%)' // CSS 색감 O
+    cssFilter: 'sepia(15%) contrast(75%) brightness(100%) saturate(80%)' // CSS 색감 O
   },
    { 
-    name: '코닥2 (풀)', 
+    name: 'KodakFrame dark', 
     frame: frameAsset,    // 프레임 O
     texture: textureAsset,  // 텍스처 O
     cssFilter: 'sepia(15%) contrast(105%) brightness(100%) saturate(90%)' // CSS 색감 O
   },
   { 
-    name: '프레임만', 
+    name: 'VintageCam', 
     frame: frameAsset,    // 프레임 O
     texture: null,          // 텍스처 X
-    cssFilter: 'sepia(20%) contrast(80%) brightness(85%) saturate(110%)' // CSS 색감 O
+    cssFilter: 'sepia(30%) contrast(80%) brightness(85%) saturate(110%)' // CSS 색감 O
   },
    { 
-    name: '프레임만2', 
+    name: 'NaturalCam', 
     frame: frameAsset,    // 프레임 O
     texture: null,          // 텍스처 X
     cssFilter: 'sepia(0%) contrast(105%) brightness(100%) saturate(80%)' // CSS 색감 O
   },
   { 
-    name: '프레임만3', 
+    name: 'Fade', 
     frame: frameAsset,    // 프레임 O
     texture: null,          // 텍스처 X
     cssFilter: 'sepia(20%) contrast(85%) brightness(85%) saturate(110%)' // CSS 색감 O
   },
    { 
-    name: '프레임만4', 
+    name: 'Midnight', 
     frame: frameAsset,    // 프레임 O
     texture: null,          // 텍스처 X
     cssFilter: 'sepia(20%) contrast(75%) brightness(105%) saturate(130%)' // CSS 색감 O
   },
   { 
-    name: '텍스처 + 색감', 
+    name: 'Retro', 
     frame: null,            // 프레임 X
     texture: textureAsset,  // 텍스처 O
     cssFilter: 'sepia(10%) contrast(80%) brightness(105%) saturate(110%)' // CSS 색감 O
   },
    { 
-    name: '텍스처 + 색감2', 
+    name: 'Sepia', 
     frame: null,            // 프레임 X
     texture: textureAsset,  // 텍스처 O
     cssFilter: 'sepia(20%) contrast(90%) brightness(115%) saturate(85%)' // CSS 색감 O
   },
   { 
-    name: '텍스처 + 색감3', 
+    name: 'Retrica', 
     frame: null,            // 프레임 X
     texture: textureAsset,  // 텍스처 O
     cssFilter: 'sepia(0%) contrast(70%) brightness(95%) saturate(75%)' // CSS 색감 O
   },
   { 
-    name: '흑백 (프레임 없음)', 
+    name: 'Gritty', 
     frame: null,            // 프레임 X
     texture: null,  // 텍스처 O
     cssFilter: 'grayscale(50%) contrast(100%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
   },
    { 
-    name: 'ㅈㄴ흑백 (프레임 없음)', 
+    name: 'Graphite', 
     frame: null,            // 프레임 X
     texture: null,  // 텍스처 O
     cssFilter: 'grayscale(90%) contrast(100%) brightness(100%)' // CSS 색감 O (텍스처는 흑백으로)
   },
   { 
-    name: '기본', 
+    name: 'Mood', 
     frame: null,            // 프레임 X
     texture: null,          // 텍스처 X
     cssFilter:'sepia(10%) contrast(100%) brightness(105%) saturate(80%)'      // CSS 색감 X
   },
   { 
-    name: '기본2', 
+    name: 'Reminiscent', 
     frame: null,            // 프레임 X
     texture: null,          // 텍스처 X
     cssFilter:'sepia(10%) contrast(85%) brightness(120%) saturate(100%)'      // CSS 색감 X
@@ -131,11 +131,13 @@ const CameraPage = () => {
 
   // 4. 스와이프 및 필터 인덱스 state
   const [currentFilterIndex, setCurrentFilterIndex] = useState(0);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   
   const nextFilter = () => setCurrentFilterIndex((prev) => (prev + 1) % FILTERS.length);
   const prevFilter = () => setCurrentFilterIndex((prev) => (prev - 1 + FILTERS.length) % FILTERS.length);
+const selectFilter = (index) => setCurrentFilterIndex(index);
 
   // 5. 스와이프 이벤트 핸들러
   const handleTouchStart = (e) => {
@@ -217,7 +219,7 @@ const CameraPage = () => {
             textureImg.crossOrigin = "anonymous";
             textureImg.src = filmTextureSrc;
             textureImg.onload = () => {
-              ctx.globalAlpha = 0.7;
+              ctx.globalAlpha = 0.2;
               ctx.globalCompositeOperation = 'overlay';
 
               const ratio = textureImg.width / textureImg.height;
@@ -332,10 +334,10 @@ const CameraPage = () => {
           setIsRecording(false); setCountdown(0);
         };
         mediaRecorderRef.current.start();
-        const newCount = shotCount + 1;
-        setShotCount(newCount);
-        localStorage.setItem(storageKey, newCount.toString());
-        console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (영상)`);
+        //const newCount = shotCount + 1;
+        //setShotCount(newCount);
+        //localStorage.setItem(storageKey, newCount.toString());
+        console.log(`영상 촬영 시작`);
         setTimeout(() => {
           if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
@@ -347,6 +349,11 @@ const CameraPage = () => {
         setIsRecording(false); setCountdown(0);
       }
     } else if (mode === 'film') { 
+      const currentCount = Number(localStorage.getItem(storageKey) || shotCount);
+      if (currentCount >= MAX_TOTAL_SHOTS) {
+        alert(`최대 촬영 횟수(${MAX_TOTAL_SHOTS})를 모두 사용했습니다!`);
+        return;
+      }
       const imageSrc = webcamRef.current.getScreenshot();
       if (!imageSrc) {
         alert('카메라가 준비되지 않았습니다.');

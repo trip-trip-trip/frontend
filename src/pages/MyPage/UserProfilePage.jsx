@@ -51,17 +51,20 @@ useEffect(() => {
       const data = await res.json();
 
       if (data.isSuccess) {
-        console.log("✅ 프로필 정보:", data.result); // 디버깅용
-        setUserInfo(data.result);
+        console.log(" 프로필 정보:", data.result); // 디버깅용
+        const profile = data.result;
+        setUserInfo(profile);
+        setCounts({
+        post: profile.postCount ?? 0,
+        trip: profile.tripCount ?? 0,
+        friend: profile.friendCount ?? 0
+      });
         // 친구 여부 및 본인 여부 확인
-        const checkFriend = Boolean(data.result.friend || data.result.isFriend);
-        const checkMe = Boolean(data.result.me || data.result.isMe);
-
-        // [핵심 수정] 친구거나 나일 때만 통계/게시물 데이터를 가져옴
-        // -> 친구가 아니면 API를 안 부르므로 '내 정보'가 뜰 일이 없음 (0으로 유지됨)
-        if (checkFriend || checkMe) {
-           fetchStatsAndPosts();
-        }
+        
+        // 친구거나 나일 때만 통계/게시물 데이터를 가져옴
+        if (profile.isMe || profile.isFriend) {
+        fetchPosts();
+      }
       }
     } catch (err) {
       console.error(err);
@@ -69,53 +72,65 @@ useEffect(() => {
       setLoading(false);
     }
   };
-const fetchStatsAndPosts = async () => {
-    try {
-        // (1) [Post] 게시물 목록 및 개수
-        // API: /posts?user_id={userId}&feed_type=profile
-        const postsRes = await fetch(`${API_BASE}/posts?user_id=${userId}&feed_type=profile`, {
-            headers: getHeaders(),
-        });
-        if (postsRes.ok) {
-            const data = await postsRes.json();
-            if (data.isSuccess) {
-                const posts = data.result.posts || [];
-                setUserPosts(posts); // 앨범 그리드용 리스트 저장
-                setCounts(prev => ({ ...prev, post: posts.length })); // 개수 저장
-            }
-        }
+// const fetchStatsAndPosts = async () => {
+//     try {
+//         // (1) [Post] 게시물 목록 및 개수
+//         // API: /posts?user_id={userId}&feed_type=profile
+//         const postsRes = await fetch(`${API_BASE}/posts?user_id=${userId}&feed_type=profile`, {
+//             headers: getHeaders(),
+//         });
+//         if (postsRes.ok) {
+//             const data = await postsRes.json();
+//             if (data.isSuccess) {
+//                 const posts = data.result.posts || [];
+//                 setUserPosts(posts); // 앨범 그리드용 리스트 저장
+//                 setCounts(prev => ({ ...prev, post: posts.length })); // 개수 저장
+//             }
+//         }
 
-        // (2) [Trip] 여행 목록 및 개수
-        // API: /trips?user_id={userId}
-        const tripRes = await fetch(`${API_BASE}/trips?user_id=${userId}&feed_type=profile`, {
-            headers: getHeaders(),
-        });
-        if (tripRes.ok) {
-            const tripData = await tripRes.json();
-            if (tripData.isSuccess) {
-                const trips = tripData.result || [];
-                setCounts(prev => ({ ...prev, trip: trips.length })); // 개수 저장
-            }
-        }
+//         // (2) [Trip] 여행 목록 및 개수
+//         // API: /trips?user_id={userId}
+//         const tripRes = await fetch(`${API_BASE}/trips?user_id=${userId}`, {
+//             headers: getHeaders(),
+//         });
+//         if (tripRes.ok) {
+//             const tripData = await tripRes.json();
+//             if (tripData.isSuccess) {
+//                 const trips = tripData.result || [];
+//                 setCounts(prev => ({ ...prev, trip: trips.length })); // 개수 저장
+//             }
+//         }
 
-        // (3) [Friend] 친구 목록 및 개수
-        // API: /users/friendships?user_id={userId}
-        const friendRes = await fetch(`${API_BASE}/users/friendships?user_id=${userId}&feed_type=profile`, { 
-            headers: getHeaders(),
-        });
-        if (friendRes.ok) {
-            const friendData = await friendRes.json();
-            if (friendData.isSuccess) {
-                const friends = friendData.result || [];
-                setCounts(prev => ({ ...prev, friend: friends.length })); // 개수 저장
-            }
-        }
+//         // (3) [Friend] 친구 목록 및 개수
+//         // API: /users/friendships?user_id={userId}
+//         const friendRes = await fetch(`${API_BASE}/users/friendships?user_id=${userId}`, { 
+//             headers: getHeaders(),
+//         });
+//         if (friendRes.ok) {
+//             const friendData = await friendRes.json();
+//             if (friendData.isSuccess) {
+//                 const friends = friendData.result || [];
+//                 setCounts(prev => ({ ...prev, friend: friends.length })); // 개수 저장
+//             }
+//         }
 
-    } catch (err) {
-        console.error("통계 데이터 로드 실패:", err);
-    }
-  };
-  const sendRequest = async () => {
+//     } catch (err) {
+//         console.error("통계 데이터 로드 실패:", err);
+//     }
+//   };
+  const fetchPosts = async () => {
+  const res = await fetch(`${API_BASE}/posts?user_id=${userId}&feed_type=profile`, {
+    headers: getHeaders(),
+  });
+
+  const data = await res.json();
+  if (data.isSuccess) {
+    setUserPosts(data.result.posts || []);
+  }
+};
+
+
+const sendRequest = async () => {
     try {
       const res = await fetch(`${API_BASE}/friendships/requests`, {
         method: 'POST',
@@ -170,7 +185,7 @@ const fetchStatsAndPosts = async () => {
            <img 
              src={userInfo.avatarUrl || defaultProfile} 
              alt="프로필" 
-             className="profile-img"
+             className="profile-img-my"
              onError={(e) => {e.target.src = defaultProfile;}}
            />
         </div>
@@ -230,21 +245,46 @@ const fetchStatsAndPosts = async () => {
             <div className="album-item add" onClick={() => navigate("/post_select")}>+</div>
           )}
           
-          {visiblePosts.length > 0 ? (
-            visiblePosts.map((post) => {
-              const thumbUrl = post.media?.[0]?.thumbnailUrl || post.media?.[0]?.url || post.media?.[0]?.thumbnail_url;
-              return (
-                <div
-                  key={post.id}
-                  className="album-item"
-                  style={thumbUrl ? { backgroundImage: `url(${thumbUrl})` } : { backgroundColor: '#ccc' }}
-                  onClick={() => navigate(`/post/${post.id}`)} 
-                />
-              );
-            })
-          ) : (
-            !isMe && <div className="empty-feed-msg">게시물이 없습니다.</div>
-          )}
+         {visiblePosts.length > 0
+            ? visiblePosts.map((post) => {
+                const mediaList = post.media || [];
+                const cover = mediaList[0];
+
+                if (!cover) return null;
+
+                const isVideo = cover.mediaKind === "VIDEO";
+                const imageSrc =
+                  cover.thumbnailUrl || cover.url || cover.thumbnail_url;
+
+                return (
+                  <div
+                    key={post.id}
+                    className="album-item"
+                    onClick={() => navigate(`/post/${post.id}`)}
+                  >
+                    {isVideo ? (
+                      <video
+                        className="album-media"
+                        src={cover.url}
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : (
+                      <img
+                        className="album-media"
+                        src={imageSrc}
+                        alt={post.caption}
+                        onError={(e) => {
+                          e.target.style.backgroundColor = "#ccc";
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })
+            : !isMe && <div className="empty-feed-msg">게시물이 없습니다.</div>}
         </div>
       )}
     </div>

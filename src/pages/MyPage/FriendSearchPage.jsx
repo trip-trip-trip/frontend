@@ -98,16 +98,24 @@ const [sentRequests, setSentRequests] = useState([]);
       const res = await fetch(`${API_BASE}/users/friendships/search?keyword=${encodeURIComponent(val)}`, {
         headers: getHeaders(),
       });
+
       const data = await res.json();
-      if (data.isSuccess) {
-        setSearchResults(data.result || []);
-      } else {
+      if (data.isSuccess){
+        let foundUsers = data.result || [];
+        const myFriendIds = friends.map(f => f.id); 
+        foundUsers = foundUsers.map(user => ({
+          ...user,
+          friend: user.friend || myFriendIds.includes(user.id)
+        }));
+        setSearchResults(foundUsers);
+      } else{
         setSearchResults([]);
       }
-    } catch (err) {
+    }catch (err) {
       console.error("검색 에러:", err);
     }
   };
+  
 
   // 3. 친구 요청 보내기 (+)
   const sendRequest = async (targetId) => {
@@ -205,10 +213,13 @@ const [sentRequests, setSentRequests] = useState([]);
 
       <div className="friend-content">
         
+    <div className="section-header"> 
             <div className="section-title-group">
-             <img src={addUserIconSection} className="section-icon" alt="icon" />
+              <img src={addUserIconSection} className="section-icon" alt="icon" />
               <span className="section-title">친구 추가하기</span>
             </div>
+          
+        </div>
           
  <div className="add-friend-section">
   {/* 검색창 */}
@@ -259,7 +270,7 @@ const [sentRequests, setSentRequests] = useState([]);
               {u.id === user?.id ? (
                 <span className="status-badge">나</span>
               ) : u.friend ? (
-                <span className="status-badge">이미 친구</span>
+                null
               ) : u.pendingReceived ? (
                 <span className="status-badge">요청 받음</span>
               ) : isSent ? (
@@ -291,7 +302,7 @@ const [sentRequests, setSentRequests] = useState([]);
             </div>
             <img 
              src={isListOpen ? toggleUp : toggleDown} 
-              className="toggle-icon"
+              className="toggle-icon-up"
               alt="toggle" 
             />
           </div>

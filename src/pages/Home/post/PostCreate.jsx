@@ -1,404 +1,347 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Post.css';
 import Header from '../../../components/Header/Header';
+import './PostCreate.css'; 
+import { useAuth } from '../../../contexts/AuthContext';
+import Navbar from '../../../components/NavBar/NavBar';
+import default_pic from "../../../assets/default-profile.png";
 
-// const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-const MAPS_KEY = 'AIzaSyBxUpz_y5O2nOTivngRz6fVvYHtG91i75M'
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
-
-// --- 데모 데이터 (API 실패 시 사용) ---
-const MOCK_TRIP_LIST = [
-  { id: 10, title: "2025 도쿄여행 🗼" },
-  { id: 20, title: "부산맛집탐방 🍜" },
-  { id: 21, title: "친구들과 졸업여행! 🎓" }
-];
-
-const MOCK_MEDIA_DATA = {
-  10: {
-    contents: {
-      photos: [
-        { media: { mediaAssetId: 101, contentType: 'MEDIA', url: 'https://placehold.co/400x400/e9c46a/264653?text=Tokyo1' } },
-        { media: { mediaAssetId: 102, contentType: 'MEDIA', url: 'https://placehold.co/400x400/f4a261/264653?text=Tokyo2' } },
-        { media: { mediaAssetId: 103, contentType: 'MEDIA', url: 'https://placehold.co/400x400/e76f51/264653?text=Tokyo3' } }
-      ],
-      scrapbooks: [
-        { media: { mediaAssetId: 104, contentType: 'MEDIA', url: 'https://placehold.co/400x400/2a9d8f/ffffff?text=Scrapbook' } }
-      ],
-      reelItems: []
-    }
-  },
-  20: {
-    contents: {
-      photos: [
-        { media: { mediaAssetId: 201, contentType: 'MEDIA', url: 'https://placehold.co/400x400/ade8f4/000000?text=Busan1' } },
-        { media: { mediaAssetId: 202, contentType: 'MEDIA', url: 'https://placehold.co/400x400/90e0ef/000000?text=Busan2' } }
-      ],
-      scrapbooks: [],
-      reelItems: [
-        { media: { mediaAssetId: 203, contentType: 'MEDIA', url: 'https://placehold.co/400x400/0077b6/ffffff?text=Reel1' } },
-        { media: { mediaAssetId: 204, contentType: 'MEDIA', url: 'https://placehold.co/400x400/00b4d8/ffffff?text=Reel2' } }
-      ]
-    }
-  },
-  21: {
-    contents: {
-      photos: [
-        { media: { mediaAssetId: 301, contentType: 'MEDIA', url: 'https://placehold.co/400x400/ffd6ff/000000?text=Graduation' } }
-      ],
-      scrapbooks: [],
-      reelItems: []
-    }
-  }
-};
-
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
+  
 export default function PostCreate() {
-  const nav = useNavigate();
+  const navigate = useNavigate();
+  const { token } = useAuth(); 
 
-  const [locationText, setLocationText] = useState('');
+  // --- 상태 관리 ---
+  const [step, setStep] = useState(1); // 1: 여행선택, 2: 미디어선택, 3: 글작성
+  
+  const [myTripsData, setMyTripsData] = useState([]); 
+  const [selectedTripData, setSelectedTripData] = useState(null); 
+  const [selectedMedia, setSelectedMedia] = useState([]); 
+  const [filterType, setFilterType] = useState('ALL'); 
   const [content, setContent] = useState('');
-  const [privacy, setPrivacy] = useState('FRIENDS');
-  const [loading, setLoading] = useState(false); // 미디어 로딩 + 공유 버튼 로딩
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [myTrips, setMyTrips] = useState([]); //내 여행 목록
-  const [placeList, setPlaceList] = useState([]);
-  
-  const [selectedTripId, setSelectedTripId] = useState(null);
-  const [tripContents, setTripContents] = useState(null);
-  const [selectedMedia, setSelectedMedia] = useState([]);
-  const [selectedCoords, setSelectedCoords] = useState({ lat: null, lng: null });
-  
-  // 실제 API 로직을 위한 여행 목록 로딩 상태
-  const [isLoadingTrips, setIsLoadingTrips] = useState(false);
-
-  //  여행 목록 불러오기 + 여행지 장소
+  // 여행 목록 불러오기
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
-    const fetchPlaces = async()=>{
-      try{
-        const res = await fetch(`${API_BASE}/trips/places`,{
-          headers: { Authorization: `Bearer ${token}`},
-
-        });
-        const data = await res.json();
-        if(data.isSuccess){
-          setPlaceList(data.result.contents || data.result || []);
-        }
-      }catch(e){
-        console.error("여행지 목록 로드 실패: ", e);
-      }
-    };
     const fetchMyTrips = async () => {
-      setIsLoadingTrips(true);
-      // const token = localStorage.getItem('jwtToken');
+      // if (!token) return;
       try {
-        const res = await fetch(`${API_BASE}/trips`, {
+        const res = await fetch(`${API_BASE}/trips?completedOnly=true`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
+        
         if (data.isSuccess) {
-          const extractedTrips = data.result.map(tripPackage => ({
-            id: tripPackage.trip.id,
-            title: tripPackage.trip.title,
-            placeId: tripPackage.trip.placeId
-          }));
-          setMyTrips(extractedTrips || []);
-        } else {
-          throw new Error(data.message || '여행 목록 로드 실패');
+          setMyTripsData(data.result || []);
         }
       } catch (e) {
-        console.error('여행 목록 로드 실패, 데모 데이터를 사용합니다:', e);
-        // API 실패 시에만 데모 데이터 사용
-        // setMyTrips(MOCK_TRIP_LIST);
-      } finally {
-        setIsLoadingTrips(false);
+        console.error("여행 목록 로드 실패", e);
       }
     };
-    fetchPlaces();
     fetchMyTrips();
+  }, [token]);
 
-  }, []);
-   
-  // 위치 텍스트 자동 채우기
-  const handleTripChange = (e) => {
-    const newTripId = Number(e.target.value);
-    setSelectedTripId(newTripId || null);
-
-    if (newTripId) {
-      // 선택한 여행 찾기
-      const selectedTrip = myTrips.find(t => t.id === newTripId);
-      
-      if (selectedTrip && selectedTrip.placeId) {
-        // API 응답에 맞춰 p.placeId가 아니라 p.id로 찾아야 함
-        const matchedPlace = placeList.find(p => p.id === selectedTrip.placeId);
-        
-        // 찾았으면 위치 입력창에 자동 입력
-        if (matchedPlace) {
-          setLocationText(matchedPlace.name || matchedPlace.placeName || '');         //좌표도 미리 state에 저장해두기! (구글 API 안 써도 됨)
-          setSelectedCoords({
-              lat: matchedPlace.lat,
-              lng: matchedPlace.lng
-          });
-        }
-      }
-    } else {
-      setLocationText('');
-      setSelectedCoords({ lat: null, lng: null }); // 선택 해제 시 좌표 초기화
-    }
+  // --- [Step 1 -> 2] 여행 선택 핸들러 ---
+  const handleSelectTrip = (tripItem) => {
+    setSelectedTripData(tripItem);
+    setSelectedMedia([]); 
+    setStep(2);
   };
+  
+  // --- [Step 2] 미디어 필터링 및 평탄화 ---
+  const filteredMedia = useMemo(() => {
+    if (!selectedTripData || !selectedTripData.contents) return [];
+    
+    const { contents } = selectedTripData;
+    let list = [];
 
-  // 선택된 여행의 미디어 불러오기
-  useEffect(() => {
-    if (!selectedTripId) {
-      setTripContents(null);
-      setSelectedMedia([]);
-      return;
+    if (contents.photos) {
+        list = [...list, ...contents.photos.map(item => ({ ...item.media, type: 'PHOTO' }))];
     }
-
-    const fetchTripMedia = async () => {
-      setLoading(true);
-      const token = localStorage.getItem('jwtToken');
-      try {
-        const res = await fetch(`${API_BASE}/trips/${selectedTripId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+    if (contents.reelItems) {
+        list = [...list, ...contents.reelItems.map(item => ({ ...item.media, type: 'VIDEO' }))];
+    }
+    ///////
+    if (contents.reel && contents.reel.media) {
+        list.push({
+            ...contents.reel.media, 
+            type: 'VIDEO' 
         });
-        const data = await res.json();
-        
-        if (data.isSuccess) {
-          setTripContents(data.result.contents);
-        } else {
-          throw new Error(data.message || '미디어 로드 실패');
-        }
-      } catch (e) {
-        console.error('Trip 미디어 로드 실패, 데모 데이터를 확인합니다:', e);
-        // API 실패 시에만 데모 데이터 사용
-        const mockData = MOCK_MEDIA_DATA[selectedTripId];
-        if (mockData) {
-            setTripContents(mockData.contents);
-        } else {
-            setTripContents(null);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+    } else if (contents.reel && !contents.reel.media && contents.reel.url) {
+        //구조가 다를 경우 대비 
+        list.push({
+            ...contents.reel,
+            type: 'VIDEO'
+        });
+    }
+    ////////
+    if (contents.scrapbooks) {
+        list = [...list, ...contents.scrapbooks.map(item => ({ ...item.media, type: 'SCRAPBOOK' }))];
+    }
 
-    fetchTripMedia();
-  }, [selectedTripId]);
+    if (filterType === 'ALL') return list;
+    return list.filter(m => m.type === filterType);
+  }, [selectedTripData, filterType]);
 
-
-  const allMedia = useMemo(() => {
-    if (!tripContents) return [];
-    
-    const photos = tripContents.photos ? tripContents.photos.map(p => p.media) : [];
-    const scrapbooks = tripContents.scrapbooks ? tripContents.scrapbooks.map(s => s.media) : [];
-    const reelItems = tripContents.reelItems ? tripContents.reelItems.map(r => r.media) : [];
-    
-    const mediaMap = new Map();
-    [...photos, ...scrapbooks, ...reelItems].forEach(media => {
-      if (media && media.mediaAssetId) {
-        mediaMap.set(media.mediaAssetId, media);
-      }
-    });
-    
-    return Array.from(mediaMap.values());
-  }, [tripContents]);
-
-  const toggleMediaSelection = (media) => {
-    setSelectedMedia((prev) => {
-      const isSelected = prev.find(m => m.mediaAssetId === media.mediaAssetId);
-      if (isSelected) {
+  // 미디어 선택 토글
+  const toggleMedia = (media) => {
+    setSelectedMedia(prev => {
+      const exists = prev.find(m => m.mediaAssetId === media.mediaAssetId);
+      if (exists) {
         return prev.filter(m => m.mediaAssetId !== media.mediaAssetId);
-      } else {
-        return [...prev, media];
       }
+      return [...prev, media];
     });
   };
-  
-  
-  const canShare = useMemo(() => {
-    return selectedMedia.length > 0 && !!selectedTripId && !loading;
-  }, [selectedMedia, selectedTripId, loading]);
 
-  async function geocodeAddress(address) {
-    if (!address || !MAPS_KEY) {
-      console.warn("Geocoding: 주소가 없거나 Maps API 키가 없습니다.");
-      return { lat: null, lng: null };
-    }
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${MAPS_KEY}`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.status === 'OK') {
-        const loc = data.results[0].geometry.location;
-        return { lat: loc.lat, lng: loc.lng };
-      }
-    } catch (e) {
-      console.error('Geocoding 실패:', e);
-    }
-    return { lat: null, lng: null };
-  }
-
-  const share = async () => {
-    if (!canShare) return;
+  // --- [Step 3] 최종 업로드 ---
+  const handleUpload = async () => {
+    if (!content.trim()) return alert("코멘트를 작성해주세요.");
+    if (!selectedTripData) return;
 
     setLoading(true);
 
     try {
-      // 실제 Geocoding 호출
-      // 1순위: 여행 선택해서 이미 확보된 좌표 사용 (가장 정확 & 빠름)
-      // 2순위: 사용자가 위치를 손으로 수정했을 경우 등을 대비해, 좌표가 없으면 그때만 구글링(Geocoding)
-      
-      let finalLat = selectedCoords.lat;
-      let finalLng = selectedCoords.lng;
-
-      // 만약 여행 선택 안 하고 손으로 위치만 적었거나, 좌표가 없는 경우에만 구글 API 호출
-      if ((!finalLat || !finalLng) && locationText) {
-         console.log("좌표가 없어서 구글 API를 호출합니다...");
-         const r = await geocodeAddress(locationText);
-         finalLat = r.lat;
-         finalLng = r.lng;
-      }
-
-      // let lat = null;
-      // let lng = null;
-      // if (locationText) {
-      //   const r = await geocodeAddress(locationText);
-      //   lat = r.lat;
-      //   lng = r.lng;
-      // }
-      
-      // const visibilityMap = {
-      //   friends: 'friends',
-      //   private: 'private',
-      // };
-      
       const payload = {
-        tripId: selectedTripId,
-        visibility: privacy, // 대문자 값 그대로 사용
-        caption: content,    // title 제거하고 content만 사용
-        location_text: locationText,
-        lat: finalLat,
-        lng: finalLng,
-        media: selectedMedia.map((media) => {
-            let serverType = media.contentType;
-            if (serverType === 'PHOTO') {
-                serverType = 'MEDIA';
-            } else if (serverType === 'VIDEO') {
-                serverType = 'MEDIA';
-            }
-            return {
-                media_id: media.mediaAssetId,
-                object_type: serverType,
-            };
+        tripId: selectedTripData.trip.id,
+        visibility: isPrivate ? 'PRIVATE' : 'FRIENDS',
+        caption: content,
+        location_text: selectedTripData.trip.placeName || "",
+        lat: selectedTripData.trip.lat || null,
+        lng: selectedTripData.trip.lng || null,
+        media: selectedMedia.map(m => {
+          let objectType = 'MEDIA'; 
+
+          if (m.type === 'VIDEO') objectType = 'SHORT_REEL';
+          else if (m.type === 'SCRAPBOOK') objectType = 'SCRAPBOOK';
+
+          return {
+             media_id: m.mediaAssetId,
+             object_type: objectType 
+          }
         })
       };
-      
-      console.log("--- 업로드 페이로드 ---", payload);
-      
-      // 실제 POST /posts API 호출
+
       const res = await fetch(`${API_BASE}/posts`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
       
       const data = await res.json();
-      
-      if (!res.ok || !data.isSuccess) {
-        alert(data.message || '게시물 업로드 실패');
-        return;
+      if (data.isSuccess) {
+        alert("게시물이 등록되었습니다!");
+        navigate('/home', { replace: true });
+      } else {
+        alert(data.message || "업로드 실패");
       }
-      
-      alert('게시물 업로드 성공!');
-      nav('/home', { replace: true });
-
     } catch (e) {
-      console.error('업로드 오류:', e);
-      alert('업로드 중 오류 발생');
+      console.error(e);
+      alert("오류 발생");
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
+  };
+
+  // 헤더 타이틀 & 뒤로가기
+  const getTitle = () => {
+    if(step === 1) return "여행 선택";
+    if(step === 2) return "미디어 선택";
+    return "게시물 작성";
+  };
+
+  const handleBackClick = () => {
+      if (step > 1) {
+          setStep(step - 1); 
+      } else {
+          navigate(-1); 
+      }
   };
 
   return (
-    <>
-      <div className="compose">
-        <header className="compose-header">
-          <Header title="새 게시물" toBack={true} />
-        </header>
+    <div className="post-create-container">
+      <Header title={getTitle()} toBack={true} onBackClick={handleBackClick} /> 
+
+      <main className="post-body">
         
-        <main className="compose-body">
-          <div className="form-row">
-            <select 
-                className="trip-select"
-                value={selectedTripId || ""}
-                onChange={handleTripChange}
-                disabled={isLoadingTrips}
-            >
-              <option value="">
-                {isLoadingTrips ? "여행 로딩 중..." : "클릭하여 여행 선택"}
-              </option>
-              {myTrips.map(trip => (
-                <option key={trip.id} value={trip.id}>
-                  {trip.title}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="picker-row">
-            {loading && <div>미디어 불러오는 중...</div>}
-            
-            {selectedTripId && !loading && (
-              <div className="media-picker-grid">
-                {allMedia.length === 0 && (
-                  <div>이 여행에는 미디어가 없습니다.</div>
-                )}
-                {allMedia.map((media) => {
-                  const imageUrl = media.url ? media.url.replace(/<|>/g, '') : '';
-                  const isSelected = !!selectedMedia.find(m => m.mediaAssetId === media.mediaAssetId);
-                  
-                  return (
-                    <div 
-                      key={media.mediaAssetId} 
-                      className={`media-thumb ${isSelected ? 'selected' : ''}`}
-                      onClick={() => toggleMediaSelection(media)}
-                    >
-                      <img src={imageUrl} alt={media.comment || 'Trip Media'} />
+        {/* === STEP 1: 여행 선택 === */}
+        {step === 1 && (
+          <div className="step-trip-list">
+            <h2 className="step-title">포스트를 게시할 여행을 선택해주세요</h2>
+            <div className="trip-list">
+              {myTripsData.map((item) => {
+                const t = item.trip;
+                const coverImg = item.contents?.photos?.[0]?.media?.url || default_pic;
+                
+                // 빈 값 제거 및 친구가 있는 경우만 표시하기 위한 로직
+                const members = (t.inviteesProfileImgList || []).filter(url => url && url.trim() !== "");
+
+                return (
+                    <div key={t.id} className="trip-item" onClick={() => handleSelectTrip(item)}>
+                        <div className="trip-cover">
+                            <img src={coverImg} alt="cover" onError={(e)=>e.target.src=default_pic} />
+                        </div>
+                        <div className="trip-info">
+                            <div className="trip-top-row">
+                                <span className="trip-location">{t.placeName || '여행'}</span> 
+                                <span className="trip-date">{t.startDate} ~ {t.endDate}</span>
+                            </div>
+                            <div className="trip-title">{t.title}</div>
+                            
+                            {/* 친구 프사 영역: members가 있을 때만 렌더링 */}
+                            {members.length > 0 && (
+                                <div className="trip-members">
+                                  {members.slice(0, 3).map((url, i) => (
+                                    <img 
+                                        key={i} 
+                                        src={url} 
+                                        alt="member" 
+                                        className="member-avatar"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
+                                  ))}
+                                  {members.length > 3 && <span className="member-more">+{members.length-3}</span>}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                  );
-                })}
-              </div>
+                );
+              })}
+            </div>
+            {myTripsData.length === 0 && (
+                <div style={{textAlign: 'center', marginTop: '50px', color: '#999'}}>
+                    작성 가능한(완료된) 여행이 없습니다.
+                </div>
             )}
           </div>
-          
-        
-          <div className="form-row">
-            <label>위치</label>
-            <input value={locationText} onChange={(e) => setLocationText(e.target.value)} />
-          </div>
-          
-          <div className="form-row">
-            <label>내용</label>
-            <textarea rows={4} value={content} onChange={(e) => setContent(e.target.value)} />
-          </div>
-          
-          <div className="form-row">
-            <label>공개범위</label>
-            <select value={privacy} onChange={(e) => setPrivacy(e.target.value)}>
-              <option value="FRIENDS">친구만</option>
-              <option value="PRIVATE">비공개</option>
-            </select>
+        )}
+
+        {/* === STEP 2: 미디어 선택 === */}
+        {step === 2 && (
+          <div className="step-media-select">
+            <h2 className="step-title">포스트를 게시할 사진, 영상, 스크랩북을 선택해주세요</h2>
+            <p className="step-subtitle">필터를 사용하여 원하는 미디어 목록을 볼 수 있어요.</p>
             
-            <button className='create-post-btn' onClick={share}>게시물 작성하기!</button>
-          
+            <div className="filter-tabs">
+                {['ALL', 'PHOTO', 'VIDEO', 'SCRAPBOOK'].map(type => (
+                    <button 
+                        key={type} 
+                        className={filterType === type ? 'active' : ''} 
+                        onClick={()=>setFilterType(type)}
+                    >
+                        {type === 'ALL' ? '≡ 전체' : type === 'PHOTO' ? '사진' : type === 'VIDEO' ? '영상' : '스크랩북'}
+                    </button>
+                ))}
+            </div>
+
+            <div className="media-grid">
+                {filteredMedia.length === 0 ? (
+                    <div className="no-media-msg">선택 가능한 미디어가 없습니다.</div>
+                ) : (
+                    filteredMedia.map(m => {
+                        const isSelected = selectedMedia.find(sel => sel.mediaAssetId === m.mediaAssetId);
+                        return (
+                            <div key={m.mediaAssetId} className={`media-item ${isSelected ? 'selected' : ''}`} onClick={()=>toggleMedia(m)}>
+                                {m.type === 'VIDEO' ? (
+                                    <video src={m.url} className="grid-video" muted />
+                                ) : (
+                                    <img src={m.url} alt="media" />
+                                )}
+                                {m.type === 'VIDEO' && <span className="video-badge">▶</span>}
+                                {isSelected && <div className="check-overlay">✔</div>}
+                            </div>
+                        )
+                    })
+                )}
+            </div>
+
+            {selectedMedia.length > 0 && (
+                <div className="bottom-sheet">
+                    <div className="sheet-header">
+                        <span>{selectedMedia.length}장 선택됨</span>
+                    </div>
+                    <div className="sheet-preview-list">
+                        {selectedMedia.map(m => (
+                            <div key={m.mediaAssetId} className="mini-preview-wrap">
+                                {m.type === 'VIDEO' ? (
+                                    <video src={m.url} className="mini-preview" muted />
+                                ) : (
+                                    <img src={m.url} alt="" className="mini-preview"/>
+                                )}
+                                <button className="mini-delete" onClick={(e)=>{e.stopPropagation(); toggleMedia(m);}}>×</button>
+                            </div>
+                        ))}
+                    </div>
+                    <button className="next-btn" onClick={() => setStep(3)}>선택 완료</button>
+                </div>
+            )}
           </div>
-        </main>
-      </div>
-    </>
+        )}
+
+        {/* === STEP 3: 글 작성 === */}
+        {step === 3 && (
+          <div className="step-write">
+            
+            <h2 className="step-title">코멘트를 작성해주세요</h2>
+            
+            <div className="write-preview-box">
+               {selectedMedia.length > 0 && (
+                   <div className="preview-image-main">
+                       {selectedMedia[0].type === 'VIDEO' ? (
+                            <video src={selectedMedia[0].url} controls autoPlay muted className="main-video-preview" />
+                       ) : (
+                            <img src={selectedMedia[0].url} alt="main" />
+                       )}
+                   </div>
+               )}
+               <div className="preview-thumbnails">
+                   {selectedMedia.map(m => (
+                       m.type === 'VIDEO' ? (
+                           <video 
+                               key={m.mediaAssetId} 
+                               src={m.url} 
+                               className={`thumb-video ${m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}`}
+                               muted
+                           />
+                       ) : (
+                           <img 
+                               key={m.mediaAssetId} 
+                               src={m.url} 
+                               alt="" 
+                               className={m.mediaAssetId === selectedMedia[0].mediaAssetId ? 'active' : ''}
+                           />
+                       )
+                   ))}
+               </div>
+            </div>
+
+            <div className="privacy-check">
+                <label>
+                    <input type="checkbox" checked={isPrivate} onChange={(e)=>setIsPrivate(e.target.checked)} />
+                    비공개 포스트로 올리기
+                </label>
+            </div>
+            
+            <textarea 
+                className="comment-box" 
+                placeholder="내용을 입력해주세요"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+            ></textarea>
+            
+            <button className="submit-btn" onClick={handleUpload} disabled={loading}>
+                {loading ? '게시 중...' : '게시하기!'}
+            </button>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

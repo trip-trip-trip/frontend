@@ -6,8 +6,9 @@ import go_map from '../../assets/go-map.png';
 import lgt from '../../assets/logout_icon.png'; 
 import { useAuth } from '../../contexts/AuthContext'; // 
 import back_btn from '/icons/back_btn.png'
+import trash_icon from '../../assets/trash.png';
 
-const Header = ({ title, setTab, currentTab, toBack }) => { 
+const Header = ({ title, setTab, currentTab, toBack, onDelete }) => { 
     const { pathname } = useLocation();
     const navigate = useNavigate();
     const { logout } = useAuth(); 
@@ -55,7 +56,13 @@ const Header = ({ title, setTab, currentTab, toBack }) => {
                     {(isHome || isAlbum) && (
                         <button
                             className="header-icon-btn" // CSS에서 이미지 크기를 제어할 클래스 사용
-                            onClick={() => setTab('place')} 
+                            onClick={() => {
+                                        if (setTab) {
+                                            setTab('place');
+                                        } else {
+                                            navigate('/home?tab=place');
+                                        }
+                                    }}
                             aria-label="지도 가기"
                         >
                             <img 
@@ -67,6 +74,17 @@ const Header = ({ title, setTab, currentTab, toBack }) => {
                     )}
                     {/* 홈 페이지가 아닐 때는 오른쪽 공간을 비워둡니다. */}
                 {!isHome && !isAlbum && <div className="header-side" />} 
+
+                {onDelete && (
+                        <button 
+                            className="header-icon-btn" 
+                            onClick={onDelete}
+                            aria-label="삭제하기"
+                        >
+                            <img src={trash_icon} alt="삭제" className="delete-btn-header" />
+                        </button>
+                    )}
+
                 {toBack && 
                     <button className="back-btn" onClick={() => navigate(-1)}>
                         <img src={back_btn} alt=""/>

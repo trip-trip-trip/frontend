@@ -291,8 +291,8 @@ export default function SettingPage() {
         
         {/* 시간대 설정 섹션 */}
         <section className="setting-section">
-          <h3>알림 시간대</h3>
-          <p className="setting-subtext">설정한 시간대에 알림을 받을 수 있어요.</p>
+          <h3>알림 시간대 설정</h3>
+          <p className="setting-subtext">선호하는 시간대를 선택해주세요</p>
           <div className="time-grid">
             {Object.keys(TIME_RANGES).map((t) => (
               <button

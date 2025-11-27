@@ -1,0 +1,465 @@
+.post-create-container {
+    height: 100vh;
+    background-color: #F8F7F2;
+    font-family: 'Pretendard', sans-serif;
+    padding-top: 6rem;
+    overflow-x: hidden; 
+    overflow-y: scroll;
+    box-sizing: border-box;
+    width: 100%;
+
+    /* 데스크탑용 카드 레이아웃 */
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+
+    position: relative;   /* (선택) 기준만 잡아둠 */
+}
+
+
+
+
+.post-body {
+    /* 양옆 여백을 조금 줄여서(2rem -> 1.5rem) 모바일에서 더 넓게 쓰기 */
+    padding: 1.5rem;
+    padding-bottom: 10rem;
+    
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 텍스트 스타일 (크기 확대) */
+.step-title {
+    font-size: 1.5rem; 
+    font-weight: 800;
+    color: #525b65;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+}
+
+.step-subtitle {
+    font-size: 1.2rem;
+    color: #525b65;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+}
+
+/* === Step 1: 여행 리스트 === */
+
+.trip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0; 
+}
+
+.trip-item {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    
+    padding: 1.5rem 0;
+    border-bottom: 2px dashed #ccc;
+    
+    display: flex;
+    gap: 1.2rem;
+    cursor: pointer;
+}
+
+.trip-item:active { transform: scale(0.98); }
+
+.trip-cover {
+    flex-shrink: 0; /* 찌그러짐 방지 */
+}
+
+/* 이미지와 비디오 모두에게 동일한 스타일 적용 */
+.trip-cover img,
+.trip-cover video {
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: 0.6rem;
+    object-fit: cover; /* 비율 유지하며 꽉 채우기 */
+    background: #eee;
+    display: block;    /* 하단 공백 제거 */
+}
+
+.trip-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0.2rem;
+}
+
+.trip-top-row {
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+}
+
+.trip-location { 
+    background-color: #E6E2D6; /* 연한 베이지색 배경 */
+    padding: 0.2rem 0.7rem;
+    border-radius: 1rem;       /* 알약 모양 */
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-right: 0.6rem;
+}
+.trip-date {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 400;
+}
+.trip-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
+}
+
+.trip-members { 
+    display: flex; 
+    align-items: center; 
+    padding-left: 0.5rem;
+}
+.trip-members .member-avatar {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    
+    /* 겹치는 효과 */
+    margin-left: -0.8rem; 
+    
+    border: 2px solid #F8F7F2; 
+    background: #ccc;
+}
+
+.member-more {
+    font-size: 0.8rem; color: #888; margin-left: 0.8rem;
+}
+
+/* === Step 2: 미디어 그리드 === */
+.filter-tabs {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.filter-tabs button {
+    background: none;
+    border: none;
+    font-size: 1.2rem; 
+    color: #666e77;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
+}
+
+.filter-tabs button.active {
+    color: #4a3f35;
+    font-weight: bold;
+    border-bottom: 0.2rem solid #4a3f35;
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.2rem;
+}
+
+.media-item {
+    position: relative;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+    background: #eee;
+    overflow: hidden;
+}
+
+.media-item img, 
+.media-item video,
+.grid-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+/* .media-item.selected img {
+    filter: brightness(0.5);
+} */
+
+.media-item.selected {
+    opacity: 0.8;
+}
+.media-item.selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+
+
+
+.video-badge {
+    position: absolute; top: 0.4rem; left: 0.4rem;
+    color: #fff; font-size: 0.8rem; 
+    text-shadow: 0 0.1rem 0.2rem rgba(0,0,0,0.5);
+}
+
+.check-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 1.5rem; /* 체크 아이콘도 크게 */
+    font-weight: bold;
+}
+.no-media-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 0;
+    color: #ccc;
+    font-size: 1rem;
+}
+
+/* 하단 시트 */
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;               
+    max-width: 400px;           
+
+    background: #fff;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 100;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 100%); }
+    to   { transform: translate(-50%, 0); }
+}
+
+.sheet-header {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    color: #525b65;
+}
+
+/* 가로 스크롤 리스트 */
+.sheet-preview-list {
+    display: flex;
+    gap: 1rem; /* 이미지 사이 간격 */
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    
+    /* X버튼이 위/오른쪽으로 튀어나오므로 패딩을 줘야 안 잘림 */
+    padding-top: 0.8rem; 
+    padding-right: 0.8rem;
+    padding-bottom: 0.5rem;
+    
+    /* 스크롤바 숨기기 (선택사항) */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+.sheet-preview-list::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* 이미지 래퍼 (기준점) */
+.mini-preview-wrap {
+    position: relative;
+    flex-shrink: 0; /* 이미지 찌그러짐 방지 */
+}
+
+/* 작은 미리보기 이미지 */
+.mini-preview { 
+    width: 4.5rem;   /* 크기 조정 */
+    height: 4.5rem;
+    border-radius: 0.8rem; /* 둥근 모서리 */
+    object-fit: cover; 
+    display: block;
+    border: 1px solid #eee;
+}
+
+/* X 삭제 버튼 (핵심 디자인) */
+.mini-delete {
+    position: absolute;
+    top: -0.5rem;    /* 위로 튀어나오게 */
+    right: -0.5rem;  /* 오른쪽으로 튀어나오게 */
+    
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    
+    background-color: #525B65; /* 짙은 회색 배경 */
+    color: #fff;               /* 흰색 X 글자 */
+    
+    border: none;
+    font-size: 1rem;
+    font-weight: 400;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 그림자 */
+    z-index: 10;
+}
+
+/* 완료 버튼 */
+.next-btn{
+    width: 95%;
+    padding: 1.2rem;
+    background: #525B65;
+    color: #fff;
+    border: none;
+    margin-left: 1rem;
+    border-radius: 1.6rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.submit-btn:disabled { 
+    background: #ccc; 
+}
+
+/* === Step 3: 글 작성 === */
+.step-write {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.write-preview-box {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.preview-image-main {
+    width: 100%;
+    height: 22rem; 
+    background: transparent;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-image-main img, 
+.preview-image-main video,
+.main-video-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    display: block;
+}
+
+.preview-thumbnails {
+    display: flex;
+    gap: 0.8rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.preview-thumbnails img,
+.preview-thumbnails video,
+.thumb-video {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: block; /* 필수 */
+    flex-shrink: 0;
+    background: #000;
+}
+
+.preview-thumbnails .active {
+    opacity: 1;
+    border-color: #333;
+}
+
+.privacy-check {
+    display: flex; 
+    justify-content: flex-end; 
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem; 
+    color: #666;
+}
+
+.privacy-check label { display: flex; align-items: center; cursor: pointer; }
+.privacy-check input { margin-right: 0.4rem; }
+
+.comment-box {
+    width: 100%;
+    min-height: 12rem;
+    
+    /* 기본 테두리는 투명하게 */
+    border: 5px solid transparent;
+    
+    /* 1. 이미지를 테두리로 사용 (경로는 실제 파일 위치에 맞게 수정하세요!) */
+    /* 만약 public 폴더에 넣었다면: url('/border_line.png') */
+    /* 만약 assets 폴더에서 import 했다면 JS에서 style로 넣어줘야 함. 여기선 url 가정 */
+    border-image-source: url('/border_line.png'); 
+    
+    /* 2. 이미지를 어떻게 자를 것인가 (이미지 두께에 따라 조절 필요, 보통 30 정도) */
+    border-image-slice: 30; 
+    
+    /* 3. 테두리 반복 방식 (round: 자연스럽게 반복, stretch: 늘리기) */
+    border-image-repeat: round;
+    
+    background: #fdfdfd;
+    padding: 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: none;
+    margin-bottom: 2rem;
+    box-sizing: border-box; /* 테두리 포함 크기 계산 */
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1.2rem;
+    background: #525B65;
+    color: #fff;
+    border: none;
+    border-radius: 1.2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    /* 1. 전체 앱 컨테이너 중앙 정렬 및 그림자 */
+    .post-create-container {
+        max-width: 480px; /* 모바일 너비 고정 */
+        margin: 0 auto;   /* 중앙 정렬 */
+        
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        border-left: 1px solid #eee;
+        border-right: 1px solid #eee;
+        min-height: 100vh;
+    }
+    .media-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

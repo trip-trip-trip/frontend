@@ -1,15 +1,21 @@
 .home {
-    height: 100vh; /* 또는 var(--dvh)를 사용한 100dvh */
-    display: flex;
-    flex-direction: column; /* 세로로 자식 요소 배치 */
+   height: 100dvh; 
+   display: flex;
+   flex-direction: column;
+   width: 100%;
+   overflow-x: hidden; /* 가로 스크롤 아예 차단 */
+   position: relative; /* 자식 요소 위치 기준 */
 }
 
 .home-body {
-    flex-grow: 1; 
-    overflow-y: auto; 
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden; /* 가로 스크롤 차단 */
     
-    /* 브라우저별 스크롤 관성 효과를 위한 설정 (선택 사항) */
     -webkit-overflow-scrolling: touch; 
+    
+    overscroll-behavior-y: contain; 
+    position: relative; 
 }
 
 .tabs-bar{
@@ -38,5 +44,122 @@
 }
 
 
+.home-trip-section {
+  padding-top: 5rem; 
+}
+
+.home .new-trip-container {
+  position: relative;
+  cursor: pointer;
+  background: rgba(224, 221, 210);
+}
+
+.home .new-trip-container img {
+    width: 100%;
+    height: 18rem;      
+    object-fit: contain; 
+}
+
+.home .new-trip-text {
+    position: absolute;
+    display: flex;
+    top: 56%;
+    align-items: center;
+    gap: 1.1rem;
+    width: 90%;
+    justify-content: center;
+}
+
+.home .new-trip-text img {
+    width: 2.2rem;
+    height: 2.2rem;
+}
+
+.home .new-trip-text h1 {
+    color: #525B65;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.active-trip-wrapper button {
+    background: transparent !important; 
+    border: none !important;         
+    padding: 0 !important;
+    
+    position: absolute !important;
+    bottom: 2rem !important; 
+    right: 2rem !important;   
+    z-index: 5;
+    cursor: pointer;
+}
+
+.active-trip-wrapper .main-edit-btn {
+    position: static !important; 
+    margin: 0 !important;
+    
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.7rem !important;
+    width: auto !important;
+}
+.active-trip-wrapper .main-edit-btn p {
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+    font-weight: 400 !important;
+    color: #525B65 !important;
+    border-bottom: 0.1rem solid #525B65 !important; 
+    padding-bottom: 1px !important;           
+    display: inline-block !important;          
+    line-height: 1.2 !important;              
+}
+.active-trip-wrapper {
+    position: relative;
+    width: 100%;
+    /* margin-bottom: 20px; */
+    overflow: visible; 
+}
+
+.active-trip-wrapper .active-trip-container {
+    height: auto !important; 
+    min-height: 18rem !important;
+    padding-bottom: 3.5rem !important; 
+    position: relative !important;
+}
 
 
+/* 여행 정보 */
+.hitbox-info {
+    position: absolute;
+    top: 5rem; 
+    left: 0;
+    width: 70%;
+    height: 14rem; 
+    z-index: 10;
+    cursor: pointer;
+    /* background: rgba(255, 0, 0, 0.3);  */
+}
+
+/* 카메라 */
+.hitbox-camera {
+    position: absolute;
+    top: 5rem;
+    right: 0;
+    width: 30%;
+    height: 14rem;
+    z-index: 10;
+    cursor: pointer;
+    /* background: rgba(0, 0, 255, 0.3); */
+}
+
+/* 수정하기 버튼 */
+.hitbox-edit {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 1rem;
+    width: 90px;
+    height: 40px;
+    z-index: 20;
+    cursor: pointer;
+    /* background: rgba(0, 255, 0, 0.3); */
+}

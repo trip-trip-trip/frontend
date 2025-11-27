@@ -41,7 +41,8 @@ const PhotoFrame = ({ frameId, imageUrl, onImageSelect, children, frameStyle }) 
         // 이미지가 있으면 표시
         <img 
           src={imageUrl} 
-          alt={`Scrapbook photo ${frameId}`} 
+          alt={`Scrapbook photo ${frameId}`}
+          // crossOrigin="anonymous"
           className="scrap-img"
           // 사진이 프레임에 맞게 보이도록 인라인 스타일 적용
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 

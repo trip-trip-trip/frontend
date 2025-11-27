@@ -25,7 +25,7 @@ html,body,#root{
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background-color: #000; /* 검은색 헤더 */
+  background-color: #E0DDD2; /* 검은색 헤더 */
   color: #fff;
   position: relative;
   z-index: 10;
@@ -63,13 +63,13 @@ html,body,#root{
 
 /* 카메라 뷰 컨테이너 */
 .camera-view-container {
-  flex-grow: 1; /* 남은 공간을 모두 차지 */
+
+  width: 100%;
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #000; /* 배경 검은색 */
-  overflow: hidden; /* 웹캠이 넘치지 않도록 */
+  overflow: hidden;
+  aspect-ratio: 9/16;
+  margin-top: 0;
+  margin-bottom: 180px;
 }
 
 .webcam-feed {
@@ -77,8 +77,7 @@ html,body,#root{
   height: 100%; /* 부모 컨테이너의 높이를 꽉 채움 */
   object-fit: cover; /* 화면을 꽉 채우도록 자르면서 확대/축소 */
 
-  transform-origin: center center;
- filter:none;
+ 
 }
 
 .webcam-feed.user {
@@ -88,7 +87,55 @@ html,body,#root{
 .webcam-feed.environment {
   transform: scaleX(1); /* 후면 카메라일 때 원래대로 */
 }
+.film-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* 클릭 통과 */
+  z-index: 5;
+}
 
+/* 프레임 이미지: 화면 꽉 채우기 */
+.film-frame-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; /* 프레임이 찌그러져도 화면에 딱 맞게 */
+  z-index: 6;
+  opacity:0.5;
+}
+
+/* 텍스처: 화면 꽉 채우고 혼합 모드 적용 */
+.film-texture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 텍스처는 꽉 채움 */
+  z-index: 7; /* 프레임보다 위에 */
+   filter: none;
+ mix-blend-mode: overlay;
+ opacity: 0.2;
+
+}
+
+.film-date-stamp {
+  position: absolute;
+  bottom: 3%;
+  right: 8%;
+  color: rgba(235, 177, 31, 0.55);  /* 기존 노랑 + 낮은 투명도 */
+  font-weight: 600;
+  font-family: 'Courier New', Courier, monospace;
+  
+  font-size: 1.4rem;
+  text-shadow: 1px 1px 2px rgba(51, 45, 45, 0.575);
+  z-index: 8;
+}
 /* '3' 카운트다운 오버레이 */
 .countdown-overlay {
   position: absolute;
@@ -108,30 +155,40 @@ html,body,#root{
   z-index: 5;
 }
 .camera-controls-bar {
-  background-color: #111; /* 혹은 완전 검정 #000 */
+  width: 100%;
+
+ flex-shrink: 0;
+ position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 43rem;
+  background-color: #111;
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
-  padding: 20px 20px 40px; /* 하단 패딩 넉넉히 */
+
+  padding: 20px 20px 35px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  z-index: 30;
-  transition: all 0.3s ease;
+  z-index: 50;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  
 }
 
-/* 필터창이 열리면 바가 위로 살짝 올라오는 느낌을 원하시면 padding 조정 가능 */
 .camera-controls-bar.filter-open {
-    padding-top: 10px;
+  padding-top: 35px; /* 열렸을 때 위쪽 공간 확보 */
 }
-
 /* (1) 모드 선택 캡슐 버튼 */
 .mode-selector-capsule {
   display: flex;
   background-color: rgba(255, 255, 255, 0.2); /* 반투명 배경 */
   border-radius: 20px;
   padding: 4px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 31;
 }
 
 .mode-btn {
@@ -154,11 +211,13 @@ html,body,#root{
 /* (2) 메인 컨트롤 행 (아이콘 - 셔터 - 아이콘) */
 .main-controls-row {
     width: 100%;
-    display: flex;
-    justify-content: space-between; /* 양끝 정렬 */
-    align-items: center;
-    padding: 0 10px;
-    box-sizing: border-box;
+  box-sizing: border-box; 
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  padding: 0 15px;
 }
 
 .control-icon-btn {
@@ -228,18 +287,25 @@ html,body,#root{
 
 /* (3) 필터 슬라이더 영역 */
 .filter-slider-container {
-    width: 100%;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+  position: absolute;
+  bottom: 110%;
+  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  
+  margin-bottom: 18px; 
+  align-items: center;
+  gap: 10px;
+  animation: slideUpFade 0.25s ease-out;
+  z-index: 60;
 }
 
 /* 선택된 필터 이름 (타원형 뱃지) */
 .selected-filter-name-pill {
-    background-color: rgba(255,255,255,0.9);
-    color: #000;
+    background-color: #E0DDD2;
+    color: #444;
     padding: 6px 16px;
     border-radius: 20px;
     font-size: 13px;
@@ -284,14 +350,24 @@ html,body,#root{
     border: 2px solid transparent;
 }
 .filter-item-box.selected .filter-preview {
-    border-color: #FFB800; /* 선택 시 테두리 강조 */
+    border: color #ffb700; /* 선택 시 테두리 강조 */
 }
 
 .filter-name-small {
     font-size: 10px;
-    color: #fff;
+    color: #eee;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+}
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -1,0 +1,122 @@
+/* 기본 컨테이너 (PostCreate와 동일) */
+.post-edit-container {
+    padding-top: 6rem;
+    background-color: #F8F7F2;
+    min-height: 100vh;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.post-body {
+    padding: 2rem;
+    padding-bottom: 10rem;
+}
+
+/* 페이지 제목: "포스트 수정하기" */
+.page-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #525B65; /* 짙은 회색 */
+    margin-bottom: 2rem;
+}
+
+/* 이미지 미리보기 박스 */
+.write-preview-box {
+    margin-bottom: 2rem;
+}
+
+.preview-image-main img {
+    width: 100%;
+    height: 22rem;
+    object-fit: cover;
+    border-radius: 0.8rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 0.2rem 0.8rem rgba(0,0,0,0.1);
+}
+
+.preview-thumbnails {
+    display: flex;
+    gap: 0.6rem;
+    overflow-x: auto;
+}
+
+.preview-thumbnails img {
+    width: 5rem;
+    height: 5rem;
+    object-fit: cover;
+    border-radius: 0.4rem;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.preview-thumbnails img.active {
+    opacity: 1;
+    border: 0.2rem solid #525B65;
+}
+
+/* 코멘트 라벨 + 체크박스 한 줄 배치 */
+.comment-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.label-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #4a3f35;
+}
+
+.privacy-check {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #666;
+    cursor: pointer;
+}
+
+.privacy-check input {
+    margin-right: 0.5rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: #D3CFC0; /* 체크박스 색상 (선택사항) */
+}
+
+/* 점선 텍스트 상자 */
+.comment-box {
+    width: 100%;
+    min-height: 12rem;
+    border: 0.2rem dashed #888; /* 조금 더 진한 회색 점선 */
+    background: #F8F7F2;        /* 배경색 투명 혹은 페이지색과 동일 */
+    padding: 1.5rem;
+    border-radius: 1.5rem;      /* 둥근 모서리 */
+    font-size: 1.1rem;
+    line-height: 1.6;
+    resize: none;
+    margin-bottom: 3rem;
+    color: #555;
+}
+
+.comment-box:focus {
+    outline: none;
+    border-color: #525B65;
+}
+
+/* 하단 버튼 */
+.submit-btn {
+    width: 100%;
+    padding: 1.5rem;
+    background: #525B65; /* 짙은 회색/남색 계열 */
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+.edit-mode-btn {
+    /* 수정하기 버튼 전용 스타일이 필요하다면 추가 */
+    box-shadow: 0 0.4rem 1rem rgba(0,0,0,0.15);
+}

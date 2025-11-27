@@ -38,6 +38,8 @@ import SelectPlace from './pages/Album/CreateTrip/SelectPlace';
 import PostEdit from './pages/Home/post/PostEdit';
 import EditTrip from './pages/Album/TripDetails/EditTrip';
 import SharedList from './pages/Album/TripDetails/SharedList';
+import ShowMedia from './pages/Album/TripDetails/ShowMedia';
+import LoginGuard from './contexts/LoginGuard';
 
 const App = () => {
   // 스크린 사이즈 세팅
@@ -45,6 +47,11 @@ const App = () => {
       let dvh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--dvh', `${dvh}px`);
    }
+
+  const ProtectedHome = LoginGuard(Home);
+  const ProtectedCamera = LoginGuard(CameraPage);
+  const ProtecetedProfilePage = LoginGuard(ProfilePage);
+  const ProtectedAlbum = LoginGuard(Album);
 
   useEffect(() => {
       setScreenSize();
@@ -80,16 +87,20 @@ const App = () => {
         <Route path='/' element={<StartPage/>}/>
         <Route path='/home' element={<Home/>}/>
 
-        <Route path='/trips' element={<Album/>}/>
+        <Route path='/trips' element={<ProtectedAlbum/>}/>
         <Route path='/trips/friends' element={<AddFriend/>}/>
         <Route path='/trips/places' element={<SelectPlace/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
         <Route path='/trips/detail/:tripId' element={<TripDetail/>}/>
         <Route path='/trips/detail/:tripId/edit' element={<EditTrip/>}/>
-        <Route path='/trips/shared' element={<SharedList/>}/>
+        <Route path='/trips/:tripId/shared' element={<SharedList/>}/>
         <Route path='/trips/detail/:tripId/share' element={<SharePhoto/>}/>
         <Route path='/trips/detail/:tripId/vid' element={<VideoDetail/>}/>
+        <Route path='/trips/detail/:tripId/:mediaAssetId' element={<ShowMedia/>}/>
         <Route path='/trips/detail/:tripId/pic' element={<PhotoDetail/>}/>
+        <Route path='/trips/detail/:tripId/invitedFriends' element={<SharedList/>}/>
+        <Route path='/trips/detail/:tripId/addFriends' element={<AddFriend/>}/>
+
         <Route path='/scrapbook/frame' element={<PickFrame/>}/>
         <Route path='/scrapbook/create' element={<SelectPic/>}/>
         <Route path='/scrapbook/complete' element={<CreateScrap/>}/>
@@ -108,7 +119,7 @@ const App = () => {
 
 
         {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
-        <Route path="/mypage/profile" element={<ProfilePage />} />
+        <Route path="/mypage/profile" element={<ProtecetedProfilePage />} />
 <Route path="/mypage/edit" element={<ProfileEditPage />} />
         {/* 프로필 하위 페이지들 */}
         <Route path="/mypage/friends" element={<FriendListPage />} />
@@ -116,7 +127,7 @@ const App = () => {
         <Route path="/user/:userId" element={<UserProfilePage />} />
         <Route path="/mypage/settings" element={<SettingsPage />} />
         <Route path="/mypage/feed" element={<FeedPage />} />
-        <Route path="/camera/:tripId" element={<CameraPage />} />
+        <Route path="/camera/:tripId" element={<ProtectedCamera />} />
         <Route path="/capture-complete/:tripId" element={<CaptureCompletePage />} />
       </Routes>
       {/* <AddToHomeScreenPrompt /> */}
