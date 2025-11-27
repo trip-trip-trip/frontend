@@ -85,9 +85,9 @@ const App = () => {
 <div className="app-container"> 
    <Routes>
         <Route path='/' element={<StartPage/>}/>
-        <Route path='/home' element={<Home/>}/>
+        <Route path='/home' element={<ProtectedHome/>}/>
 
-        <Route path='/trips' element={<Album/>}/>
+        <Route path='/trips' element={<ProtectedAlbum/>}/>
         <Route path='/trips/friends' element={<AddFriend/>}/>
         <Route path='/trips/places' element={<SelectPlace/>}/>
         <Route path='/trips/create' element={<CreateTrip/>}/>
@@ -119,7 +119,7 @@ const App = () => {
 
 
         {/* 프로필 메인 (하단 네비의 “프로필” 버튼 → 여기로 이동) */}
-        <Route path="/mypage/profile" element={<ProfilePage />} />
+        <Route path="/mypage/profile" element={<ProtecetedProfilePage />} />
 <Route path="/mypage/edit" element={<ProfileEditPage />} />
         {/* 프로필 하위 페이지들 */}
         <Route path="/mypage/friends" element={<FriendListPage />} />
@@ -127,7 +127,7 @@ const App = () => {
         <Route path="/user/:userId" element={<UserProfilePage />} />
         <Route path="/mypage/settings" element={<SettingsPage />} />
         <Route path="/mypage/feed" element={<FeedPage />} />
-        <Route path="/camera/:tripId" element={<CameraPage />} />
+        <Route path="/camera/:tripId" element={<ProtectedCamera />} />
         <Route path="/capture-complete/:tripId" element={<CaptureCompletePage />} />
       </Routes>
       {/* <AddToHomeScreenPrompt /> */}
