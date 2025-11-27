@@ -153,7 +153,7 @@ const Album = () => {
 
           if (trip.startDate > todayDate) {
             plannedTrip.push(tripData);
-          } else if (trip.endDateDate >= todayDate){
+          } else if (trip.endDate >= todayDate){
             activeTrips.push(tripData);
           } else{
             completedList.push(tripData);
