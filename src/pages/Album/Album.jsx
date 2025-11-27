@@ -14,15 +14,17 @@ import Upcoming from '../../components/Album/UpcomingTrip';
 
 
 const Album = () => {
-  const API_BASE = import.meta.env.PROD 
-    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-    : '/api';
+  // const API_BASE = import.meta.env.PROD 
+  //   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+  //   : '/api';
   const [isLoading, setIsLoading] = useState(true); 
-  const todayDate = new Date();
+  const todayDate = new Date().toISOString().split('T')[0];
   // todayDate.setHours(0, 0, 0, 0); // 로컬 시간대의 오늘 자정
+  const API_BASE = 'https://tripshot.duckdns.org';
+  const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiI0IiwiaWF0IjoxNzY0MjM0NDk2LCJleHAiOjE3NjQyMzgwOTZ9.RLWjZ2oe03_doXHxdOaEt4xjfqAlhnXGXwr_0ds5f901XFHPb8HlJKyK7mN40sAlytdUOMbsPOnLeKr0Y2sffg';
   
   const navigate = useNavigate();
-  const { token, activeTripId, setActiveTripId } = useAuth();
+  const { activeTripId, setActiveTripId } = useAuth();
 
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
@@ -307,9 +309,11 @@ return(
                   <img src={plus_btn} alt="" />
                   <h1>새로운 여행 만들기</h1>
                 </div>
+                <div className="utc-ment">
+                  *날짜 정보는 UTC를 기준으로 계산됩니다.
+                </div>
             </div> 
             }
-            <h4>*날짜 정보는 UTC를 기준으로 계산됩니다.</h4>
         </div>
 
         {/* --- 예정된 여행 섹션 --- */}
