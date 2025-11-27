@@ -3,44 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import './TabPlace.css';
 import homePlace from '../../../assets/home_placeLogo.png';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { useAuth } from '../../../contexts/AuthContext';
 
 // API 키 및 상수 설정
 const MAPS_KEY = 'AIzaSyBxUpz_y5O2nOTivngRz6fVvYHtG91i75M';
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
+
 const FALLBACK_THUMB = `${window.location.origin}/icons/tripshot.png`;
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.9780 }; // 서울 중심
-const LS_KEY = 'tripshot_posts';
-
-/* 로컬 스토리지 읽기 헬퍼 */
-const readLocalPosts = () => {
-    try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
-    catch { return []; }
-};
 
 /* 이미지 경로 절대 경로 변환 */
 const toAbsolute = (path) => {
     if (!path) return FALLBACK_THUMB;
     if (path.startsWith('http')) return path;
-    return `${window.location.origin}${path}`;
+    return `https://tripshot.duckdns.org${path}`;
 };
 
-const mapLocalPostForMap = (p) => ({
-    id: p.id,
-    post_id: p.id,
-    lat: Number(p.lat),
-    lng: Number(p.lng),
-    title: p.title || p.content || "제목 없음",
-    thumbnail_url: toAbsolute(p.images?.[0] || p.image),
-    author_avatar: p.author_avatar,
-});
+const addJitter = (coord, id) => {
+    const jitterAmount = 0.002; 
+    const safeId = id || 0; 
+    const seed = (safeId * 9301 + 49297) % 233280;
+    const pseudoRandom = seed / 233280; 
+    
+    return Number(coord) + (pseudoRandom - 0.5) * jitterAmount;
+}
 
-/* 더미 데이터 (API 실패 시 사용) */
-const hardcodedDummies = [
-    { id: 2, post_id: 2, lat: 37.550000, lng: 126.988000, thumbnail_url: 'https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=https://t1.daumcdn.net/brunch/service/user/bUxO/image/CNVUiFf4ZuP8oLPqZr9L83WoopE.jpg', title: '남산 1' },
-    { id: 3, post_id: 3, lat: 37.550500, lng: 126.988500, thumbnail_url: 'https://media.triple.guide/triple-cms/c_limit,f_auto,h_1024,w_1024/5623e2d7-aee0-4933-85ff-e48db3d31da1.jpeg', title: '남산 2' }
-];
-
-/* 구글 맵 스크립트 로더 (싱글톤 패턴) */
+/* 구글 맵 스크립트 로더 */
 let mapsLoaderPromise = null;
 function loadGoogleMaps() {
     if (window.google?.maps) return Promise.resolve(window.google.maps);
@@ -67,35 +58,36 @@ const MAP_STYLES = [
     { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
     { featureType: "road", elementType: "all", stylers: [{ saturation: "0" }, { lightness: "0" }] },
     { featureType: "transit", elementType: "all", stylers: [{ visibility: "off" }] },
-    { 
-        featureType: "water", elementType: "geometry", stylers: [{ color: "#a7c5df" }, { saturation: 0 }, { lightness: 0 }] 
-    }
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#a7c5df" }, { saturation: 0 }, { lightness: 0 }] }
 ];
 
-export default function TabPlace({ setTab }) {
+export default function TabPlace({ setTab, activeTrip }) {
     const navigate = useNavigate();
+    const { token } = useAuth();
 
-    const mapRef = useRef(null);         // DOM 엘리먼트
-    const mapInstanceRef = useRef(null); // Google Map 인스턴스
-    const infoWindowRef = useRef(null);  // InfoWindow 인스턴스
-    const clustererRef = useRef(null);   // Marker Clusterer
+    const mapRef = useRef(null);        
+    const mapInstanceRef = useRef(null); 
+    const infoWindowRef = useRef(null); 
+    const markersRef = useRef([]);
 
     const [isMapLoaded, setIsMapLoaded] = useState(false);
     const [photos, setPhotos] = useState([]);
+    
     const [loading, setLoading] = useState(false);
+    const [placeTabs, setPlaceTabs] = useState(false);
+    const [selectedPlaceId, setSelectedPlaceId] = useState(null);
 
     /* 1. 지도 스크립트 로드 */
     useEffect(() => {
         loadGoogleMaps().then(() => setIsMapLoaded(true)).catch(console.error);
     }, []);
 
-    /* 2. 지도 초기화 (스크립트 로드됨 + DOM 준비됨) */
+    /* 2. 지도 초기화 */
     useEffect(() => {
         if (!isMapLoaded || !mapRef.current || mapInstanceRef.current) return;
 
         const maps = window.google.maps;
         
-        // 지도 생성
         const map = new maps.Map(mapRef.current, {
             center: DEFAULT_CENTER,
             zoom: 12,
@@ -105,18 +97,18 @@ export default function TabPlace({ setTab }) {
         });
 
         mapInstanceRef.current = map;
-        infoWindowRef.current = new maps.InfoWindow();
+        infoWindowRef.current = new maps.InfoWindow({
+            disableAutoPan: false
+        });
 
-        // 탭 전환 등으로 컴포넌트가 다시 마운트될 때 지도가 깨지는 것 방지 (Resize)
-        // 약간의 지연 후 resize 이벤트를 트리거해주면 안전합니다.
         setTimeout(() => {
              maps.event.trigger(map, "resize");
              map.setCenter(DEFAULT_CENTER);
         }, 100);
 
-    }, [isMapLoaded]); // mapRef.current는 ref라 의존성에 넣지 않아도 되지만, isMapLoaded가 핵심
+    }, [isMapLoaded]);
 
-    /* 3. 데이터 Fetch */
+    /* 3. 데이터 Fetch (순수 API 데이터만 사용) */
     useEffect(() => {
         if (!isMapLoaded) return;
         
@@ -124,62 +116,76 @@ export default function TabPlace({ setTab }) {
         const loadData = async () => {
             setLoading(true);
             
-            // 1) 로컬 포스트 가져오기
-            const localPosts = readLocalPosts()
-                .map(mapLocalPostForMap)
-                .filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lng));
-
-            // API URL 없으면 로컬 + 더미만 사용
             if (!API_BASE) {
-                setPhotos([...localPosts, ...hardcodedDummies]);
                 setLoading(false);
                 return;
             }
 
             try {
-                // 2) 서버 포스트 가져오기
+                // (1) 상세 정보
                 const detailRes = await fetch(`${API_BASE}/posts?feed_type=all&limit=200`, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}` }
+                   headers: { Authorization: `Bearer ${token || ""}` }
                 });
                 const detailJson = await detailRes.json();
                 const details = detailJson?.result?.posts ?? [];
 
-                // ID별 상세 정보 맵핑
                 const detailMap = new Map();
                 details.forEach(p => detailMap.set(p.id, {
                     title: p.caption ?? "사진",
-                    thumbnail_url: p.media?.[0]?.thumbnail_url ? toAbsolute(p.media[0].thumbnail_url) : FALLBACK_THUMB,
+                    thumbnail_url: p.media?.[0]?.thumbnail_url ? toAbsolute(p.media[0].thumbnail_url) : null,
                     avatar_url: p.author?.avatar_url,
                 }));
 
-                // 위치 정보 가져오기
-                const locRes = await fetch(`${API_BASE}/posts/locations`);
+                // (2) 위치 정보
+                const locRes = await fetch(`${API_BASE}/posts/locations?feed_type=all`, {
+                    headers: { Authorization: `Bearer ${token || ""}` }              
+                });
+
                 const locJson = await locRes.json();
                 const locList = locJson?.result?.posts ?? [];
+                
+                const tabs =locJson?.result?.place_tabs??[];
+                if (!cancel) setPlaceTabs(tabs);
 
+                // const placeTabs = locJson?.result?.place_tabs ?? [];
+
+                if (activeTrip && activeTrip.placeName && mapInstanceRef.current) {
+                    const targetPlace = tabs.find(p => p.name === activeTrip.placeName);
+                    if (targetPlace) {
+                        console.log("📍 여행 장소로 이동:", targetPlace.name);
+                        const movePos = { lat: targetPlace.lat, lng: targetPlace.lng };
+                        mapInstanceRef.current.setCenter(movePos);
+                        mapInstanceRef.current.setZoom(11);
+                        if(!cancel) setSelectedPlaceId(targetPlace.place_id); 
+                    }
+                }
+
+                // (3) 데이터 병합 (로컬 데이터 병합 로직 제거됨)
                 const merged = locList.map(loc => {
-                    const d = detailMap.get(loc.post_id);
-                    if (!d) return null;
+                    const d = detailMap.get(loc.post_id) || {};
+                    
+                    let rawThumb = loc.thumbnail_url || d.thumbnail_url;
+                    let finalThumb = rawThumb ? toAbsolute(rawThumb) : FALLBACK_THUMB;
+
+                    // 비디오 썸네일이면 기본 이미지로 대체
+                    if (/\.(mp4|mov|webm|avi|mkv)$/i.test(finalThumb)) {
+                        finalThumb = FALLBACK_THUMB; 
+                    }
+
                     return {
                         id: loc.post_id,
-                        lat: Number(loc.lat),
-                        lng: Number(loc.lng),
-                        title: d.title,
-                        thumbnail_url: d.thumbnail_url,
-                        avatar_url: d.avatar_url,
+                        lat: addJitter(loc.lat, loc.post_id), // 좌표 겹침 방지
+                        lng: addJitter(loc.lng, loc.post_id),
+                        title: d.title || "게시물",
+                        thumbnail_url: finalThumb,
                     };
                 }).filter(Boolean);
 
-                // 로컬 데이터와 병합 (중복 제거)
-                const finalPhotos = [
-                    ...localPosts,
-                    ...merged.filter(p => !localPosts.some(lp => lp.id === p.id))
-                ];
+                if (!cancel) setPhotos(merged); // 순수 서버 데이터만 설정
 
-                if (!cancel) setPhotos(finalPhotos);
             } catch (e) {
                 console.error("Map Data Load Error:", e);
-                if (!cancel) setPhotos([...localPosts, ...hardcodedDummies]);
+                if (!cancel) setPhotos([]); // 에러 시 빈 배열 (더미 안 보여줌)
             } finally {
                 setLoading(false);
             }
@@ -187,9 +193,9 @@ export default function TabPlace({ setTab }) {
 
         loadData();
         return () => { cancel = true; };
-    }, [isMapLoaded]);
+    }, [isMapLoaded, activeTrip, token]);
 
-    /* 4. 마커 및 클러스터링 렌더링 */
+    /* 4. 마커 렌더링 */
     useEffect(() => {
         const map = mapInstanceRef.current;
         const info = infoWindowRef.current;
@@ -197,15 +203,18 @@ export default function TabPlace({ setTab }) {
 
         if (!map || !info || !maps || photos.length === 0) return;
 
-        // 기존 클러스터/마커 정리
-        if (clustererRef.current) {
-            clustererRef.current.clearMarkers();
-        }
+        // if (clustererRef.current) {
+        //     clustererRef.current.clearMarkers();
+        // }
+        markersRef.current.forEach(marker => marker.setMap(null));
+        markersRef.current = [];
 
-        const markers = photos.map(p => {
+        if (photos.length === 0) return;
+
+        photos.forEach(p => {
             const marker = new maps.Marker({
                 position: { lat: p.lat, lng: p.lng },
-                map: map, // 클러스터러를 쓰더라도 일단 map 지정 가능
+                map: map,
                 icon: {
                     url: p.thumbnail_url,
                     size: new maps.Size(56, 56),
@@ -215,25 +224,23 @@ export default function TabPlace({ setTab }) {
                 title: p.title
             });
 
-            //  InfoWindow 클릭 이벤트 핸들링 ★
             marker.addListener("click", () => {
-                // HTML 컨텐츠 설정 (ID 부여)
                 const contentString = `
-                    <div id="info-window-${p.id}" style="cursor: pointer; text-align: center;">
-                        <img src="${p.thumbnail_url}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 5px;" />
-                        <div style="font-weight: bold; font-size: 14px; color: #333;">${p.title}</div>
-                        <div style="color: #007AFF; font-size: 12px; margin-top: 4px;">보러가기 &gt;</div>
+                    <div class="info-window" id="info-window-${p.id}">
+                        <img src="${p.thumbnail_url}" class="info-img" />
+                        <div class="info-content">
+                            <div class="info-title">${p.title}</div>
+                            <div class="info-more">보러가기 &gt;</div>
+                        </div>
                     </div>
                 `;
                 
                 info.setContent(contentString);
                 info.open(map, marker);
 
-                // 'domready': InfoWindow의 HTML이 지도 위에 완전히 그려진 후 발생
                 maps.event.addListenerOnce(info, 'domready', () => {
                     const el = document.getElementById(`info-window-${p.id}`);
                     if (el) {
-                        // 기존 클릭 이벤트 방지 후 리액트 네비게이션 실행
                         el.addEventListener('click', () => {
                             navigate(`/post/${p.id}`);
                         });
@@ -241,13 +248,21 @@ export default function TabPlace({ setTab }) {
                 });
             });
 
-            return marker;
+            // return marker;
+            markersRef.current.push(marker);
         });
+        // clustererRef.current = new MarkerClusterer({ map, markers });
 
-        // 클러스터러 생성 및 마커 추가
-        clustererRef.current = new MarkerClusterer({ map, markers });
+    }, [photos, navigate]);
 
-    }, [photos, navigate]); // photos가 바뀌면 마커 다시 그림
+     const handlePlaceClick = (place) => {
+        if (!mapInstanceRef.current) return;
+        
+        mapInstanceRef.current.panTo({ lat: place.lat, lng: place.lng });
+        mapInstanceRef.current.setZoom(12); 
+        
+        setSelectedPlaceId(place.place_id);
+    };
 
     const goBack = () => {
         if (setTab) setTab("all");
@@ -265,7 +280,24 @@ export default function TabPlace({ setTab }) {
                 </button>
             </div>
 
-            {/* 지도 컨테이너: CSS에서 반드시 height가 지정되어 있어야 함 */}
+            <div className='place-guide-text'>
+                장소를 클릭하여 지도가 해당 위치로 이동해요.
+            </div>
+            {/* 탭  */}
+            {placeTabs.length > 0 && (
+                <div className="place-tabs-container">
+                    {placeTabs.map(place => (
+                        <button 
+                            key={place.place_id}
+                            className={`place-chip ${selectedPlaceId === place.place_id ? 'active' : ''}`}
+                            onClick={() => handlePlaceClick(place)}
+                        >
+                            {place.name}
+                        </button>
+                    ))}
+                </div>
+            )} 
+
             <div ref={mapRef} className="map-container" style={{ flex: 1, minHeight: '400px', width: '100%' }}>
                 {(!isMapLoaded || loading) && (
                     <div className="map-loading" style={{

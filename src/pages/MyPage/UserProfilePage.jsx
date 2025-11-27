@@ -185,7 +185,7 @@ const sendRequest = async () => {
            <img 
              src={userInfo.avatarUrl || defaultProfile} 
              alt="프로필" 
-             className="profile-img"
+             className="profile-img-my"
              onError={(e) => {e.target.src = defaultProfile;}}
            />
         </div>
@@ -245,21 +245,46 @@ const sendRequest = async () => {
             <div className="album-item add" onClick={() => navigate("/post_select")}>+</div>
           )}
           
-          {visiblePosts.length > 0 ? (
-            visiblePosts.map((post) => {
-              const thumbUrl = post.media?.[0]?.thumbnailUrl || post.media?.[0]?.url || post.media?.[0]?.thumbnail_url;
-              return (
-                <div
-                  key={post.id}
-                  className="album-item"
-                  style={thumbUrl ? { backgroundImage: `url(${thumbUrl})` } : { backgroundColor: '#ccc' }}
-                  onClick={() => navigate(`/post/${post.id}`)} 
-                />
-              );
-            })
-          ) : (
-            !isMe && <div className="empty-feed-msg">게시물이 없습니다.</div>
-          )}
+         {visiblePosts.length > 0
+            ? visiblePosts.map((post) => {
+                const mediaList = post.media || [];
+                const cover = mediaList[0];
+
+                if (!cover) return null;
+
+                const isVideo = cover.mediaKind === "VIDEO";
+                const imageSrc =
+                  cover.thumbnailUrl || cover.url || cover.thumbnail_url;
+
+                return (
+                  <div
+                    key={post.id}
+                    className="album-item"
+                    onClick={() => navigate(`/post/${post.id}`)}
+                  >
+                    {isVideo ? (
+                      <video
+                        className="album-media"
+                        src={cover.url}
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : (
+                      <img
+                        className="album-media"
+                        src={imageSrc}
+                        alt={post.caption}
+                        onError={(e) => {
+                          e.target.style.backgroundColor = "#ccc";
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })
+            : !isMe && <div className="empty-feed-msg">게시물이 없습니다.</div>}
         </div>
       )}
     </div>

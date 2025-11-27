@@ -1,7 +1,8 @@
 .create-scrap{
-    padding: 5rem 0;
+    padding: 1rem 0 7rem 0;
     overflow-y: auto; /* 이 영역에만 스크롤 적용 */
     position: relative;
+    margin-top: 5.7rem;
 }
 
 .back-btn{

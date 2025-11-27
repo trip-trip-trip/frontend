@@ -1,0 +1,54 @@
+.show-media{
+    background-color: black;
+    height: 100%;
+    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
+    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+}
+
+.show-media-cont{
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.show-media-cont img{
+    width: 90%;
+}
+
+.show-media-cont video{
+    width: 90%;
+}
+
+.comment-cont{
+    z-index: 10;
+    width: 100%;
+    background: rgba(36, 36, 36, 0.751);
+    height: 13rem;
+    position: absolute;
+    bottom: 0;
+}
+
+.function-cont{
+    z-index: 10;
+    width: 100%;
+    background: rgba(36, 36, 36, 0.751);
+    height: 5rem;
+    position: absolute;
+    top: 0;
+}
+
+.function-cont h1{
+    color: white;
+    margin-top: 0;
+    padding: 1rem 2rem;
+    font-weight: 300;
+}
+
+.comment-cont h4{
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 400;
+    padding: 1rem 2rem;
+}

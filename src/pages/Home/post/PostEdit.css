@@ -115,6 +115,7 @@
     cursor: pointer;
 }
 
+
 .edit-mode-btn {
     /* 수정하기 버튼 전용 스타일이 필요하다면 추가 */
     box-shadow: 0 0.4rem 1rem rgba(0,0,0,0.15);

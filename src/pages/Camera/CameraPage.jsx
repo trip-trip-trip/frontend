@@ -9,8 +9,8 @@ import {useAuth} from'../../contexts/AuthContext';
 
 
 // 1. 사용할 모든 '재료' 임포트
-import frameAsset from '../../assets/cameralens22.png'; // 님의 고정 프레임
-import textureAsset from '../../assets/filmeffect.png'; // 님의 고정 텍스처
+import frameAsset from '../../assets/cameralens22.png'; 
+import textureAsset from '../../assets/filmeffect.png'; 
 import switchmode from '../../assets/switchcam.png';
 
 import backIcon from'../../assets/back.png';
@@ -335,10 +335,10 @@ const selectFilter = (index) => setCurrentFilterIndex(index);
           setIsRecording(false); setCountdown(0);
         };
         mediaRecorderRef.current.start();
-        const newCount = shotCount + 1;
-        setShotCount(newCount);
-        localStorage.setItem(storageKey, newCount.toString());
-        console.log(`[총 촬영] ${newCount} / ${MAX_TOTAL_SHOTS} 회 (영상)`);
+        //const newCount = shotCount + 1;
+        //setShotCount(newCount);
+        //localStorage.setItem(storageKey, newCount.toString());
+        console.log(`영상 촬영 시작`);
         setTimeout(() => {
           if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             mediaRecorderRef.current.stop();
@@ -350,6 +350,11 @@ const selectFilter = (index) => setCurrentFilterIndex(index);
         setIsRecording(false); setCountdown(0);
       }
     } else if (mode === 'film') { 
+      const currentCount = Number(localStorage.getItem(storageKey) || shotCount);
+      if (currentCount >= MAX_TOTAL_SHOTS) {
+        alert(`최대 촬영 횟수(${MAX_TOTAL_SHOTS})를 모두 사용했습니다!`);
+        return;
+      }
       const imageSrc = webcamRef.current.getScreenshot();
       if (!imageSrc) {
         alert('카메라가 준비되지 않았습니다.');

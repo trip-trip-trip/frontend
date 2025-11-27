@@ -4,19 +4,32 @@ import search_icon from '/icons/search.png';
 import Header from '../../../components/Header/Header';
 import Navbar from '../../../components/NavBar/NavBar';
 import './AddFriend.css'
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import default_profile from '/profile-img.png';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const AddFriend = () => {
+  const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
+
   const [searchFriend, setSearchFriend] = useState("");
+  const [friendList, setFriendList] = useState([]);
   const [selectedFriends, setSelectedFriends] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const {token} = useAuth();
+  const {tripId} = useParams();
+  const navigate = useNavigate();
 // 더미값
-  const friendList = [
-      { id: 11, username: '사람', tag: 'person', avatarUrl: '/profile-img.png', bio: '안녕하세요'},
-      { id: 12, username: '사라', tag: 'sara', avatarUrl: '', bio: '여행 좋아해요'},
-      { id: 13, username: '또사람', tag: 'another', avatarUrl: '', bio: 'react 개발자'},
-      { id: 14, username: '눈사람', tag: 'snowman', avatarUrl: '/profile-img.png', bio: '겨울 조아요'},
-      { id: 15, username: '김멋사', tag: 'musa', avatarUrl: '', bio: '프론트엔드'},
-      { id: 16, username: '김친구', tag: 'kimfriend', avatarUrl: '', bio: '같이 가자'},
-  ];
+  // const friendList = [
+  //     { id: 11, username: '사람', tag: 'person', avatarUrl: '/profile-img.png', bio: '안녕하세요'},
+  //     { id: 12, username: '사라', tag: 'sara', avatarUrl: '', bio: '여행 좋아해요'},
+  //     { id: 13, username: '또사람', tag: 'another', avatarUrl: '', bio: 'react 개발자'},
+  //     { id: 14, username: '눈사람', tag: 'snowman', avatarUrl: '/profile-img.png', bio: '겨울 조아요'},
+  //     { id: 15, username: '김멋사', tag: 'musa', avatarUrl: '', bio: '프론트엔드'},
+  //     { id: 16, username: '김친구', tag: 'kimfriend', avatarUrl: '', bio: '같이 가자'},
+  // ];
   
     // 검색 필터링 (username으로 필터링)
     const filteredFriendList = friendList.filter(friend => friend.username.includes(searchFriend));
@@ -41,16 +54,93 @@ const AddFriend = () => {
 
     const handleFriendBtn = () => {
       console.log(selectedFriends);
+      handleAddFriends();
+      navigate(`/trips/detail/${tripId}`)
     }
-    
 
+
+    const fetchFriendList = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `${API_BASE}/users/friendships`,
+          {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+        }
+        const data = await response.json();
+        const fetchedFriends = data.result;
+        setFriendList(fetchedFriends);
+      } catch (error) {
+        console.error("Error fetching trip data:", error);
+      } finally{
+        setIsLoading(false);
+      }
+    }
+
+    useEffect(() => {
+      if (token) {
+        fetchFriendList();
+      }
+    }, [token]); 
+
+
+    const handleAddFriends = async () => {
+      const selectedFriendsID = [];
+
+      selectedFriends.map((i)=>[
+        selectedFriendsID.push(i.id)
+      ])
+
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `${API_BASE}/trips/${tripId}/invite`,
+          {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+              "X-User-Id": "long"
+            },
+            body:JSON.stringify({
+              "inviteeUserIds": selectedFriendsID,
+              "message": "같이 앨범 공유하자"
+            },)
+          }
+        );
+
+        if (response.status === 400) {
+          alert("이 여행에 대한 초대 권한이 없습니다.");
+          navigate(`/trips/detail/${tripId}`, { replace: true });
+          return;
+        }
+  
+        if (!response.ok) {
+          throw new Error(`여행 친구 추가 실패: ${response.status}`);
+        }
+        const data = await response.json();
+        const fetchedFriends = data.result;
+        setFriendList(fetchedFriends);
+      } catch (error) {
+        console.error("Error fetching trip data:", error);
+      } finally{
+        setIsLoading(false);
+      }
+    }
 
   return (
     <div className='add-friend'>
-      {/* Header 컴포넌트가 title/subtitle props를 받는다고 가정 */}
       <Header 
         toBack={true}
-        title="도쿄 여행"
       />
       <div className="add-friend-container">
         <div className="friend-search-wrapper">
@@ -74,8 +164,7 @@ const AddFriend = () => {
               <div className="friend-profile">
                 {friend.avatarUrl 
                 ? <img src={friend.avatarUrl} alt={""} className='profile-img'/>
-                : <div className="profile-circle">
-                  </div>
+                : <img src={default_profile} alt={""} className='profile-img'/>
                 }
                 <p className='friend-name'>{friend.username}</p>
               </div>
@@ -85,15 +174,24 @@ const AddFriend = () => {
             </div>
           ))}
         </div>
-        {
+      </div>
+      {
           selectedFriends.length>0 &&
           <div className="selected-friends-bottom">
             <div className="selected-friends-list">
                 {selectedFriends.map((friend) => (
                     <div className="selected-friend-item" key={friend.id}>
-                        <div className="profile-circle selected-profile" onClick={() => removeFriend(friend)}>
+                        {friend.avatarUrl ?
+                          <div className='profile-circle selected' onClick={() => removeFriend(friend)}>
+                            <img src={friend.avatarUrl} alt="" />
                             <span className="remove-icon">×</span>
-                        </div>
+                          </div>
+                        :
+                          <div className='profile-circle selected' onClick={() => removeFriend(friend)}>
+                            <img src={default_profile} alt="" />
+                            <span className="remove-icon">×</span>
+                          </div>
+                        }
                         <p className='selected-name'>{friend.username}</p>
                     </div>
                 ))}
@@ -105,8 +203,6 @@ const AddFriend = () => {
           </div>
         </div>
         }              
-      
-      </div>
     </div>
   )
 }

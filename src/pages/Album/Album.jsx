@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext'; // 1. AuthContext 임포�
 import Header from '../../components/Header/Header';
 import new_trip from '/new_trip.png';
 import plus_btn from '/icons/plus_icon.png'
+import Upcoming from '../../components/Album/UpcomingTrip';
 
 
 const Album = () => {
@@ -18,39 +19,24 @@ const Album = () => {
     : '/api';
   const [isLoading, setIsLoading] = useState(true); 
   const todayDate = new Date().toISOString().split('T')[0];
-  
+  // todayDate.setHours(0, 0, 0, 0); // 로컬 시간대의 오늘 자정
+
   const navigate = useNavigate();
   const { token, activeTripId, setActiveTripId } = useAuth();
 
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
   const [tripData, setTripData] = useState({});
-
+  // 날짜에 따라 여행 -> 시작/완료/대기중 구분
   const [activeTripInfo, setActiveTripInfo] = useState(null);
   const [completedTrips, setCompletedTrips] = useState([]);
   const [plannedTrips, setPlannedTrips] = useState([]);
   
   // 친구 초대 요청 존재 여부
-  const [hasInviteRequest, setHasInviteRequest]=useState(false);
+  const [hasInviteRequest, setHasInviteRequest] = useState();
+  // 친구 초대 요청 저장
+  const [tripRequest, setTripRequest] = useState();
 
-  // 친구 초대 요청 정보 - 요청받기 위해 일단 더미값 채워둠
-  const [tripRequest, setTripRequest] = useState({
-    title: '제주도 여행',
-    requestor: '김친구',
-    startDate: '2025-11-12',
-    endDate: '2025-12-12',
-    members: ['김친구', '박친구'],
-    image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
-    coverImage: '/trip-img/trip4.jpeg',
-  });
-
-  // setTripRequest({
-  //   title: '제주도 여행',
-  //   requestor: '김친구',
-  //   dateRange : '2025.11.18-22',
-  //   members: ['김친구', '박친구'],
-  //   image: ['/trip-img/trip4.jpeg','/trip-img/trip6.jpeg'],
-  // });
 
   useEffect(() => {    
     if (activeTripId) {
@@ -73,7 +59,39 @@ const Album = () => {
  
 ////-----------
 
-  useEffect(() => {
+  //여행 초대 정보
+  const fetchInvitations = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/invitations`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
+      }
+      const data = await response.json();
+      const fetchedInvitation = data.result;
+
+      if (fetchedInvitation?.length > 0){
+        setHasInviteRequest(true);
+        setTripRequest(fetchedInvitation[0]);
+        console.log(fetchedInvitation);
+      }
+
+    } catch (error) {
+      console.error("Error fetching invitation data:", error);
+    }
+  };
+
+
     async function fetchTrips() {
       setIsLoading(true);
       
@@ -110,15 +128,21 @@ const Album = () => {
         fetchedTrips.forEach(item => {
           const trip = item.trip;
           const contents = item.contents;
+          // const startDateObj = new Date(trip.startDate);
+          // startDateObj.setHours(0, 0, 0, 0);
+          
+          // const endDateObj = new Date(trip.endDate);
+          // endDateObj.setHours(0, 0, 0, 0); // (매우 중요) 종료일도 자정으로 통일
           
           const tripData = {
             id: trip.id,
+            placeName: trip.placeName,
             title: trip.title,
             startDate: trip.startDate,
             endDate: trip.endDate,
             members: (trip.inviteesNameList || []).map((name, index) => ({
                 name: name,
-                profile: trip.inviteesProfileImgList[index] || '',
+                profile: trip.inviteesProfileImgList[index] || 'none',
                 tag: trip.inviteesTagList[index] || ''
             })),
             film_count: contents.photos.length,
@@ -126,6 +150,15 @@ const Album = () => {
             image: contents.photos.map(p => p.media.url),
             coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
           };
+
+
+          // if (trip.startDate > todayDate) {
+          //   plannedTrip.push(tripData);
+          // } else if (trip.endDate >= todayDate){
+          //   activeTrips.push(tripData);
+          // } else{
+          //   completedList.push(tripData);
+          // }
 
           if (trip.endDate < todayDate) {
             completedList.push(tripData);
@@ -158,67 +191,86 @@ const Album = () => {
 
       } catch (error) {
         console.error("Error fetching trips:", error);
-      }finally{
-        setIsLoading(false);
       }
     }
-    fetchTrips();
-  }, [token, activeTripId]);
+  
+    useEffect(() => {
+      async function initialDataFetch() {
+        setIsLoading(true);
+        try {
+          await Promise.all([
+            fetchTrips(),
+            fetchInvitations()
+          ]);
+        } catch (error) {
+          console.error("Initial data fetch failed:", error);
+        } finally {
+          setIsLoading(false); // 마지막에 한 번만 해제
+        }
+      }
+      if (token) {
+        initialDataFetch();
+      } else {
+        setIsLoading(false);
+        navigate('/login');
+      }
+    // ...
+    }, [token, activeTripId]);
+
+  
+  // // 친구 초대 요청에서 <거절> 클릭 시 동작
+  // const handleRejectRequest = () => {
+  //   setHasInviteRequest(false);
+  //   alert("친구의 요청을 거절했어요.");
+  // }
+
+  // 친구 초대 요청에서 <수락> 클릭 시 동작
+  // const handleAcceptRequest = () => {
+  //   setHasInviteRequest(false);
+  //   if (!activeTripId){
+  //     const newTripId = `${tripRequest.title.replace(/\s/g, '-')}-${new Date().getTime()}`;
+  //     const newTripInfo = {
+  //       id: newTripId,
+  //       title : tripRequest.title,
+  //       startDate : tripRequest.startDate,
+  //       vid_count: 0,
+  //       film_count: 0,
+  //       endDate : tripRequest.endDate,
+  //       members : tripRequest.members,
+  //       coverImage : tripRequest.coverImage || '',
+  //       image: [],
+  //     }
+
+  //     localStorage.setItem(`tripInfo_${newTripId}`, JSON.stringify(newTripInfo));
+  //     const ids = JSON.parse(localStorage.getItem('tripIds') || '[]');
+  //     localStorage.setItem('tripIds', JSON.stringify([...new Set([...ids, newTripId])]));
+  //     // setActiveTrip(newTripInfo);
+  //     setActiveTripId(newTripId);
+  //     setHasInviteRequest(false);
+      
+  //     // setActiveTripInfo({
+  //     //   title : tripRequest.title,
+  //     //   startDate : tripRequest.startDate,
+  //     //   endDate : tripRequest.endDate,
+  //     //   members : tripRequest.members,
+  //     //   image : tripRequest.image,
+  //     // })
+  //     // setHasActiveTrip(true);
+  //     alert("새 여행이 생성되었습니다.");
+  //     // console.log(activeTripInfo);
+  //   }
+  // }
 
   if (isLoading) {
     return (
       <div className='album'>
         <Header/>
           <div className="album-container">
-            <h1>여행 정보를 불러오는 중...</h1>
+            <div className="ment">여행 정보를 불러오는 중...</div>
           </div>
         <Navbar/>
       </div>
     );
-  }
-
-
-  // 친구 초대 요청에서 <거절> 클릭 시 동작
-  const handleRejectRequest = () => {
-    setHasInviteRequest(false);
-    alert("친구의 요청을 거절했어요.");
-  }
-
-  // 친구 초대 요청에서 <수락> 클릭 시 동작
-  const handleAcceptRequest = () => {
-    setHasInviteRequest(false);
-    if (!activeTripId){
-      const newTripId = `${tripRequest.title.replace(/\s/g, '-')}-${new Date().getTime()}`;
-      const newTripInfo = {
-        id: newTripId,
-        title : tripRequest.title,
-        startDate : tripRequest.startDate,
-        vid_count: 0,
-        film_count: 0,
-        endDate : tripRequest.endDate,
-        members : tripRequest.members,
-        coverImage : tripRequest.coverImage || '',
-        image: [],
-      }
-
-      localStorage.setItem(`tripInfo_${newTripId}`, JSON.stringify(newTripInfo));
-      const ids = JSON.parse(localStorage.getItem('tripIds') || '[]');
-      localStorage.setItem('tripIds', JSON.stringify([...new Set([...ids, newTripId])]));
-      // setActiveTrip(newTripInfo);
-      setActiveTripId(newTripId);
-      setHasInviteRequest(false);
-      
-      // setActiveTripInfo({
-      //   title : tripRequest.title,
-      //   startDate : tripRequest.startDate,
-      //   endDate : tripRequest.endDate,
-      //   members : tripRequest.members,
-      //   image : tripRequest.image,
-      // })
-      // setHasActiveTrip(true);
-      alert("새 여행이 생성되었습니다.");
-      // console.log(activeTripInfo);
-    }
   }
   
 return(
@@ -226,28 +278,28 @@ return(
       <Header/>
         {/* <button className='add-trip-btn' onClick={handleCreateBtn}>+</button> */}
         <div className="album-container">
-        {/* 친구 초대 요청이 있으면 요청 표시 */}
+        <div className={`request-cont ${activeTripId ? 'active' : 'nonactive'}`}>
+          {/* 친구 초대 요청이 있으면 요청 표시 */}
         { hasInviteRequest
           ? <FriendRequest 
-              img={tripRequest.image}
-              tripName={tripRequest.title}
-              userName={tripRequest.requestor}
-              onAccept={handleAcceptRequest}
-              onReject={handleRejectRequest}/> 
+              data={tripRequest}/> 
           : <></>}
+        </div>
+        
         {/* 활성화된 여행 있으면 표시 */}
         <div className="album-active-cont">
           {activeTripId
             ? <ActiveTrip tripName={activeTripInfo?.title}
+                          placeName={activeTripInfo?.placeName}
                           tripId = {activeTripId}
                           members={activeTripInfo?.members || []}
                           img={activeTripInfo?.image || []}
-                          filmCount={activeTripInfo.film_count || 0}
-                          vidCount={activeTripInfo.vid_count || 0}
+                          filmCount={activeTripInfo?.film_count || 0}
+                          vidCount={activeTripInfo?.vid_count || 0}
                           startDate={activeTripInfo?.startDate}
                           endDate={activeTripInfo?.endDate}
                           />
-            : <div className="new-trip-container" onClick={()=>navigate('/trips/create')}>
+            : <div className="new-trip-container" onClick={()=>navigate('/trips/places')}>
                 <div className="new-trip-img">
                   <img src={new_trip} alt="" />
                 </div>
@@ -255,8 +307,40 @@ return(
                   <img src={plus_btn} alt="" />
                   <h1>새로운 여행 만들기</h1>
                 </div>
-            </div> }
+                <div className="utc-ment">
+                  *날짜 정보는 UTC를 기준으로 계산됩니다.
+                </div>
+            </div> 
+            }
         </div>
+
+        {/* --- 예정된 여행 섹션 --- */}
+        {
+          (plannedTrips.length > 0) &&
+          <div className="completed-album">
+            <h2 className="section-title">예정된 여행</h2>
+          <div className="upcoming-trips-list">
+            {plannedTrips.map((trip, index) => (
+              <div 
+                key = {index}
+                className="upcoming-trip-item">
+                <Upcoming
+                  tripId = {trip.id}
+                  placeName={trip.placeName}
+                  title={trip.title}
+                  startDate={trip.startDate}
+                  endDate={trip.endDate}
+                  members={trip.members}
+                  coverImage={trip.coverImage}
+                  images={trip.image}
+                />
+              </div>
+            ))}
+          </div> 
+        </div>
+        }
+        
+
         {/* --- 완료된 여행 섹션 --- */}
         <div className="completed-album">
           <h2 className="section-title">지난 여행 기록</h2>
@@ -268,6 +352,7 @@ return(
                 className="completed-trip-item">
                 <EndedTripItem
                   tripId = {trip.id}
+                  placeName={trip.placeName}
                   title={trip.title}
                   startDate={trip.startDate}
                   endDate={trip.endDate}

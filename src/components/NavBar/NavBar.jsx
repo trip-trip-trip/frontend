@@ -76,6 +76,10 @@ const Navbar = () => {
     navigate(targetPath);
     setShowMenu(false);
   };
+  const handleHomeClick = () => {
+    // state로 'feed' 탭을 활성화하라는 신호를 보냄
+    navigate('/home', { state: { activeTab: 'feed', timestamp: Date.now() } });
+  };
 
 
   if (
@@ -108,7 +112,7 @@ const Navbar = () => {
             <div className="divider"></div>
             <button 
                 className="popup-item"
-                onClick={() => handleMenuItemClick('scrapbook/frame')}
+                onClick={() => handleMenuItemClick('/scrapbook/frame')}
             >
                 스크랩북 만들기
             </button>
@@ -125,15 +129,14 @@ const Navbar = () => {
 
     <nav className="navbar">
       
-      {/* 1. 홈 (/) */}
-      <div className="nav-link" onClick={() => navigate('/home')}>
-        <img 
-          src={path === '/home' ? home_on : home_off} 
-          alt="홈" 
-          className='icon' 
-        />
-        <p className={path === '/home' ? 'active' : ''}>홈</p>
-      </div>
+      <div className="nav-link" onClick={handleHomeClick}>
+          <img 
+            src={path === '/home' ? home_on : home_off} 
+            alt="홈" 
+            className='icon' 
+          />
+          <p className={path === '/home' ? 'active' : ''}>홈</p>
+        </div>
       
       {/* 2. 촬영 (카메라) */}
       <div className="nav-link" onClick={handleCameraClick}>

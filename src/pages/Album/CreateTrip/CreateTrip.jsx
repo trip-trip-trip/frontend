@@ -5,7 +5,6 @@ import Header from '../../../components/Header/Header';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext'; 
 
-// 1. API_BASE 정의 (다른 파일에서 가져옴)
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
@@ -21,14 +20,32 @@ const CreateTrip = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { selectedPlace } = location.state;
-    
+  const [btnLoading, setBtnLoading] = useState(false);
+
   // 2. [수정] API 호출을 위해 'token'을 함께 가져옵니다.
     const { token, activeTripId, setActiveTripId } = useAuth(); 
+
+    const handleOnedayBtn = () => {
+      const newOnedayState = !oneday;
+      setOneday(newOnedayState);
+
+      if (newOnedayState) {
+          if (startDate) {
+              setEndDate(startDate);
+          } else if (endDate) {
+              setStartDate(endDate);
+          }
+      }
+    }
 
     // 3. [핵심 수정] 여행 생성 버튼 핸들러 (API 연동)
     const handleCreateBtn = async () => { // 👈 async 함수로 변경
     if (activeTripId){
       alert("이미 생성된 여행이 있습니다. 해당 여행이 끝난 후 새 여행 생성이 가능합니다.");
+    }
+    if (btnLoading){
+      console.log("생성 작업이 이미 진행 중입니다.");
+      return;
     }
     // 4. 폼 유효성 검사 (API 기준으로는 name, startDate, endDate만)
     if( !name || !startDate || !endDate ){
@@ -52,6 +69,8 @@ const CreateTrip = () => {
     };
 
     console.log("새 여행 생성 API 호출:", newTripData);
+
+    setBtnLoading(true);
 
     try {
       const response = await fetch(`${API_BASE}/trips`, {
@@ -98,6 +117,8 @@ const CreateTrip = () => {
     } catch (err) {
       console.error("여행 생성 API 호출 실패:", err);
       alert(`여행 생성에 실패했습니다: ${err.message}`);
+    } finally{
+      setBtnLoading(false);
     }
 
     }
@@ -115,7 +136,9 @@ const CreateTrip = () => {
             </div>
             <h3>여행 일정을 알려주세요</h3>
             <div className="oneday-check">
-              <input type="checkbox" onClick={()=>setOneday(!oneday)}/>
+              <input type="checkbox" 
+                    checked={oneday}
+                    onClick={handleOnedayBtn}/>
               <h4>당일치기</h4>
             </div>
             { oneday
@@ -140,7 +163,9 @@ const CreateTrip = () => {
           {
                 name && startDate && endDate && location &&
                 <div className="create-trip-btn-cont">
-                  <button className='create-trip-btn' onClick={handleCreateBtn}>여행 만들기!</button>
+                  <button className='create-trip-btn' onClick={handleCreateBtn} disabled={btnLoading}>
+                    {btnLoading ? '여행 생성 중...' : '여행 만들기!'}
+                  </button>
                 </div>
               }
           </div>

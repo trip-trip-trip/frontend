@@ -10,7 +10,7 @@ import members_icon from '/icons/members_icon.png'
 import camera_icon from '/icons/camera_icon.png'
 import write_icon from '/icons/write_icon.png'
 
-const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmCount, vidCount}) => {
+const ActiveTrip = ({placeName, tripId, tripName, title, startDate, endDate, members, filmCount, vidCount}) => {
     const navigate = useNavigate();
 
     // 카메라 버튼 핸들러
@@ -29,11 +29,11 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
     <div className='active-trip-container'>
       <div className="active-header">
         <div className="active-trip-title">
-          <h2>지금 <span>{tripName}</span> 여행중 </h2>
+          <h2 className='active-trip-name'><span>{tripName}</span> 여행 중 </h2>
         </div>
         <div className="active-trip-members">
-          {/* 친구 수 + 1명(본인) 추가 */}
-          <h5><span>{(members.length) + 1}명</span> | {startDate?.slice(2).split('-').join('.')} ~ {endDate.slice(2).split('-').join('.')}</h5>
+          {/* 친구 수 + 본인 추가 */}
+          <h5><span>{(members.length)}명</span> | {startDate?.slice(2).split('-').join('.')} ~ {endDate?.slice(2).split('-').join('.')}</h5>
         </div>
       </div>
 
@@ -57,16 +57,16 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
               }
             })}>
               <div className="active-album-date">
-                <h5 className='left-date'>{startDate.split('-')}</h5>
-                <p>-------------</p>
-                <h5 className='right-date'>{endDate.split('-')}</h5>              
+                <h5 className='left-date'>{startDate?.split('-')}</h5>
+                <p>------------</p>
+                <h5 className='right-date'>{endDate?.split('-')}</h5>              
               </div>
 
               <div className="active-trip-info">
                 <div className="active-line">
                   <div className="active-item">
                     <img src={location_icon} alt="" className='ticket-icon big'/>
-                    <h4 className='info-box'>{tripName}</h4>
+                    <h4 className='info-box'>{placeName}</h4>
                   </div>
                   <div className="active-item">
                     <img src={film_icon} alt="" className='ticket-icon'/>
@@ -76,7 +76,7 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
                 <div className="active-line">
                   <div className="active-item">
                     <img src={members_icon} alt="" className='ticket-icon big'/>
-                    <h4 className='info-box'>{(members.length) + 1} <span>명 참여 중</span></h4>
+                    <h4 className='info-box'>{(members.length)} <span>명 참여 중</span></h4>
                   </div>
                   <div className="active-item">
                     <img src={vid_icon} alt="" className='ticket-icon'/>
@@ -100,11 +100,16 @@ const ActiveTrip = ({tripId, tripName, title, startDate, endDate, members, filmC
         </div>
         
           </div>
-          
+          <div className="main-edit-cont">
+            <div className="utc-ment active">
+              *날짜 정보는 UTC를 기준으로 계산됩니다.
+            </div>
             <div className="main-edit-btn" onClick={handleEditClick}>
               <img src={write_icon} alt="" />
               <p>수정하기</p>
+            </div>
           </div>
+          
         </div>
       
   )

@@ -27,24 +27,45 @@
 
 .info-window {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column; /* 세로 배치 (사진 위, 글 아래) */
+  align-items: center;    /* 가운데 정렬 */
+  gap: 8px;               /* 사진과 글 사이 간격 */
+  min-width: 160px;       /* 최소 너비 */
+  max-width: 200px;       /* 너무 넓어지지 않게 제한 */
+  padding: 4px;           /* 내부 여백 */
 }
 
 .info-img {
-  width: 56px;
-  height: 56px;
+  width: 100%;            /* 가로 꽉 채우기 */
+  height: 120px;          /* 시원하게 높이 키움 (기존 56px -> 120px) */
+  object-fit: cover;      /* 비율 유지하며 자르기 */
   border-radius: 8px;
-  object-fit: cover;
+  display: block;
+}
+
+/* 텍스트 영역 */
+.info-content {
+  width: 100%;
+  text-align: center;     /* 텍스트 가운데 정렬 */
+  padding-right: 0;       /* 가로형일 때 줬던 여백 제거 */
 }
 
 .info-title {
-  font-weight: 600;
-  font-size: 14px;
-  max-width: 180px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 4px;
+
+  /* 긴 제목 말줄임표 처리 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.info-more {
+  font-size: 13px;
+  color: #007AFF;
+  cursor: pointer;
 }
 
 .place-header-controls {
@@ -69,4 +90,45 @@
 
 .back-to-feed-btn:hover {
   color: #000;
+}
+
+/* 안내 텍스트 */
+.place-guide-text {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+/*  장소 탭 컨테이너 */
+.place-tabs-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    
+    /* 스크롤바 숨김 */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+.place-tabs-container::-webkit-scrollbar { display: none; }
+
+/*  장소 칩 스타일 */
+.place-chip {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: none;
+    background-color: #E6E2D6; /* 기본 베이지/회색 */
+    color: #555;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.place-chip.active {
+    background-color: #525B65; /* 선택시 진한 회색 */
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }

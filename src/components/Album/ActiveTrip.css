@@ -31,6 +31,10 @@
     font-weight: 700;
 }
 
+.active-trip-name{
+    font-weight: 300;
+}
+
 .active-trip-title h2{
     font-weight: 300;
     margin: 1.6rem 0;
@@ -118,7 +122,7 @@
 
 .active-album-date{
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     font-family: 'Orbit';
     margin-bottom: 0.5rem;
@@ -137,13 +141,13 @@
     display: flex;
     flex-direction: column;
     top: 30%;
-    gap: 1.3rem;
+    gap: 1rem;
 }
 
 .active-line{
     display: flex;
     width: 100%;
-    justify-content: space-around;
+    justify-content: space-between;
     gap: 1.5rem;
 }
 
@@ -179,6 +183,10 @@
     font-size: 1rem;
     font-style: normal;
     font-weight: 400;
+}
+
+h5.left-date{
+    margin-left: 1.5rem;
 }
 
 .goto-camera-btn{
@@ -251,4 +259,13 @@
     font-size: 1.2rem;
     font-weight: 400;
     border-bottom: 0.1rem solid #525B65;
+}
+
+.main-edit-cont{
+    display: flex;
+    justify-content: space-between;
+}
+
+.utc-ment.active{
+    margin: 0;
 }

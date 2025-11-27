@@ -10,16 +10,15 @@ import { useAuth } from '../../../contexts/AuthContext';
 // 프레임 목록 더미
 const FrameList = [
   { id: 1, url: '/frame1.PNG', picNum: 4 },
-  { id: 2, url: '/frame1.PNG', picNum: 3 },
-  { id: 3, url: '/frame1.PNG', picNum: 2 },
-  { id: 4, url: '/frame1.PNG', picNum: 4 },
+  { id: 2, url: '/frame2.PNG', picNum: 2 },
+  { id: 3, url: '/frame3.PNG', picNum: 3 },
 ];
 const PickFrame = () => {
   const navigate = useNavigate();
 
   const location = useLocation();
   const [tripId, setTripId] = useState();
-  
+
   useEffect(() => {
     if (location?.state?.tripId) {
       setTripId(location.state.tripId);
@@ -29,6 +28,7 @@ const PickFrame = () => {
   const API_BASE = import.meta.env.PROD 
       ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
       : '/api';
+
   const [isLoading, setIsLoading] = useState(true); 
 
   const {token} = useAuth();

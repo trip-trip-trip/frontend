@@ -1,8 +1,9 @@
 .setting-page {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   background-color: #F6F6F5; /* 전체 배경 흰색 */
+  overflow: hidden;
 }
 
 /* 1. 상단바 */

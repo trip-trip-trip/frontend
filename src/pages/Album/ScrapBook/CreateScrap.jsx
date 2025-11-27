@@ -9,6 +9,7 @@ import { useRef } from 'react';
 import save_btn from '/icons/save_btn.png'
 import { toBlob } from 'html-to-image';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useState } from 'react';
 
 
 const API_BASE = import.meta.env.PROD 
@@ -23,21 +24,15 @@ const FRAME_POSITIONS = {
         { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
         { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
     ],
-    2: [ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
-      { id: 1, initialUrlIndex: 0, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
-      { id: 2, initialUrlIndex: 1, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
-      { id: 3, initialUrlIndex: 2, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
+    2: [ // '/frame2.PNG'에 대한 4장의 사진 위치 설정
+      { id: 1, initialUrlIndex: 0, style: { top: '10.3rem', left: '1.7rem', width: '20.5rem', height: '12.6rem', transform: 'rotate(9.982deg)' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '29.2rem', left: '10rem', width: '12.4rem', height: '9.3rem', transform: 'rotate(-12.581deg)' } },
     ],
-    3:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
-      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
-      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
+    3: [ // '/frame3.PNG'에 대한 4장의 사진 위치 설정
+      { id: 1, initialUrlIndex: 0, style: { top: '13.7rem', left: '19.6rem', width: '11.3rem', height: '11.9rem', transform: 'rotate(2.5deg)' } },
+      { id: 2, initialUrlIndex: 1, style: { top: '26rem', left: '10.2rem', width: '18.7rem', height: '18.1rem', transform: 'rotate(-82deg)' } },
+      { id: 3, initialUrlIndex: 2, style: { top: '10.1rem', left: '5.5rem', width: '14rem', height: '14.8rem', transform: 'rotate(-7.086deg)'} },
     ],
-    4:[ // '/frame1.PNG'에 대한 4장의 사진 위치 설정
-      { id: 1, initialUrlIndex: 0, style: { top: '0', left: '0', width: '32rem', height: '48rem' } },
-      { id: 2, initialUrlIndex: 1, style: { top: '7.2rem', left: '6.2rem', width: '8.7rem', height: '11.6rem', transform: 'rotate(-9.802deg)' } },
-      { id: 3, initialUrlIndex: 2, style: { top: '24.4rem', left: '15rem', width: '11.4rem', height: '12.2rem', transform: 'rotate(5.292deg)' } },
-      { id: 4, initialUrlIndex: 3, style: { top: '10.5rem', left: '16.7rem', width: '10.8rem', height: '8.9rem'} },
-    ]
 };
 
 const CreateScrap = () => {
@@ -53,6 +48,7 @@ const CreateScrap = () => {
     const scrapRef = useRef(null);
     const {token} = useAuth();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     // 선택된 프레임의 위치 정보 가져오기
     const initialFrameData = FRAME_POSITIONS[selectedFrameId] || [];
@@ -75,7 +71,7 @@ const CreateScrap = () => {
       try {
         const dataUrl = await toPng(scrapRef.current, {
           cacheBust: true,
-          pixelRatio: 3,
+          pixelRatio: 2,
         });
         const link = document.createElement('a');
         link.href = dataUrl;
@@ -93,15 +89,22 @@ const CreateScrap = () => {
 // API ------------------------------------------
     const handleSaveToAlbum = async () => {
 
+      if(loading){
+        console.log("저장 작업이 이미 진행 중입니다.");
+        return;
+      }
+
       if (!scrapRef.current) {
           alert("스크랩북 제작 중 오류가 발생했습니다. 다시 시도해주세요.");
           return;
       }
 
+      setLoading(true);
+
       try {
           const fileBlob = await toBlob(scrapRef.current, {
               cacheBust: true,
-              pixelRatio: 3,
+              pixelRatio: 2,
               backgroundColor: 'white'
           });
 
@@ -118,7 +121,7 @@ const CreateScrap = () => {
               "media": {
                   "tripId": `${tripId}`,
                   "mediaKind": "PHOTO",
-                  "captureType": "SCRAPBOOK",
+                  "captureType": "NORMAL",
                   "comment": '' 
               },
               "tripId": `${tripId}`,
@@ -148,6 +151,8 @@ const CreateScrap = () => {
       } catch (error) {
           console.error('스크랩북 앨범 저장 중 오류 발생:', error);
           alert('스크랩북을 앨범에 저장하는 중 네트워크 오류가 발생했습니다.');
+      } finally{
+        setLoading(false);
       }
   };
 
@@ -175,8 +180,8 @@ const CreateScrap = () => {
                   </button>
                 </div>
                 <p><span>[앨범에 저장하기]</span>를 눌러서 여행 앨범에 스크랩북을 저장할 수 있어요.</p>
-                <button className='save-scrap-button album' onClick={handleSaveToAlbum}>
-                  앨범에 저장하기
+                <button className='save-scrap-button album' onClick={handleSaveToAlbum} disabled={loading}>
+                  {loading? '저장 중...' : '앨범에 저장하기'}
                 </button>
                 <button className='save-scrap-button retry' onClick={()=>navigate(-2)}>
                   다시 만들기

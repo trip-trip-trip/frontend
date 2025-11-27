@@ -4,7 +4,9 @@ import { useAuth } from '../../../contexts/AuthContext';
 import Header from '../../../components/Header/Header';
 import './PostEdit.css'; 
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
 
 const PostEdit = () => {
   const { id } = useParams();
@@ -29,23 +31,26 @@ const PostEdit = () => {
         if (data.isSuccess) {
           const p = data.result;
           
-          // 권한 체크
-          if (p.author?.id !== user?.id && p.author?.username !== user?.username) {
-             // API에 따라 author 구조가 다를 수 있어 안전하게 체크
-             // (본인 확인 로직이 확실하다면 생략 가능)
-          }
-
-          // 데이터 매핑
           setContent(p.caption || '');
           setIsPrivate(p.visibility === 'PRIVATE');
 
-          // 미디어 데이터 매핑 
+          // 미디어 데이터 매핑 시 비디오 타입 확인
           if (p.media && Array.isArray(p.media)) {
-             setMediaList(p.media.map(m => ({
-                 mediaAssetId: m.mediaAssetId || m.id, // ID 필드명 주의
-                 url: m.url || m.mediaUrl || '',       // 이미지 URL
-                 type: m.type || 'MEDIA'               // 타입
-             })));
+             setMediaList(p.media.map(m => {
+                 const url = m.url || m.mediaUrl || '';
+                 let type = m.type || 'MEDIA';
+
+                 // 파일 확장자가 영상이면 타입을 강제로 VIDEO로 지정
+                 if (/\.(mp4|mov|webm|avi|mkv)$/i.test(url)) {
+                     type = 'VIDEO';
+                 }
+
+                 return {
+                     mediaAssetId: m.mediaAssetId || m.id,
+                     url: url,      
+                     type: type              
+                 };
+             }));
           }
         } else {
           alert("게시물 정보를 불러오지 못했습니다.");
@@ -62,7 +67,6 @@ const PostEdit = () => {
   // 수정 요청 (PATCH)
   const handleUpdate = async () => {
     if (!content.trim()) return alert("내용을 입력해주세요.");
-    // if (!confirm("게시물을 수정하시겠습니까?")) return;
 
     setLoading(true);
 
@@ -71,7 +75,8 @@ const PostEdit = () => {
         visibility: isPrivate ? 'PRIVATE' : 'FRIENDS',
         media: mediaList.map((m, index) => ({
             media_id: m.mediaAssetId,
-            object_type: m.type === 'SCRAPBOOK' ? 'SCRAPBOOK' : 'MEDIA',
+            // VIDEO 타입을 서버 스펙에 맞게 변환 
+            object_type: m.type === 'SCRAPBOOK' ? 'SCRAPBOOK' : (m.type === 'VIDEO' ? 'SHORT_REEL' : 'MEDIA'),
             position: index + 1
         }))
     };
@@ -101,10 +106,40 @@ const PostEdit = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm("정말로 게시물을 삭제하시겠습니까?")) return;
+
+    setLoading(true);
+    try {
+        const res = await fetch(`${API_BASE}/posts/${id}`, {
+            method: 'DELETE',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await res.json();
+
+        if (data.isSuccess) {
+            alert("게시물이 삭제되었습니다.");
+            navigate('/home', { replace: true }); 
+        } else {
+            // 실패 시 서버 메시지 출력
+            alert(`삭제 실패: ${data.message}`);
+        }
+
+    } catch (e) {
+        console.error("Delete Error:", e);
+        alert("삭제 중 오류가 발생했습니다.");
+    } finally {
+        setLoading(false);
+    }
+  };
+  
   return (
     <div className="post-edit-container">
-      {/* 헤더: 뒤로가기 버튼 연결 */}
-      <Header title="" goBack={true} />
+     <Header toBack={true} onDelete={handleDelete} />
 
       <main className="post-body">
         <h2 className="page-title">포스트 수정하기</h2>
@@ -112,19 +147,38 @@ const PostEdit = () => {
         <div className="write-preview-box">
            {mediaList.length > 0 && (
                <div className="preview-image-main">
-                    {/* 대표 이미지 */}
-                    <img src={mediaList[0].url} alt="main" />
+                    {mediaList[0].type === 'VIDEO' ? (
+                        <video 
+                            src={mediaList[0].url} 
+                            controls 
+                            className="main-preview-video" 
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px' }}
+                        />
+                    ) : (
+                        <img src={mediaList[0].url} alt="main" />
+                    )}
                </div>
            )}
-           {/* 썸네일 리스트 */}
+           
+           {/* ★ [수정 3] 썸네일 리스트: 비디오일 경우 video 태그 사용 */}
            <div className="preview-thumbnails">
                {mediaList.map((m, idx) => (
-                   <img 
-                     key={m.mediaAssetId || idx} 
-                     src={m.url} 
-                     alt="" 
-                     className={idx === 0 ? 'active' : ''} 
-                   />
+                   m.type === 'VIDEO' ? (
+                       <video 
+                         key={m.mediaAssetId || idx} 
+                         src={m.url} 
+                         className={idx === 0 ? 'active' : ''} 
+                         muted // 썸네일은 소리 끔
+                         style={{ objectFit: 'cover', width:'60px', height:'60px', borderRadius:'8px', border: idx === 0 ? '2px solid #333' : 'none' }}
+                       />
+                   ) : (
+                       <img 
+                         key={m.mediaAssetId || idx} 
+                         src={m.url} 
+                         alt="" 
+                         className={idx === 0 ? 'active' : ''} 
+                       />
+                   )
                ))}
            </div>
         </div>
@@ -150,14 +204,23 @@ const PostEdit = () => {
             onChange={(e) => setContent(e.target.value)}
         ></textarea>
 
-        {/* 수정하기 버튼 (색상: 짙은 회색) */}
+        {/* 수정하기 버튼 */}
         <button 
             className="submit-btn edit-mode-btn" 
             onClick={handleUpdate} 
             disabled={loading}
         >
-            {loading ? '수정 중...' : '수정하기★'} 
+            {loading ? '수정 중...' : '수정하기'} 
         </button>
+
+        {/* 삭제하기 버튼
+        <button 
+            className="delete-postbtn" 
+            onClick={handleDelete} 
+            disabled={loading}
+        >
+            삭제하기
+        </button> */}
 
       </main>
     </div>

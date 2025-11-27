@@ -29,11 +29,8 @@ export const AuthProvider = ({ children }) => {
   const fetchActiveTrip = useCallback(async (currentToken) => {
     if (!currentToken) return;
 
-    // TODO: 실제 진행 중인 여행을 확인하는 API 엔드포인트로 변경하세요.
-    const TRIP_STATUS_API_URL = `${API_BASE}/trips/isActiveTrips`; 
-
     try {
-      const res = await fetch(TRIP_STATUS_API_URL, {
+      const res = await fetch(`${API_BASE}/trips/isActiveTrips`, {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
 
@@ -95,25 +92,33 @@ export const AuthProvider = ({ children }) => {
 
     } catch (err) {
       console.error("사용자 프로필 로드 실패:", err);
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("jwtToken");
-    const savedTripId = localStorage.getItem("activeTripId");
-    if (savedTripId) {
-      setActiveTripId(Number(savedTripId));
-    }
+    const initializeAuth = async () => {
+      const savedToken = localStorage.getItem("jwtToken");
+      const savedTripId = localStorage.getItem("activeTripId");
+      let currentToken = null;
 
-    if (savedToken) {
-      setToken(savedToken);
-      fetchUserProfile(savedToken);
-      fetchActiveTrip(savedToken);
-    } else {
+      if (savedTripId) {
+        setActiveTripId(Number(savedTripId));
+      }
+
+      if (savedToken) {
+        setToken(savedToken);
+        currentToken = savedToken;
+      }
+
+      if (currentToken) {
+        await Promise.all([
+          fetchUserProfile(currentToken), // fetchUserProfile 내부의 finally는 제거해야 함
+          fetchActiveTrip(currentToken)
+        ]);
+      }
       setIsLoading(false);
     }
+    initializeAuth();
   }, [fetchUserProfile, fetchActiveTrip]);
 
   // 로그인

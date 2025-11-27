@@ -1,14 +1,19 @@
 .add-friend{
     padding: 5rem 0 22rem 0;
     position: relative;
-    flex-grow: 1; /* flex 컨테이너에서 남은 공간을 모두 채우도록 */
-    overflow-y: auto; /* 이 영역에만 스크롤 적용 */
+    flex-grow: 1;
+    overflow-y: auto;
     background: #F6F6F5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 .add-friend-container{
     margin-top: 5rem;
     position: relative;
+    width: 100%;
 }
 
 .friend-search{
@@ -37,6 +42,10 @@ input::placeholder{
     color: #525B65;
 }
 
+.friend-name{
+  margin: 0;
+}
+
 .friend-list{
     display: flex;
     flex-direction: column;
@@ -61,6 +70,7 @@ input::placeholder{
     display: flex;
     gap: 1.8rem;
     align-items: center;
+    justify-content: center;
 }
 
 .friend-profile p{
@@ -164,6 +174,8 @@ input[type="search"]{
     border-radius: 50%;
     background-color: #E0DDD2; /* 프로필 이미지 플레이스홀더 */
     border: 1px dashed #525B65;
+    margin: 0 0 0 0;
+    padding: 0;
   }
   
   .friend-name {
@@ -175,20 +187,22 @@ input[type="search"]{
   .selected-friends-bottom {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
     background-color: #F6F6F5;
     border-top: 0.1rem solid #e0e0e0;
-    padding: 1rem 2rem;
     box-shadow: 0 -0.2rem 0.5rem rgba(0, 0, 0, 0.05);
     z-index: 10;
+    max-width: 43rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-bottom: 1rem;
   }
   
   .selected-friends-list {
     display: flex;
     overflow-x: auto;
     gap: 1.5rem;
-    padding-bottom: 1rem;
+    padding: 2rem 2rem 1rem 2rem;
   }
   
   .selected-friend-item {
@@ -198,22 +212,28 @@ input[type="search"]{
     min-width: 6rem;
     cursor: pointer;
   }
+
+  .selected-friend-item img{
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50rem;
+  }
   
-  .profile-circle.selected-profile {
+  .profile-circle.selected {
     position: relative;
     width: 5rem;
     height: 5rem;
-    background-color: #e3dcd1;
     border: none;
     margin-right: 0;
+    background: none;
   }
   
   .remove-icon {
     position: absolute;
-    top: 0px;
-    right: 0px;
-    width: 20px;
-    height: 20px;
+    top: 0;
+    right: 0;
+    width: 2rem;
+    height: 2rem;
     background-color: #5f7478; /* X 아이콘 배경색 */
     color: white;
     border-radius: 50%;

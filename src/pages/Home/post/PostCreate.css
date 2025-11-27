@@ -3,15 +3,23 @@
     background-color: #F8F7F2;
     font-family: 'Pretendard', sans-serif;
     padding-top: 6rem;
-    
-    /* 가로 스크롤 아예 막기 */
     overflow-x: hidden; 
     overflow-y: scroll;
-    
-    /* 패딩 포함 크기 계산 */
     box-sizing: border-box;
     width: 100%;
+
+    /* 데스크탑용 카드 레이아웃 */
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+
+    position: relative;   /* (선택) 기준만 잡아둠 */
 }
+
+
+
 
 .post-body {
     /* 양옆 여백을 조금 줄여서(2rem -> 1.5rem) 모바일에서 더 넓게 쓰기 */
@@ -39,38 +47,41 @@
 }
 
 /* === Step 1: 여행 리스트 === */
+
 .trip-list {
     display: flex;
     flex-direction: column;
-    /* gap을 없애고 border-bottom으로 간격을 줍니다 */
     gap: 0; 
 }
 
 .trip-item {
-    /* 흰색 배경과 그림자 제거 -> 투명하게 */
     background: transparent;
     box-shadow: none;
     border-radius: 0;
     
-    /* 패딩 조정: 위아래 간격 넓게 */
     padding: 1.5rem 0;
-    
-    /* 하단 점선 추가 */
     border-bottom: 2px dashed #ccc;
     
     display: flex;
     gap: 1.2rem;
     cursor: pointer;
-    align-items: flex-start; /* 상단 정렬 */
 }
+
 .trip-item:active { transform: scale(0.98); }
 
-.trip-cover img {
+.trip-cover {
+    flex-shrink: 0; /* 찌그러짐 방지 */
+}
+
+/* 이미지와 비디오 모두에게 동일한 스타일 적용 */
+.trip-cover img,
+.trip-cover video {
     width: 6.5rem;
     height: 6.5rem;
     border-radius: 0.6rem;
-    object-fit: cover;
+    object-fit: cover; /* 비율 유지하며 꽉 채우기 */
     background: #eee;
+    display: block;    /* 하단 공백 제거 */
 }
 
 .trip-info {
@@ -102,7 +113,7 @@
     font-weight: 400;
 }
 .trip-title {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #333;
     margin-bottom: 0.8rem;
@@ -158,7 +169,7 @@
 
 .media-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.2rem;
 }
 
@@ -167,15 +178,31 @@
     aspect-ratio: 1/1;
     cursor: pointer;
     background: #eee;
+    overflow: hidden;
 }
 
-.media-item img {
-    width: 100%; height: 100%; object-fit: cover;
+.media-item img, 
+.media-item video,
+.grid-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
-
-.media-item.selected img {
+/* .media-item.selected img {
     filter: brightness(0.5);
+} */
+
+.media-item.selected {
+    opacity: 0.8;
 }
+.media-item.selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+
+
 
 .video-badge {
     position: absolute; top: 0.4rem; left: 0.4rem;
@@ -202,19 +229,25 @@
 /* 하단 시트 */
 .bottom-sheet {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
+    bottom: 0;
+
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;               
+    max-width: 400px;           
+
     background: #fff;
     border-top-left-radius: 1.5rem;
     border-top-right-radius: 1.5rem;
-    padding: 1.5rem 1.5rem 2.5rem 1.5rem; 
-    /* box-shadow: 0 1rem 1.5rem rgba(0,0,0,0.4); */
+    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
     z-index: 100;
     animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    from { transform: translate(-50%, 100%); }
+    to   { transform: translate(-50%, 0); }
 }
 
 .sheet-header {
@@ -304,7 +337,6 @@
 }
 
 /* === Step 3: 글 작성 === */
-
 .step-write {
     display: flex;
     flex-direction: column;
@@ -312,29 +344,58 @@
 }
 
 .write-preview-box {
-    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.preview-image-main {
     width: 100%;
+    height: 22rem; 
+    background: transparent;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.preview-image-main img {
-    width: 100%; 
-    height: 15rem; 
+
+.preview-image-main img, 
+.preview-image-main video,
+.main-video-preview {
+    width: 100%;
+    height: 100%;
     object-fit: contain; 
-    border-radius: 0.8rem; 
-    margin-bottom: 0.8rem;
-    box-shadow: 0 0.2rem 0.8rem rgba(0,0,0,0.1);
+    display: block;
 }
+
 .preview-thumbnails {
     display: flex;
-    gap: 0.6rem; 
+    gap: 0.8rem;
     overflow-x: auto;
+    padding-bottom: 0.5rem;
 }
-.preview-thumbnails img {
-    width: 4rem; 
-    height: 5rem; 
-    object-fit: cover; border-radius: 0.4rem; opacity: 0.5; transition: 0.2s;
+
+.preview-thumbnails img,
+.preview-thumbnails video,
+.thumb-video {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: block; /* 필수 */
+    flex-shrink: 0;
+    background: #000;
 }
-.preview-thumbnails img.active {
-    opacity: 1; border: 0.2rem solid #525B65;
+
+.preview-thumbnails .active {
+    opacity: 1;
+    border-color: #333;
 }
 
 .privacy-check {
@@ -385,4 +446,20 @@
     font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    /* 1. 전체 앱 컨테이너 중앙 정렬 및 그림자 */
+    .post-create-container {
+        max-width: 480px; /* 모바일 너비 고정 */
+        margin: 0 auto;   /* 중앙 정렬 */
+        
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        border-left: 1px solid #eee;
+        border-right: 1px solid #eee;
+        min-height: 100vh;
+    }
+    .media-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
