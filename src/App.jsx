@@ -85,7 +85,7 @@ const App = () => {
 <div className="app-container"> 
    <Routes>
         <Route path='/' element={<StartPage/>}/>
-        <Route path='/home' element={<ProtectedHome/>}/>
+        <Route path='/home' element={<Home/>}/>
 
         <Route path='/trips' element={<ProtectedAlbum/>}/>
         <Route path='/trips/friends' element={<AddFriend/>}/>
