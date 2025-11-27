@@ -1,373 +1,215 @@
-html,body,#root{
-  height:100%;
-    margin: 0;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
   padding: 0;
+  background-color: #2c2c2c; 
   overflow: hidden;
 }
-.camera-page-wrapper {
+
+.capture-complete-wrapper {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  max-width: 43rem; /* 스마트폰 가로 폭 제한 (피그마 390px + 여유) */
-  margin: 0 auto; /* 중앙 정렬 */
-  background-color: #000; /* 전체 배경을 검은색으로 */
-  position: relative;
-  overflow: hidden; /* 넘치는 콘텐츠 숨기기 */
-}
-
-.flip-icon {
-  width: 30px;
-  height: 30px;
-}
-/* 헤더 스타일 */
-.camera-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  background-color: #E0DDD2; /* 검은색 헤더 */
-  color: #fff;
-  position: relative;
-  z-index: 10;
-}
-
-.camera-header .back-button {
-  /*position: absolute;
-  left: 15px;*/
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  height: 24px;
-  line-height: 1;
-}
-
-.camera-header .header-title {
-  font-size: 18px;
-  font-weight: bold;
+  max-width: 43rem;
   margin: 0 auto;
-}
-.flip-camera-button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.6rem; /* (아이콘 폰트 사용 시 2.4rem) */
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  width: 40px; /* 영역 확보 */
-  text-align: right;
-}
-
-/* 카메라 뷰 컨테이너 */
-.camera-view-container {
-
-  width: 100%;
+  background-color: #2c2c2c; /* 하단 코멘트 섹션과 이어지는 배경 */
   position: relative;
   overflow: hidden;
-  aspect-ratio: 9/16;
-  margin-top: 0;
-  margin-bottom: 180px;
 }
 
-.webcam-feed {
-  width: 100%; /* 너비는 자동으로, 높이는 컨테이너에 맞춰서 */
-  height: 100%; /* 부모 컨테이너의 높이를 꽉 채움 */
-  object-fit: cover; /* 화면을 꽉 채우도록 자르면서 확대/축소 */
-
- 
-}
-
-.webcam-feed.user {
-  transform: scaleX(-1); /* 전면 카메라일 때 좌우 반전 */
-}
-
-.webcam-feed.environment {
-  transform: scaleX(1); /* 후면 카메라일 때 원래대로 */
-}
-.film-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* 클릭 통과 */
-  z-index: 5;
-}
-
-/* 프레임 이미지: 화면 꽉 채우기 */
-.film-frame-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill; /* 프레임이 찌그러져도 화면에 딱 맞게 */
-  z-index: 6;
-  opacity:0.5;
-}
-
-/* 텍스처: 화면 꽉 채우고 혼합 모드 적용 */
-.film-texture-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 텍스처는 꽉 채움 */
-  z-index: 7; /* 프레임보다 위에 */
-   filter: none;
- mix-blend-mode: overlay;
- opacity: 0.2;
-
-}
-
-.film-date-stamp {
-  position: absolute;
-  bottom: 3%;
-  right: 8%;
-  color: rgba(235, 177, 31, 0.55);  /* 기존 노랑 + 낮은 투명도 */
-  font-weight: 600;
-  font-family: 'Courier New', Courier, monospace;
+/* 1. 상단 헤더 (베이지색) */
+.capture-header {
+  height: 50px;
+  background-color: #E0DDD2; /* 요청하신 색상 */
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  flex-shrink: 0;
   
-  font-size: 1.4rem;
-  text-shadow: 1px 1px 2px rgba(51, 45, 45, 0.575);
-  z-index: 8;
 }
-/* '3' 카운트다운 오버레이 */
-.countdown-overlay {
+
+.capture-header .back-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.capture-header .back-button img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* 2. 서브 헤더 (검은색 바 - 다시 찍기) */
+.sub-header-bar {
+  height: 40px;
+  background-color: #1A1A1A; /* 요청하신 색상 */
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.retake-text {
+  color: #E0DDD2;
+  font-size: 14px;
+  text-decoration: underline; /* 밑줄 */
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.content-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* 3. 프리뷰 컨테이너 */
+.preview-container {
+  position: relative;
+  width: 100%;
+flex:1;
+  overflow: hidden;
+
+  height: 45vh;
+  min-height: auto;
+
+  background-color: #000;
+}
+
+.blurred-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(15px); /* 강한 블러 */
+  opacity: 0.8; /* 살짝 어둡게 */
+  transform: scale(1.1); /* 블러 테두리 깨짐 방지 확대 */
+}
+
+/* 오버레이 콘텐츠 (아이콘 + 텍스트) */
+.preview-overlay-content {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 60psx;
-  font-weight: bold;
-  z-index: 5;
+  width: 100%;
+  z-index: 10;
 }
-.camera-controls-bar {
-  width: 100%;
 
- flex-shrink: 0;
- position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 43rem;
-  background-color: #111;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+.film-overlay-icon {
+  width: 100%; 
+  max-width: 390px;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
 
-  padding: 20px 20px 35px;
+.overlay-text-main {
+  color: #E0DDD2;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.overlay-text-sub {
+  color: #E0DDD2;
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.9;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+/* 4. 코멘트 섹션 */
+.comment-section {
+  background-color: #1A1A1A; /* 어두운 배경 */
+  padding: 10px 20px;
+  flex:0 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  z-index: 50;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  
+z-index: 20;
 }
 
-.camera-controls-bar.filter-open {
-  padding-top: 35px; /* 열렸을 때 위쪽 공간 확보 */
-}
-/* (1) 모드 선택 캡슐 버튼 */
-.mode-selector-capsule {
-  display: flex;
-  background-color: rgba(255, 255, 255, 0.2); /* 반투명 배경 */
-  border-radius: 20px;
-  padding: 4px;
-  margin-bottom: 18px;
-  position: relative;
-  z-index: 31;
-}
-
-.mode-btn {
-  background: none;
-  border: none;
-  color: #aaa;
-  padding: 6px 16px;
-  border-radius: 16px;
+.comment-label {
+  color: #fff;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  margin-bottom: 10px;
+  margin-left: 4px;
 }
 
-.mode-btn.active {
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #000;
-}
-
-/* (2) 메인 컨트롤 행 (아이콘 - 셔터 - 아이콘) */
-.main-controls-row {
-    width: 100%;
-  box-sizing: border-box; 
-  
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  padding: 0 15px;
-}
-
-.control-icon-btn {
-    background: none;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-}
-.control-icon-btn img {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-}
-
-/* 셔터 버튼 컨테이너 */
-.shutter-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.capture-button {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background-color: transparent; /* 테두리만 있는게 아니라 꽉 찬 흰색을 원하면 변경 */
-    border: 4px solid white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    cursor: pointer;
-}
-
-.shutter-circle {
-    width: 60px;
-    height: 60px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.1s;
-}
-.capture-button:active .shutter-circle {
-    transform: scale(0.9);
-}
-
-.recording-square {
-    width: 30px;
-    height: 30px;
-    background-color: #ff3b30;
-    border-radius: 6px;
-}
-
-/* 미니 프로그레스 바 (셔터 버튼 아래) */
-.mini-progress-bar {
-    width: 60px;
-    height: 4px;
-    background-color: #444;
-    border-radius: 2px;
-    overflow: hidden;
-}
-.mini-progress-bar .fill {
-    height: 100%;
-    background-color: #FFB800; /* 노란색 포인트 */
-}
-
-
-/* (3) 필터 슬라이더 영역 */
-.filter-slider-container {
-  position: absolute;
-  bottom: 110%;
+/* 코멘트 박스 (이미지 배경) */
+.comment-input-wrapper {
   width: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  /* 비율 유지하며 높이 설정 (이미지 비율에 따라 조절 필요) */
+  min-height: 120px; 
+  background-repeat: no-repeat;
+  background-size: 100% 100%; /* 이미지를 박스에 꽉 채움 */
+  padding: 20px; /* 이미지 테두리 안쪽 여백 */
+  box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  
-  margin-bottom: 18px; 
-  align-items: center;
-  gap: 10px;
-  animation: slideUpFade 0.25s ease-out;
-  z-index: 60;
+  align-items: flex-start;
 }
 
-/* 선택된 필터 이름 (타원형 뱃지) */
-.selected-filter-name-pill {
-    background-color: #E0DDD2;
-    color: #444;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 5px;
+.transparent-textarea {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.5;
+  font-family: inherit;
 }
 
-.filter-scroll-area {
-    width: 100%;
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 4px 10px;
-    /* 스크롤바 숨기기 */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-.filter-scroll-area::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+.transparent-textarea::placeholder {
+  color: #888;
 }
 
-.filter-item-box {
-    flex: 0 0 auto; /* 크기 고정 */
-    width: 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-}
-.filter-item-box.selected {
-    opacity: 1;
+/* 5. 하단 저장 버튼 */
+.footer-area {
+  background-color: #1A1A1A; /* 코멘트 섹션과 동일 */
+  padding: 0 20px 30px 20px; /* 하단 여백 */
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.filter-preview {
-    width: 56px;
-    height: 56px;
-    background-color: #eee;
-    border-radius: 8px;
-    border: 2px solid transparent;
-}
-.filter-item-box.selected .filter-preview {
-    border: color #ffb700; /* 선택 시 테두리 강조 */
+.img-save-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  max-width: 350px; /* 버튼 최대 너비 */
+  transition: transform 0.1s;
 }
 
-.filter-name-small {
-    font-size: 10px;
-    color: #eee;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+.img-save-button:active {
+  transform: scale(0.98);
 }
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+.img-save-button img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.img-save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
