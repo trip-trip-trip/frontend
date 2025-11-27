@@ -283,3 +283,36 @@
   height: 10px;
   
 }
+
+/* 앨범 그리드 아이템 수정 */
+.album-item {
+    position: relative; /* 자식 요소(배지) 위치 잡기 위해 */
+    background-color: #eee;
+    overflow: hidden;   /* 둥근 모서리 유지 */
+    cursor: pointer;
+    /* 기존 스타일 유지하면서 아래 속성 추가 */
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
+/* 그리드 내부 이미지/비디오 꽉 채우기 */
+.grid-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율 유지하며 꽉 참 */
+    display: block;
+}
+
+/* 우측 상단 비디오 아이콘 배지 */
+.video-icon-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    color: #fff;
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.5); /* 반투명 검정 배경 */
+    padding: 2px 5px;
+    border-radius: 4px;
+    z-index: 1;
+}
