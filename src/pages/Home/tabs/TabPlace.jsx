@@ -20,11 +20,15 @@ const toAbsolute = (path) => {
     return `${window.location.origin}${path}`;
 };
 
-const addJitter = (coord) =>{
-    const jitterAmount = 0.0005; 
-    // -0.00025 ~ +0.00025 사이의 랜덤 값 추가
-    return Number(coord) + (Math.random() - 0.5) * jitterAmount;
+const addJitter = (coord, id) => {
+    const jitterAmount = 0.002; 
+    const seed = (id * 9301 + 49297) % 233280; // 간단한 유사 난수 생성
+    const pseudoRandom = seed / 233280; 
+    
+    return Number(coord) + (pseudoRandom - 0.5) * jitterAmount;
 }
+
+
 
 /* 구글 맵 스크립트 로더 */
 let mapsLoaderPromise = null;
@@ -68,6 +72,8 @@ export default function TabPlace({ setTab, activeTrip }) {
     const [isMapLoaded, setIsMapLoaded] = useState(false);
     const [photos, setPhotos] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [placeTabs, setPlaceTabs] = useState(false);
+    const [selectedPlaceId, setSelectedPlaceId] = useState(null);
 
     /* 1. 지도 스크립트 로드 */
     useEffect(() => {
@@ -129,20 +135,77 @@ export default function TabPlace({ setTab, activeTrip }) {
                 }));
 
                 // (2) 위치 정보
-                const locRes = await fetch(`${API_BASE}/posts/locations?feed_type=all`, {
+                const locRes = await fetch(`${API_BASE}{
+    "isSuccess": true,
+    "code": 200,
+    "message": "OK",
+    "result": {
+        "posts": [
+            {
+                "lat": 37.5665000,
+                "lng": 126.9780000,
+                "post_id": 1,
+                "thumbnail_type": "SHORT_REEL",
+                "thumbnail_url": "https://cdn.trip.com/thumb/jeju_drone.jpg"
+            },
+            {
+                "lat": 37.5512000,
+                "lng": 126.9882000,
+                "post_id": 40,
+                "thumbnail_type": "MEDIA",
+                "thumbnail_url": "https://cdn.trip.com/img/namsan_view.jpg"
+            },
+            {
+                "lat": 33.4893000,
+                "lng": 126.4983000,
+                "post_id": 42,
+                "thumbnail_type": "MEDIA",
+                "thumbnail_url": "https://cdn.trip.com/video/jeju_drone.mp4"
+            }
+        ],
+        "place_tabs": [
+            {
+                "name": "Seoul",
+                "lat": 37.5665000,
+                "lng": 126.9780000,
+                "place_id": 11,
+                "post_count": 1
+            },
+            {
+                "name": "Namsan Tower",
+                "lat": 37.5512000,
+                "lng": 126.9882000,
+                "place_id": 12,
+                "post_count": 1
+            },
+            {
+                "name": "Jeju Island",
+                "lat": 33.4893000,
+                "lng": 126.4983000,
+                "place_id": 13,
+                "post_count": 1
+            }
+        ]
+    }
+}`, {
                     headers: { Authorization: `Bearer ${token || ""}` }              
                 });
 
                 const locJson = await locRes.json();
                 const locList = locJson?.result?.posts ?? [];
-                const placeTabs = locJson?.result?.place_tabs ?? [];
+
+                const tabs =locJson?.result?.place_tabs??[];
+                if (!cancel) setPlaceTabs(tabs);
+
+                // const placeTabs = locJson?.result?.place_tabs ?? [];
 
                 if (activeTrip && activeTrip.placeName && mapInstanceRef.current) {
-                    const targetPlace = placeTabs.find(p => p.name === activeTrip.placeName);
+                    const targetPlace = tabs.find(p => p.name === activeTrip.placeName);
                     if (targetPlace) {
                         const movePos = { lat: targetPlace.lat, lng: targetPlace.lng };
                         mapInstanceRef.current.setCenter(movePos);
-                        mapInstanceRef.current.setZoom(10); 
+                        mapInstanceRef.current.setZoom(11);
+                        if(!cancel) setSelectedPlaceId(targetPlace.place_id); 
                     }
                 }
 
@@ -190,9 +253,9 @@ export default function TabPlace({ setTab, activeTrip }) {
 
         if (!map || !info || !maps || photos.length === 0) return;
 
-        if (clustererRef.current) {
-            clustererRef.current.clearMarkers();
-        }
+        // if (clustererRef.current) {
+        //     clustererRef.current.clearMarkers();
+        // }
 
         const markers = photos.map(p => {
             const marker = new maps.Marker({
@@ -233,10 +296,18 @@ export default function TabPlace({ setTab, activeTrip }) {
 
             return marker;
         });
-
-        clustererRef.current = new MarkerClusterer({ map, markers });
+        // clustererRef.current = new MarkerClusterer({ map, markers });
 
     }, [photos, navigate]);
+
+     const handlePlaceClick = (place) => {
+        if (!mapInstanceRef.current) return;
+        
+        mapInstanceRef.current.panTo({ lat: place.lat, lng: place.lng });
+        mapInstanceRef.current.setZoom(12); 
+        
+        setSelectedPlaceId(place.place_id);
+    };
 
     const goBack = () => {
         if (setTab) setTab("all");
@@ -253,6 +324,24 @@ export default function TabPlace({ setTab, activeTrip }) {
                     피드로 돌아가기
                 </button>
             </div>
+
+            <div className='place-guide-text'>
+                장소를 클릭하여 지도가 해당 위치로 이동해요.
+            </div>
+            {/* 탭  */}
+            {placeTabs.length > 0 && (
+                <div className="place-tabs-container">
+                    {placeTabs.map(place => (
+                        <button 
+                            key={place.place_id}
+                            className={`place-chip ${selectedPlaceId === place.place_id ? 'active' : ''}`}
+                            onClick={() => handlePlaceClick(place)}
+                        >
+                            {place.name}
+                        </button>
+                    ))}
+                </div>
+            )} 
 
             <div ref={mapRef} className="map-container" style={{ flex: 1, minHeight: '400px', width: '100%' }}>
                 {(!isMapLoaded || loading) && (
