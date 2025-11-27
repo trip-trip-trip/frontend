@@ -239,7 +239,7 @@ const fetchData = async () => {
             <div className="section-list">
               {friends.length > 0 ? friends.map(friend => (
                 <div className="friend-item" key={friend.id}>
-                  <div className="friend-info" className="friend-info" 
+                  <div className="friend-info" 
                     onClick={() => navigate(`/user/${friend.id}`)}
                     style={{cursor:'pointer'}}>
                     <img src={friend.avatarUrl || defaultProfile} className="friend-img" alt="프사"/>
