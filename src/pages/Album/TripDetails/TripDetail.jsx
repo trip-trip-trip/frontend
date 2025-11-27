@@ -296,7 +296,13 @@ const TripDetail = () => {
       }
       
       const data = await response.json();
-      console.log('초대 수락 성공:', data.result);
+      
+      if (data.isSuccess && data.result.status === "DECLINED"){
+        alert('기간이 겹치는 여행이 있어 초대가 거절되었습니다.');
+        navigate(`/trips`); 
+        return;
+      }
+      // console.log('초대 수락 성공:', data.result);
 
       alert('여행 초대를 수락했습니다.');
       navigate(`/trips`); 
