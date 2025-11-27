@@ -9,6 +9,7 @@ import default_pic from "../../../assets/default-profile.png";
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
+  
 
 export default function PostCreate() {
   const navigate = useNavigate();
@@ -66,9 +67,19 @@ export default function PostCreate() {
         list = [...list, ...contents.reelItems.map(item => ({ ...item.media, type: 'VIDEO' }))];
     }
     ///////
-    if(contents.reel){
-      list.push({...contents.reel, type: 'VIDEO'});
+    if (contents.reel && contents.reel.media) {
+        list.push({
+            ...contents.reel.media, 
+            type: 'VIDEO' 
+        });
+    } else if (contents.reel && !contents.reel.media && contents.reel.url) {
+        //구조가 다를 경우 대비 
+        list.push({
+            ...contents.reel,
+            type: 'VIDEO'
+        });
     }
+    ////////
     if (contents.scrapbooks) {
         list = [...list, ...contents.scrapbooks.map(item => ({ ...item.media, type: 'SCRAPBOOK' }))];
     }
