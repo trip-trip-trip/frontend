@@ -233,8 +233,8 @@
 
     left: 50%;
     transform: translateX(-50%);
-    width: 100vw;               /* 모바일에선 꽉 차게 */
-    max-width: 480px;           /* 데스크탑에선 480px로 제한 */
+    width: 100vw;               
+    max-width: 400px;           
 
     background: #fff;
     border-top-left-radius: 1.5rem;
