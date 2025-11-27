@@ -16,9 +16,15 @@
 .post-detail-page {
     padding-top: 60px;
     height: 100vh;
+    height: 100dvh; 
+    width: 100%;
+    overflow-x: hidden; 
     overflow-y: auto;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    
+    position: relative;
 }
 
 /* ---------------------------------------------------

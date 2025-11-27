@@ -6,7 +6,9 @@
   flex-direction: column;
   align-items: center;
 
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh; 
+  padding-top: calc(5.7rem + env(safe-area-inset-top));
 }
 
 .card { 
@@ -71,7 +73,7 @@
 
 .back-btn {
     align-self: flex-start;
-    margin-top: 1.6rem; 
+    margin-top: 0.5rem; 
     margin-bottom: 3.2rem; /* 이미지처럼 제목 위 공간 확보 */
     background: none;
     border: none;
@@ -186,14 +188,6 @@
   object-fit: contain;
 }
 
-.lg-title {
-  margin-top: 0; 
-  margin-bottom: 0.6rem;
-  font-size: 2rem;
-  font-weight: 800;
-  text-align: left;
-  color: #333; 
-}
 
 .sp-sub {
   margin-bottom: 2rem;
@@ -257,5 +251,8 @@
 .lg-title {
   font-size: 2.2rem;
   margin: 0 0 10px 0; /* 기존 margin-top 제거 */
-  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: left;
+  color: #333; 
 }
