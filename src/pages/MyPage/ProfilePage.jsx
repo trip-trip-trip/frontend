@@ -201,20 +201,48 @@ return (
        <div className="album-grid">
          <div className="album-item add" onClick={() => navigate("/post/create")}>+</div>
          
-         {myPosts.map((post) => {
-           const thumbUrl = post.media?.[0]?.thumbnail_url || post.media?.[0]?.url;
-           return (
-             <div
-               key={post.id}
-               className="album-item"
-               style={thumbUrl ? { backgroundImage: `url(${thumbUrl})` } : { backgroundColor: '#ccc' }}
-               onClick={() => navigate(`/post/${post.id}`)} 
-             />
-           );
-         })}
-       </div>
+          {myPosts.map((post) => {
+          const mediaList = post.media || [];
+          const cover = mediaList[0];
 
-       <NavBar current="mypage" />
-     </div>
-   );
+          if (!cover) return null;
+
+          const isVideo = cover.mediaKind === "VIDEO";
+          //  const thumbUrl = post.media?.[0]?.thumbnail_url || post.media?.[0]?.url;
+          const imageSrc =
+            cover.thumbnailUrl || cover.url || cover.thumbnail_url;
+          return (
+            <div
+              key={post.id}
+              className="album-item"
+              onClick={() => navigate(`/post/${post.id}`)}
+            >
+              {isVideo ? (
+                <video
+                  className="album-media"
+                  src={cover.url}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  className="album-media"
+                  src={imageSrc}
+                  alt={post.caption}
+                  onError={(e) => {
+                    e.target.style.backgroundColor = "#ccc";
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <NavBar current="mypage" />
+    </div>
+  );
 }
+
