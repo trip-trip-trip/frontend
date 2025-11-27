@@ -100,10 +100,19 @@
     
     display: flex !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 0.7rem !important;
     width: auto !important;
 }
-
+.active-trip-wrapper .main-edit-btn p {
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+    font-weight: 400 !important;
+    color: #525B65 !important;
+    border-bottom: 0.1rem solid #525B65 !important; 
+    padding-bottom: 1px !important;           
+    display: inline-block !important;          
+    line-height: 1.2 !important;              
+}
 .active-trip-wrapper {
     position: relative;
     width: 100%;
@@ -116,17 +125,6 @@
     min-height: 18rem !important;
     padding-bottom: 3.5rem !important; 
     position: relative !important;
-}
-
-.active-trip-wrapper .main-edit-btn p {
-    margin: 0 !important;
-    font-size: 1.2rem !important;
-    font-weight: 600 !important;
-    color: #525B65 !important;
-    border-bottom: 1px solid #525B65 !important; 
-    padding-bottom: 1px !important;           
-    display: inline-block !important;          
-    line-height: 1.2 !important;              
 }
 
 
