@@ -24,12 +24,12 @@ const toAbsolute = (path) => {
 
 const addJitter = (coord, id) => {
     const jitterAmount = 0.002; 
-    const seed = (id * 9301 + 49297) % 233280; // 간단한 유사 난수 생성
+    const safeId = id || 0; 
+    const seed = (safeId * 9301 + 49297) % 233280;
     const pseudoRandom = seed / 233280; 
     
     return Number(coord) + (pseudoRandom - 0.5) * jitterAmount;
 }
-
 
 /* 구글 맵 스크립트 로더 */
 let mapsLoaderPromise = null;
@@ -67,8 +67,8 @@ export default function TabPlace({ setTab, activeTrip }) {
 
     const mapRef = useRef(null);        
     const mapInstanceRef = useRef(null); 
-    const infoWindowRef = useRef(null);  
-    // const clustererRef = useRef(null);   
+    const infoWindowRef = useRef(null); 
+    const markersRef = useRef([]);
 
     const [isMapLoaded, setIsMapLoaded] = useState(false);
     const [photos, setPhotos] = useState([]);
@@ -98,7 +98,7 @@ export default function TabPlace({ setTab, activeTrip }) {
 
         mapInstanceRef.current = map;
         infoWindowRef.current = new maps.InfoWindow({
-            disableAutoPan: true
+            disableAutoPan: false
         });
 
         setTimeout(() => {
@@ -152,6 +152,7 @@ export default function TabPlace({ setTab, activeTrip }) {
                 if (activeTrip && activeTrip.placeName && mapInstanceRef.current) {
                     const targetPlace = tabs.find(p => p.name === activeTrip.placeName);
                     if (targetPlace) {
+                        console.log("📍 여행 장소로 이동:", targetPlace.name);
                         const movePos = { lat: targetPlace.lat, lng: targetPlace.lng };
                         mapInstanceRef.current.setCenter(movePos);
                         mapInstanceRef.current.setZoom(11);
@@ -173,11 +174,10 @@ export default function TabPlace({ setTab, activeTrip }) {
 
                     return {
                         id: loc.post_id,
-                        lat: addJitter(loc.lat),
-                        lng: addJitter(loc.lng),
+                        lat: addJitter(loc.lat, loc.post_id), // 좌표 겹침 방지
+                        lng: addJitter(loc.lng, loc.post_id),
                         title: d.title || "게시물",
                         thumbnail_url: finalThumb,
-                        avatar_url: d.avatar_url,
                     };
                 }).filter(Boolean);
 
@@ -206,8 +206,12 @@ export default function TabPlace({ setTab, activeTrip }) {
         // if (clustererRef.current) {
         //     clustererRef.current.clearMarkers();
         // }
+        markersRef.current.forEach(marker => marker.setMap(null));
+        markersRef.current = [];
 
-        const markers = photos.map(p => {
+        if (photos.length === 0) return;
+
+        photos.forEach(p => {
             const marker = new maps.Marker({
                 position: { lat: p.lat, lng: p.lng },
                 map: map,
@@ -244,7 +248,8 @@ export default function TabPlace({ setTab, activeTrip }) {
                 });
             });
 
-            return marker;
+            // return marker;
+            markersRef.current.push(marker);
         });
         // clustererRef.current = new MarkerClusterer({ map, markers });
 
