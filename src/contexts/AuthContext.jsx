@@ -1,12 +1,12 @@
 // src/contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
-const API_BASE = import.meta.env.PROD
-  ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org')
-  : '/api';
+// const API_BASE = import.meta.env.PROD
+//   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org')
+//   : '/api';
 
-// const API_BASE = 'https://tripshot.duckdns.org';
-// const currentToken = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiIzNCIsImlhdCI6MTc2NDAwODk3NSwiZXhwIjoxNzY0MDEyNTc1fQ._wdW-QkZcAPMjKY7bAqnPcghb8u1YsGTtpX88zg-YaJFw3A-P31h2YEtuNe-ORPJbME6EwBwy3MAiVb6YdaC_Q';
+const API_BASE = 'https://tripshot.duckdns.org';
+const currentToken = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiI0IiwiaWF0IjoxNzY0MjM5MTAzLCJleHAiOjE3NjQyNDI3MDN9.aP5RZ1aCs6zWNafql2KUUJz8lbCrcq1_PMIqpvAdbwGth4fY6Cv_Q0g2teuJ_hdjTQoJ3FG0AOAyiGVlyXQzJg';
 
 const AuthContext = createContext();
 
@@ -97,25 +97,33 @@ export const AuthProvider = ({ children }) => {
 
     } catch (err) {
       console.error("사용자 프로필 로드 실패:", err);
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("jwtToken");
-    const savedTripId = localStorage.getItem("activeTripId");
-    if (savedTripId) {
-      setActiveTripId(Number(savedTripId));
-    }
+    const initializeAuth = async () => {
+      const savedToken = localStorage.getItem("jwtToken");
+      const savedTripId = localStorage.getItem("activeTripId");
+      let currentToken = null;
 
-    if (savedToken) {
-      setToken(savedToken);
-      fetchUserProfile(savedToken);
-      fetchActiveTrip(savedToken);
-    } else {
+      if (savedTripId) {
+        setActiveTripId(Number(savedTripId));
+      }
+
+      if (savedToken) {
+        setToken(savedToken);
+        currentToken = savedToken;
+      }
+
+      if (currentToken) {
+        await Promise.all([
+          fetchUserProfile(currentToken), // fetchUserProfile 내부의 finally는 제거해야 함
+          fetchActiveTrip(currentToken)
+        ]);
+      }
       setIsLoading(false);
     }
+    initializeAuth();
   }, [fetchUserProfile, fetchActiveTrip]);
 
   // 로그인
