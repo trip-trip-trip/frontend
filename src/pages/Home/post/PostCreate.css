@@ -223,7 +223,13 @@
 /* 하단 시트 */
 .bottom-sheet {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
+    bottom: 0;
+    left: 50%;                /* 화면 가운데 기준 */
+    transform: translate(-50%, 0);  /* 가운데 정렬 */
+
+    width: 100%;
+    max-width: 480px;         /* 앱 너비와 동일하게 */
+
     background: #fff;
     border-top-left-radius: 1.5rem;
     border-top-right-radius: 1.5rem;
@@ -234,8 +240,8 @@
 }
 
 @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    from { transform: translate(-50%, 100%); }
+    to { transform: translate(-50%, 0); }
 }
 
 .sheet-header {
@@ -446,13 +452,6 @@
         border-left: 1px solid #eee;
         border-right: 1px solid #eee;
         min-height: 100vh;
-    }
-    .bottom-sheet {
-        max-width: 480px; 
-        margin: 0 auto;   
-        left: 0; 
-        right: 0;
-        width: 100%; 
     }
     .media-grid {
         grid-template-columns: repeat(4, 1fr);
