@@ -178,6 +178,7 @@
 }
 
 .album-item {
+  positive:relative;
   width: 100%;
   /* 134 : 200 비율 */
   aspect-ratio: 134 / 200; 
@@ -188,7 +189,15 @@
   cursor: pointer;
   overflow: hidden;
 }
-
+.album-media {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  display: block;
+}
 /* + 버튼 스타일 */
 .album-item.add {
   background-color: #E0DDD2;
