@@ -11,6 +11,21 @@
     /* 패딩 포함 크기 계산 */
     box-sizing: border-box;
     width: 100%;
+} 
+@media (min-width: 768px) {
+    .post-create-container {
+        max-width: 480px; /* 모바일 앱 표준 너비 */
+        margin: 0 auto;   /* 화면 가운데로 */
+        
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        border-left: 1px solid #eee;
+        border-right: 1px solid #eee;
+    }
+
+    .bottom-sheet {
+        max-width: 480px; 
+        margin: 0 auto;   /* left:0, right:0 상태에서 중앙 정렬됨 */
+    }
 }
 
 .post-body {
@@ -105,7 +120,7 @@
     font-weight: 400;
 }
 .trip-title {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #333;
     margin-bottom: 0.8rem;
