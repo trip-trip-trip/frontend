@@ -14,17 +14,15 @@ import Upcoming from '../../components/Album/UpcomingTrip';
 
 
 const Album = () => {
-  // const API_BASE = import.meta.env.PROD 
-  //   ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
-  //   : '/api';
+  const API_BASE = import.meta.env.PROD 
+    ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
+    : '/api';
   const [isLoading, setIsLoading] = useState(true); 
   const todayDate = new Date().toISOString().split('T')[0];
   // todayDate.setHours(0, 0, 0, 0); // 로컬 시간대의 오늘 자정
-  const API_BASE = 'https://tripshot.duckdns.org';
-  const token = 'eyJhbGciOiJIUzUxMiJ9.eyJsdmwiOiJBQ0NFU1MiLCJzdWIiOiI0IiwiaWF0IjoxNzY0MjM0NDk2LCJleHAiOjE3NjQyMzgwOTZ9.RLWjZ2oe03_doXHxdOaEt4xjfqAlhnXGXwr_0ds5f901XFHPb8HlJKyK7mN40sAlytdUOMbsPOnLeKr0Y2sffg';
-  
+
   const navigate = useNavigate();
-  const { activeTripId, setActiveTripId } = useAuth();
+  const { token, activeTripId, setActiveTripId } = useAuth();
 
   // 3. 활성 여행의 '정보' (제목, 날짜 등)를 담을 state
   const [activeShotCount, setActiveShotCount] = useState(0);
