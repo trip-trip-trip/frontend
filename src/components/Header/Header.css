@@ -181,6 +181,9 @@
   z-index: 999;
   cursor: pointer;
 }
+.delete-btn-header{
+  margin-left: 2rem;
+}
 
 .back-btn img{
   width: 1.1rem;

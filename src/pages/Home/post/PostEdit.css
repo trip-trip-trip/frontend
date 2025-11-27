@@ -115,19 +115,8 @@
     cursor: pointer;
 }
 
+
 .edit-mode-btn {
     /* 수정하기 버튼 전용 스타일이 필요하다면 추가 */
     box-shadow: 0 0.4rem 1rem rgba(0,0,0,0.15);
-}
-.delete-postbtn{
-    margin-top: 12px;
-    width: 100%;
-    padding: 14px;
-    border-radius: 2rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    border: none;
-    background-color: #f1d4d4;
-    color: #fff;
-    cursor: pointer;
 }
