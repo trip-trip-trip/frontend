@@ -150,9 +150,9 @@ form.edit-trip-form{
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 6rem;
+    height: 8rem;
     position: fixed;
-    bottom: 10rem;
+    bottom: 0rem;
     z-index: 10;
     width: 100%;
     max-width: 43rem;
