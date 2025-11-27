@@ -22,8 +22,9 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: "icons/tripshot_logo.png",
+      // 클릭 시 이동할 URL 정보를 여기에 추가합니다.
       data: {
-        url: '/home' //home으로 이동
+        url: '/home' 
       }
     })
   );
