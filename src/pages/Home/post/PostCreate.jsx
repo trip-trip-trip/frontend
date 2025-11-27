@@ -10,6 +10,7 @@ const API_BASE = import.meta.env.PROD
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
   
+
 export default function PostCreate() {
   const navigate = useNavigate();
   const { token } = useAuth(); 
@@ -28,7 +29,7 @@ export default function PostCreate() {
   // 여행 목록 불러오기
   useEffect(() => {
     const fetchMyTrips = async () => {
-      // if (!token) return;
+      if (!token) return;
       try {
         const res = await fetch(`${API_BASE}/trips?completedOnly=true`, {
           headers: { Authorization: `Bearer ${token}` },

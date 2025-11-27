@@ -12,19 +12,25 @@
     box-sizing: border-box;
     width: 100%;
 } 
+
+
 @media (min-width: 768px) {
+    /* 1. 전체 앱 컨테이너 중앙 정렬 및 그림자 */
     .post-create-container {
-        max-width: 480px; /* 모바일 앱 표준 너비 */
-        margin: 0 auto;   /* 화면 가운데로 */
+        max-width: 480px; /* 모바일 너비 고정 */
+        margin: 0 auto;   /* 중앙 정렬 */
         
-        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
         border-left: 1px solid #eee;
         border-right: 1px solid #eee;
+        min-height: 100vh;
     }
-
     .bottom-sheet {
         max-width: 480px; 
-        margin: 0 auto;   /* left:0, right:0 상태에서 중앙 정렬됨 */
+        margin: 0 auto;   
+        left: 0; 
+        right: 0;
+        width: 100%; 
     }
 }
 
