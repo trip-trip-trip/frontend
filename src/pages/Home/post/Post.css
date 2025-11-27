@@ -271,8 +271,12 @@
 .comment-input-area.detail-input {
     position: fixed; 
     bottom: 0;
+    
+    left: 50%;
+    transform: translateX(-50%);
+
     width: 100%;
-    max-width: 400px;
+    max-width: 400px; 
     
     display: flex;
     align-items: center;
