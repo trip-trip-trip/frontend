@@ -117,13 +117,12 @@ const Home = () => {
     
   //   fetchActiveTripStatus();
   // }, [token]); 
-  // 여행 상태 조회 (useEffect로 감싸서 실행)
+  // 여행 상태 조회
   useEffect(() => {
     const fetchActiveTripStatus = async () => {
       if (!token) return;
 
       try {
-        // 1. /trips로 모든 여행 목록을 가져옵니다.
         const response = await fetch(`${API_BASE}/trips`, { 
             method: "GET",
             headers: {
@@ -139,14 +138,9 @@ const Home = () => {
             // today.setHours(0, 0, 0, 0); 
 
             const activeData = tripList.find(item => {
-                // 상태가 ACTIVE인지 확인
-                if (item.trip.status !== 'ACTIVE') return false;
-
-                // 날짜가 지났는지 확인 (종료일이 오늘보다 과거라면 false)
-                const endDate = new Date(item.trip.endDate);
-                
-                // 여행 종료일이 오늘보다 크거나 같아야 함 (아직 안 끝남)
-                return endDate >= today; 
+                if (item.trip.startDate > today) return false;
+                if (item.trip.endDate < today) return false;
+                return true;
             });
 
             if (activeData) {
@@ -167,7 +161,7 @@ const Home = () => {
                         tag: tag
                     })),
                     image: photos.map(p => p.media?.url || ''),
-                    film_count: photos.length, // 사진 개수 정상 표시
+                    film_count: photos.length, 
                     vid_count: videos.length,
                 });
             } else {
@@ -180,7 +174,8 @@ const Home = () => {
     };
 
     fetchActiveTripStatus();
-  }, [token]); // token이 있을 때 실행
+  }, [token]);
+  
 
   // --- 클릭 핸들러 ---
   const handleGoCamera = (e) => {
