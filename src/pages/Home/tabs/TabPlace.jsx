@@ -7,9 +7,11 @@ import { useAuth } from '../../../contexts/AuthContext';
 
 // API 키 및 상수 설정
 const MAPS_KEY = 'AIzaSyBxUpz_y5O2nOTivngRz6fVvYHtG91i75M';
+
 const API_BASE = import.meta.env.PROD 
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
+
 const FALLBACK_THUMB = `${window.location.origin}/icons/tripshot.png`;
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.9780 }; // 서울 중심
 
@@ -17,7 +19,7 @@ const DEFAULT_CENTER = { lat: 37.5665, lng: 126.9780 }; // 서울 중심
 const toAbsolute = (path) => {
     if (!path) return FALLBACK_THUMB;
     if (path.startsWith('http')) return path;
-    return `${window.location.origin}${path}`;
+    return `https://tripshot.duckdns.org${path}`;
 };
 
 const addJitter = (coord, id) => {
@@ -27,7 +29,6 @@ const addJitter = (coord, id) => {
     
     return Number(coord) + (pseudoRandom - 0.5) * jitterAmount;
 }
-
 
 
 /* 구글 맵 스크립트 로더 */
@@ -67,10 +68,11 @@ export default function TabPlace({ setTab, activeTrip }) {
     const mapRef = useRef(null);        
     const mapInstanceRef = useRef(null); 
     const infoWindowRef = useRef(null);  
-    const clustererRef = useRef(null);   
+    // const clustererRef = useRef(null);   
 
     const [isMapLoaded, setIsMapLoaded] = useState(false);
     const [photos, setPhotos] = useState([]);
+    
     const [loading, setLoading] = useState(false);
     const [placeTabs, setPlaceTabs] = useState(false);
     const [selectedPlaceId, setSelectedPlaceId] = useState(null);
@@ -135,65 +137,13 @@ export default function TabPlace({ setTab, activeTrip }) {
                 }));
 
                 // (2) 위치 정보
-                const locRes = await fetch(`${API_BASE}{
-    "isSuccess": true,
-    "code": 200,
-    "message": "OK",
-    "result": {
-        "posts": [
-            {
-                "lat": 37.5665000,
-                "lng": 126.9780000,
-                "post_id": 1,
-                "thumbnail_type": "SHORT_REEL",
-                "thumbnail_url": "https://cdn.trip.com/thumb/jeju_drone.jpg"
-            },
-            {
-                "lat": 37.5512000,
-                "lng": 126.9882000,
-                "post_id": 40,
-                "thumbnail_type": "MEDIA",
-                "thumbnail_url": "https://cdn.trip.com/img/namsan_view.jpg"
-            },
-            {
-                "lat": 33.4893000,
-                "lng": 126.4983000,
-                "post_id": 42,
-                "thumbnail_type": "MEDIA",
-                "thumbnail_url": "https://cdn.trip.com/video/jeju_drone.mp4"
-            }
-        ],
-        "place_tabs": [
-            {
-                "name": "Seoul",
-                "lat": 37.5665000,
-                "lng": 126.9780000,
-                "place_id": 11,
-                "post_count": 1
-            },
-            {
-                "name": "Namsan Tower",
-                "lat": 37.5512000,
-                "lng": 126.9882000,
-                "place_id": 12,
-                "post_count": 1
-            },
-            {
-                "name": "Jeju Island",
-                "lat": 33.4893000,
-                "lng": 126.4983000,
-                "place_id": 13,
-                "post_count": 1
-            }
-        ]
-    }
-}`, {
+                const locRes = await fetch(`${API_BASE}/posts/locations?feed_type=all`, {
                     headers: { Authorization: `Bearer ${token || ""}` }              
                 });
 
                 const locJson = await locRes.json();
                 const locList = locJson?.result?.posts ?? [];
-
+                
                 const tabs =locJson?.result?.place_tabs??[];
                 if (!cancel) setPlaceTabs(tabs);
 
