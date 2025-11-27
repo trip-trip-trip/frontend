@@ -211,10 +211,6 @@ const TripDetail = () => {
         }
       );
 
-      if (response.status === 400) {
-        alert("이 여행의 초대 목록을 조회할 권한이 없습니다.");
-      }
-
       if (!response.ok) {
         throw new Error(`여행 상세정보 조회 실패: ${response.status}`);
       }
