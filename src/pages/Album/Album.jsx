@@ -151,22 +151,22 @@ const Album = () => {
             coverImage: contents.photos.length > 0 ? contents.photos[0].media.url : null, // 첫 번째 사진을 커버 이미지로
           };
 
-          if (trip.startDate > todayDate) {
-            plannedTrip.push(tripData);
-          } else if (trip.endDate >= todayDate){
-            activeTrips.push(tripData);
-          } else{
-            completedList.push(tripData);
-          }
 
-
-          // if (trip.endDate < todayDate) {
-          //   completedList.push(tripData);
-          // } else if (trip.startDate > todayDate) {
+          // if (trip.startDate > todayDate) {
           //   plannedTrip.push(tripData);
-          // } else {
+          // } else if (trip.endDate >= todayDate){
           //   activeTrips.push(tripData);
+          // } else{
+          //   completedList.push(tripData);
           // }
+
+          if (trip.endDate < todayDate) {
+            completedList.push(tripData);
+          } else if (trip.startDate > todayDate) {
+            plannedTrip.push(tripData);
+          } else {
+            activeTrips.push(tripData);
+          }
         });
 
         activeTrips.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
