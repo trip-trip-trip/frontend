@@ -132,7 +132,7 @@
 .new-trip-text{
     position: absolute;
     display: flex;
-    top: 56%;
+    top: 50%;
     align-items: center;
     gap: 1.1rem;
     width: 90%;
@@ -151,11 +151,11 @@
     margin: 0;
 }
 
-.album-active-cont h4{
+.utc-ment{
     color: #525B65;
     font-size: 1.1rem;
     font-weight: 400;
-    margin: 0.9rem 2.1rem;
+    margin: 0.9rem 1rem;
 }
 
 .completed-album{

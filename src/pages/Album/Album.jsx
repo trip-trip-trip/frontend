@@ -18,9 +18,9 @@ const Album = () => {
     ? (import.meta.env.VITE_API_BASE_URL || 'https://tripshot.duckdns.org') 
     : '/api';
   const [isLoading, setIsLoading] = useState(true); 
-  const todayDate = new Date();
+  const todayDate = new Date().toISOString().split('T')[0];
   // todayDate.setHours(0, 0, 0, 0); // 로컬 시간대의 오늘 자정
-  
+
   const navigate = useNavigate();
   const { token, activeTripId, setActiveTripId } = useAuth();
 
@@ -307,9 +307,11 @@ return(
                   <img src={plus_btn} alt="" />
                   <h1>새로운 여행 만들기</h1>
                 </div>
+                <div className="utc-ment">
+                  *날짜 정보는 UTC를 기준으로 계산됩니다.
+                </div>
             </div> 
             }
-            <h4>*날짜 정보는 UTC를 기준으로 계산됩니다.</h4>
         </div>
 
         {/* --- 예정된 여행 섹션 --- */}

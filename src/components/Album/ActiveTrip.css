@@ -260,3 +260,12 @@ h5.left-date{
     font-weight: 400;
     border-bottom: 0.1rem solid #525B65;
 }
+
+.main-edit-cont{
+    display: flex;
+    justify-content: space-between;
+}
+
+.utc-ment.active{
+    margin: 0;
+}
