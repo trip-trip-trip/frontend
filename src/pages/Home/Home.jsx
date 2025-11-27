@@ -135,7 +135,7 @@ const Home = () => {
         if (response.ok) {
             const data = await response.json();
             const tripList = data.result || [];
-            const today = new Date();
+            const today = new Date().toISOString().split('T')[0];
             // today.setHours(0, 0, 0, 0); 
 
             const activeData = tripList.find(item => {

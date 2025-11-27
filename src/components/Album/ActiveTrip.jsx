@@ -100,11 +100,16 @@ const ActiveTrip = ({placeName, tripId, tripName, title, startDate, endDate, mem
         </div>
         
           </div>
-          
+          <div className="main-edit-cont">
+            <div className="utc-ment active">
+              *날짜 정보는 UTC를 기준으로 계산됩니다.
+            </div>
             <div className="main-edit-btn" onClick={handleEditClick}>
               <img src={write_icon} alt="" />
               <p>수정하기</p>
+            </div>
           </div>
+          
         </div>
       
   )
