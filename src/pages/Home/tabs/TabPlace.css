@@ -91,3 +91,44 @@
 .back-to-feed-btn:hover {
   color: #000;
 }
+
+/* 안내 텍스트 */
+.place-guide-text {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+/*  장소 탭 컨테이너 */
+.place-tabs-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    
+    /* 스크롤바 숨김 */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+.place-tabs-container::-webkit-scrollbar { display: none; }
+
+/*  장소 칩 스타일 */
+.place-chip {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: none;
+    background-color: #E6E2D6; /* 기본 베이지/회색 */
+    color: #555;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.place-chip.active {
+    background-color: #525B65; /* 선택시 진한 회색 */
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
