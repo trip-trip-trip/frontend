@@ -516,7 +516,6 @@ const TripDetail = () => {
             <div className="shared-friend">
               <SharedFriends data={tripInfo.members} invite={true} onInviteClick={handleInvite} />
             </div>
-            {isPending &&
             <div className="pending-cont">
               {sentInvitations.map((i, index)=>(
                 <img key={index} src={i.inviteeAvatarUrl || default_profile} alt="" className='pending-profile'/>
@@ -530,8 +529,6 @@ const TripDetail = () => {
                 {sentInvitations.length}명 수락 대기 중 {'>'}
               </div>
             </div>
-            
-            }
           </div>
           <div className='ment'>사진은 여행이 끝난 후 확인할 수 있어요</div>
         </div>
