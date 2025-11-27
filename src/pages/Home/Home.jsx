@@ -213,13 +213,15 @@ const Home = () => {
   };
 
   if (isLoading) {
-    <div className="home">
-      <Header/>
-        <div className="ment">
-          불러오는 중...
-        </div>
-      <Navbar/>
-    </div>
+    return(
+      <div className="home">
+        <Header/>
+          <div className="ment">
+            불러오는 중...
+          </div>
+        <Navbar/>
+      </div>
+    )
   }
     
   return (
