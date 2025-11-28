@@ -58,12 +58,6 @@ const FILTERS = [
     texture: null,          // 텍스처 X
     cssFilter: 'sepia(20%) contrast(75%) brightness(105%) saturate(130%)' // CSS 색감 O
   },
-  { 
-    name: 'Retro', 
-    frame: null,            // 프레임 X
-    texture: textureAsset,  // 텍스처 O
-    cssFilter: 'sepia(10%) contrast(80%) brightness(105%) saturate(110%)' // CSS 색감 O
-  },
    { 
     name: 'Sepia', 
     frame: null,            // 프레임 X
