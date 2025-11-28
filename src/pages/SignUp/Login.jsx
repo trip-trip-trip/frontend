@@ -15,33 +15,21 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000').
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
-
-  const [showSplash, setShowSplash] = useState(true);
-  const [isFading, setIsFading] = useState(false);
-
+  const [showSplash, setShowSplash] = useState(true)
+   
+  const {login} = useAuth();
   useEffect(() => {
-    // 소셜 로그인 콜백으로 돌아온 경우 바로 끄기
+    // 소셜 로그인 콜백으로 돌아온 경우(URL에 파라미터 있음), 스플래시 없이 바로 처리
     const params = new URLSearchParams(window.location.search);
     if (params.get("jwt")) {
       setShowSplash(false);
       return;
     }
+    const timer = setTimeout(() => {
+      setShowSplash(false); // 2초 뒤 false로 변경 -> 로그인 화면 렌더링
+    }, 2000);
 
-    //1.5초 뒤에 페이드 아웃 시작 
-    const fadeTimer = setTimeout(() => {
-      setIsFading(true);
-    }, 1500);
-
-    //페이드 아웃 시간(0.8초)만큼 더 기다렸다가 아예 없애기 
-    const removeTimer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2300);
-
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(removeTimer);
-    };
+    return () => clearTimeout(timer); // 컴포넌트가 사라지면 타이머도 정리
   }, []);
 
   const startOAuth = (socialName) => {
@@ -51,14 +39,14 @@ export default function Login() {
   const handleGoogle = () => startOAuth("google");
   const handleNaver = () => startOAuth("naver");
 
-  // BE 콜백 처리
+  // // 🔥 2) BE 콜백 처리
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const jwt = params.get("jwt");
     const level = params.get("level");
     const userStr = params.get("user");
 
-    if (!jwt || !level) return;
+    if (!jwt||!level) return;
 
     window.history.replaceState({}, document.title, window.location.pathname); 
 
@@ -72,39 +60,43 @@ export default function Login() {
     }
   
     if (level === "access") {
+      //
       login(jwt, userObj);
       navigate("/home", { replace: true });      
       return;
     }
 
     if (level === "signup") {
+      // 전화번호 인증 단계로
       navigate("/phone", {
-        state: { token: jwt, user: userObj }
+        state: {
+          token: jwt,
+          user: userObj,
+        }
       });
       return;
     }
   }, [login, navigate]);
-
-
+  if (showSplash) {
+    return (
+      <main className="startpage"> {/* StartPage.css의 클래스 사용 */}
+        <img
+          src={splashLogo}
+          alt="TripShot Main"
+          className="logo"
+          draggable="false"
+        />
+      </main>
+    );
+  }
   return (
     <main className="login">
-      {showSplash && (
-        <div className={`splash-overlay ${isFading ? 'fade-out' : ''}`}>
-           <img
-            src={splashLogo}
-            alt="TripShot Main"
-            className="logo" // StartPage.css의 스타일 유지
-            draggable="false"
-          />
-        </div>
-      )}
-
-      {/* 로그인 화면 (뒤에 깔려있음) */}
       <img src={welcome_text} className="welcome-login" alt="Welcome" />
       <h1 className="lg-title">환영합니다</h1>
       <img src={tripshot_logo} className="logo-login" alt="TripShot" />
 
       <div className="login-buttons">
+
         <button className="social-btn kakao-login" onClick={handleKakao}>
           <img src={kakaoLogo} alt="" className="social-icon" />
           카카오 계정으로 계속하기
@@ -119,6 +111,7 @@ export default function Login() {
           <img src={naverLogo} alt="" className="social-icon" />
           네이버 계정으로 계속하기
         </button>
+
       </div>
     </main>
   );
