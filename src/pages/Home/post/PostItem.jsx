@@ -32,14 +32,14 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
 
   const navigate = useNavigate();
   const { token } = useAuth();
-  const userId = post.userId;
+  const authorId = post.authorId || post.author?.id;
 
   /// go to profile
   const goToUserProfile = (e) => { 
    e.stopPropagation(); //상위 요소로 이벤트 전파 방지
-   if (userId) {
-     navigate(`/user/${userId}`);
-   }
+   if (authorId) {
+    navigate(`/user/${authorId}`);
+  }
  };
 
 
