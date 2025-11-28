@@ -18,7 +18,7 @@ export default function Login() {
   const [showSplash, setShowSplash] = useState(true)
    
   const {login} = useAuth();
- useEffect(() => {
+  useEffect(() => {
     // 소셜 로그인 콜백으로 돌아온 경우(URL에 파라미터 있음), 스플래시 없이 바로 처리
     const params = new URLSearchParams(window.location.search);
     if (params.get("jwt")) {

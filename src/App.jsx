@@ -106,7 +106,6 @@ const App = () => {
 
       {/*/////////// alua /////////////*/}
         <Route path='/login' element={<Login/>}/>
-        <Route path='/StartPage' element={<StartPage/>}/>
         <Route path="/phone" element={<PhoneEnter />} />
         <Route path="/verify" element={<CodeVerify />} />
         <Route path="set-username" element={<SetUsername />} />
