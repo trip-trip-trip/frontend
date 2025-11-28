@@ -3,7 +3,6 @@ import Home from './pages/Home/Home'
 import { useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import Login from './pages/SignUp/Login';
-import StartPage from './pages/SignUp/StartPage';
 import Album from './pages/Album/Album';
 import CreateTrip from './pages/Album/CreateTrip/CreateTrip';
 import TripDetail from './pages/Album/TripDetails/TripDetail';
@@ -84,7 +83,7 @@ const App = () => {
        <AuthProvider>
 <div className="app-container"> 
    <Routes>
-        <Route path='/' element={<StartPage/>}/>
+        <Route path='/' element={<Login/>}/>
         <Route path='/home' element={<Home/>}/>
 
         <Route path='/trips' element={<ProtectedAlbum/>}/>

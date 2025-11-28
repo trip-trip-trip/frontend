@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
-
+import './StartPage.css';
 import welcome_text from '../../assets/Welcome.png'; 
 import tripshot_logo from '../../assets/loginLogo.png';
 import googleLogo from '../../assets/Group.png';
 import kakaoLogo from '../../assets/symbol-kakao.png';
 import naverLogo from '../../assets/naver_icon.png';
+import splashLogo from '../../assets/firstpage.png';
 
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -14,12 +15,26 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000').
 
 export default function Login() {
   const navigate = useNavigate();
+  const [showSplash, setShowSplash] = useState(true)
+   
+  const {login} = useAuth();
+ useEffect(() => {
+    // 소셜 로그인 콜백으로 돌아온 경우(URL에 파라미터 있음), 스플래시 없이 바로 처리
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("jwt")) {
+      setShowSplash(false);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setShowSplash(false); // 2초 뒤 false로 변경 -> 로그인 화면 렌더링
+    }, 2000);
 
-   const startOAuth = (socialName) => {
+    return () => clearTimeout(timer); // 컴포넌트가 사라지면 타이머도 정리
+  }, []);
+
+  const startOAuth = (socialName) => {
     window.location.href = `${API_BASE}/login/start/${socialName}`;
   };
-  const {login} = useAuth();
- 
   const handleKakao = () => startOAuth("kakao");
   const handleGoogle = () => startOAuth("google");
   const handleNaver = () => startOAuth("naver");
@@ -62,7 +77,18 @@ export default function Login() {
       return;
     }
   }, [login, navigate]);
-
+  if (showSplash) {
+    return (
+      <main className="startpage"> {/* StartPage.css의 클래스 사용 */}
+        <img
+          src={splashLogo}
+          alt="TripShot Main"
+          className="logo"
+          draggable="false"
+        />
+      </main>
+    );
+  }
   return (
     <main className="login">
       <img src={welcome_text} className="welcome-login" alt="Welcome" />
