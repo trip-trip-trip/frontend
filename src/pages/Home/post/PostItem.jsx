@@ -32,6 +32,16 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
 
   const navigate = useNavigate();
   const { token } = useAuth();
+  const userId = post.userId;
+
+  /// go to profile
+  const goToUserProfile = (e) => { 
+   e.stopPropagation(); //상위 요소로 이벤트 전파 방지
+   if (userId) {
+     navigate(`/user/${userId}`);
+   }
+ };
+
 
   // ★ 2. 미디어 리스트 정규화 (모든 데이터를 { url, type } 형태로 통일)
   const mediaList = useMemo(() => {
@@ -117,6 +127,7 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
             src={author_avatar || default_pic}
             alt={author}
             className="avatar"
+            onClick={goToUserProfile}
             onError={(e) => e.target.src = default_pic}
           />
           <div className="user-details">
@@ -151,7 +162,7 @@ const PostItem = ({ post = {}, isMine = false, isDetail = false }) => {
                 className="post-image"
              />
         )}
-
+ 
         {/* 미디어가 2개 이상일 때만 화살표 및 인디케이터 표시 */}
         {mediaList.length > 1 && (
           <>

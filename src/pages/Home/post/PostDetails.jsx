@@ -25,6 +25,16 @@ const PostDetail = () => {
     return Number(post.authorId) === Number(user.id);
   }, [post, user]);  
 
+  // const userId = post.userId;
+
+  /// go to profile
+  const goToUserProfile = (targetId) => { 
+   if (targetId) {
+     navigate(`/user/${targetId}`);
+   }
+ };
+
+
   /** 댓글 불러오기 */
   const fetchComments = useCallback(async () => {
     if (!id || !token) return;
@@ -233,6 +243,7 @@ const handleCommentDelete = async (comment) => {
               // 댓글 작성자 정보 안전하게 추출
               const commenter = c.commenter || c.user || {};
               const isCommentMine = Number(commenter.id) === Number(user?.id);
+              const commenterId = commenter.id;
 
               return (
                 <div key={c.id} className="comment-item detail-item">
@@ -243,7 +254,9 @@ const handleCommentDelete = async (comment) => {
                         src={commenter.avatar_url || default_pic}
                         alt="user"
                         onError={(e) => e.target.src=default_pic}
-                      />
+                        onClick={(e) => {e.stopPropagation(); 
+                          goToUserProfile(commenterId);
+                        }}                      />
                     </span>
 
                     <div className="comment-right">
